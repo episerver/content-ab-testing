@@ -4,6 +4,7 @@
     <Product>EPiServer.Marketing.Testing.Web</Product>
     <TargetFramework>net5.0</TargetFramework>
     <OutputType>Library</OutputType>    
+    <NuspecFile>Package.nuspec</NuspecFile>
     <IsPackable>true</IsPackable>
     <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
   </PropertyGroup>
