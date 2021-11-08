@@ -17,6 +17,6 @@ namespace EPiServer.Marketing.KPI.DataAccess
 
         void Delete(Guid kpiObjectId);
 
-        long GetDatabaseVersion(DbConnection dbConnection, string schema, string contextKey);
+        long GetDatabaseVersion(string schema, string contextKey);
     }
 }

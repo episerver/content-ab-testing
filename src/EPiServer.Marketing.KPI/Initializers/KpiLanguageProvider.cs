@@ -7,6 +7,7 @@ using EPiServer.Framework.Initialization;
 using EPiServer.Framework.Localization;
 using EPiServer.Framework.Localization.XmlResources;
 using EPiServer.Marketing.KPI.Manager.DataClass;
+using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.KPI.Initializers
 {
@@ -18,7 +19,7 @@ namespace EPiServer.Marketing.KPI.Initializers
         private const string PROVIDER_NAME = "KpiCustomLanguageProvider";
         public void Initialize(InitializationEngine context)
         {
-            ProviderBasedLocalizationService localizationService = context.Locate.Advanced.GetInstance<LocalizationService>() as ProviderBasedLocalizationService;
+            ProviderBasedLocalizationService localizationService = ServiceLocator.Current.GetInstance<LocalizationService>() as ProviderBasedLocalizationService;
             if (localizationService != null)
             {
                 EmbeddedXmlLocalizationProviderInitializer localizationProviderInitializer =
@@ -35,7 +36,7 @@ namespace EPiServer.Marketing.KPI.Initializers
 
         public void Uninitialize(InitializationEngine context)
         {
-            ProviderBasedLocalizationService localizationService = context.Locate.Advanced.GetInstance<LocalizationService>() as ProviderBasedLocalizationService;
+            ProviderBasedLocalizationService localizationService = ServiceLocator.Current.GetInstance<LocalizationService>() as ProviderBasedLocalizationService;
             //Gets any provider that has the same name as the one initialized.
             LocalizationProvider localizationProvider = localizationService?.ProviderList.FirstOrDefault(p => p.Name.Equals(PROVIDER_NAME, StringComparison.Ordinal));
             if (localizationProvider != null)

@@ -4,6 +4,7 @@ using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
 using System.Diagnostics.CodeAnalysis;
 using System.Web;
+using Microsoft.AspNetCore.Http;
 
 namespace EPiServer.Marketing.KPI.Common.Helpers
 {
@@ -14,14 +15,16 @@ namespace EPiServer.Marketing.KPI.Common.Helpers
     [ServiceConfiguration(ServiceType = typeof(IKpiHelper), Lifecycle = ServiceInstanceScope.Singleton)]
     internal class KpiHelper : IKpiHelper
     {
+        protected readonly Injected<IHttpContextAccessor> _httpContextAccessor;
+        
         /// <summary>
         /// Evaluates current URL to determine if page is in a system folder context (e.g Edit, or Preview)
         /// </summary>
         /// <returns></returns>
         public virtual bool IsInSystemFolder()
         {
-            return HttpContext.Current == null ||
-                   HttpContext.Current.Request.RawUrl.IndexOf(Shell.Paths.ProtectedRootPath, StringComparison.OrdinalIgnoreCase) >= 0;
+            return _httpContextAccessor.Service.HttpContext == null ||
+                   _httpContextAccessor.Service.HttpContext.Request.Path.Value.IndexOf(Shell.Paths.ProtectedRootPath, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         public string GetUrl(ContentReference contentReference)
@@ -31,7 +34,7 @@ namespace EPiServer.Marketing.KPI.Common.Helpers
 
         public string GetRequestPath()
         {
-            return HttpContext.Current!=null ? HttpContext.Current.Request.Path : string.Empty;
+            return _httpContextAccessor.Service.HttpContext!=null ? _httpContextAccessor.Service.HttpContext.Request.Path : string.Empty;
         }
     }
 }

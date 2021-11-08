@@ -17,21 +17,11 @@ namespace EPiServer.Marketing.KPI.Manager.DataClass
     /// </summary>
     [DataContract]
     public class Kpi : IKpi
-    {
-        protected IServiceLocator _servicelocator;
-
-        internal Kpi(IServiceLocator locator)
-        {
-            CreatedDate = DateTime.UtcNow;
-            ModifiedDate = DateTime.UtcNow;
-            _servicelocator = locator;
-        }
-
+    {        
         public Kpi()
         {
             CreatedDate = DateTime.UtcNow;
             ModifiedDate = DateTime.UtcNow;
-            _servicelocator = ServiceLocator.Current;
         }
 
         /// <inheritdoc />
@@ -59,7 +49,7 @@ namespace EPiServer.Marketing.KPI.Manager.DataClass
                     var attr = (UIMarkupAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(UIMarkupAttribute));
                     if( attr.text_id != null )
                     {
-                        return _servicelocator.GetInstance<LocalizationService>().GetString(attr.text_id);
+                        return LocalizationService.Current.GetString(attr.text_id);
                     }
                     return attr.text;
                 }
@@ -94,7 +84,7 @@ namespace EPiServer.Marketing.KPI.Manager.DataClass
                     var attr = (UIMarkupAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(UIMarkupAttribute));
                     if (attr.text_id != null)
                     {
-                        return _servicelocator.GetInstance<LocalizationService>().GetString(attr.description_id);
+                        return LocalizationService.Current.GetString(attr.description_id);
                     }
                     return attr.description;
                 }
@@ -117,12 +107,12 @@ namespace EPiServer.Marketing.KPI.Manager.DataClass
                     var attr = (UIMarkupAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(UIMarkupAttribute));
                     if (!TryGetResourceString(attr.configmarkup, out value))
                     {
-                        value = _servicelocator.GetInstance<LocalizationService>().GetString("/kpi/kpi_messaging/failed_to_load") + attr.readonlymarkup + ":" + value;
+                        value = LocalizationService.Current.GetString("/kpi/kpi_messaging/failed_to_load") + attr.readonlymarkup + ":" + value;
                     }
                 }
                 else
                 {
-                    value = _servicelocator.GetInstance<LocalizationService>().GetString("/kpi/kpi_messaging/UIMarkup_not_defined");
+                    value = LocalizationService.Current.GetString("/kpi/kpi_messaging/UIMarkup_not_defined");
                 }
                 return value;
             }
@@ -140,12 +130,12 @@ namespace EPiServer.Marketing.KPI.Manager.DataClass
                     var attr = (UIMarkupAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(UIMarkupAttribute));
                     if (!TryGetResourceString(attr.readonlymarkup, out value))
                     {
-                        value = _servicelocator.GetInstance<LocalizationService>().GetString("/kpi/kpi_messaging/failed_to_load") + attr.readonlymarkup + ":" + value;
+                        value = LocalizationService.Current.GetString("/kpi/kpi_messaging/failed_to_load") + attr.readonlymarkup + ":" + value;
                     }
                 }
                 else
                 {
-                    value = _servicelocator.GetInstance<LocalizationService>().GetString("/kpi/kpi_messaging/UIMarkup_not_defined");
+                    value = LocalizationService.Current.GetString("/kpi/kpi_messaging/UIMarkup_not_defined");
                 }
                 return value;
             }

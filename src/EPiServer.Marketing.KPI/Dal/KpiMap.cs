@@ -1,26 +1,26 @@
-﻿using System.Data.Entity.ModelConfiguration;
+﻿using Microsoft.EntityFrameworkCore;
 using EPiServer.Marketing.KPI.Dal.Model;
 
 namespace EPiServer.Marketing.KPI.Dal
 {
-    internal class KpiMap : EntityTypeConfiguration<DalKpi>
+    internal class KpiMap : IEntityTypeConfiguration<DalKpi>
     {
-        public KpiMap()
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<DalKpi> builder)
         {
-            this.ToTable("tblKeyPerformaceIndicator");
+            builder.ToTable("tblKeyPerformaceIndicator");
 
-            this.HasKey(hk => hk.Id);
+            builder.HasKey(hk => hk.Id);
 
-            this.Property(m => m.ClassName)
+            builder.Property(m => m.ClassName)
                 .IsRequired();
 
-            this.Property(m => m.Properties)
+            builder.Property(m => m.Properties)
                 .IsRequired();
 
-            this.Property(m => m.CreatedDate)
+            builder.Property(m => m.CreatedDate)
                 .IsRequired();
 
-            this.Property(m => m.ModifiedDate)
+            builder.Property(m => m.ModifiedDate)
                 .IsRequired();
 
         }
