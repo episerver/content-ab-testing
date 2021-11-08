@@ -22,12 +22,12 @@ namespace EPiServer.Marketing.KPI.Manager.DataClass
                     var attr = (ClientScriptAttribute)Attribute.GetCustomAttribute(this.GetType(), typeof(ClientScriptAttribute));
                     if (!TryGetResourceString(attr.ClientSideEvaluationScript, out value))
                     {
-                        value = _servicelocator.GetInstance<LocalizationService>().GetString("/kpi/kpi_messaging/failed_to_load") + attr.ClientSideEvaluationScript + ":" + value;
+                        value = LocalizationService.Current.GetString("/kpi/kpi_messaging/failed_to_load") + attr.ClientSideEvaluationScript + ":" + value;
                     }
                 }
                 else
                 {
-                    value = _servicelocator.GetInstance<LocalizationService>().GetString("/kpi/kpi_messaging/UIMarkup_not_defined");
+                    value = LocalizationService.Current.GetString("/kpi/kpi_messaging/UIMarkup_not_defined");
                 }
                 return value;
             }

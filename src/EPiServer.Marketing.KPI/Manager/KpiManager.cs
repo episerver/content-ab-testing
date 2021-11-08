@@ -20,7 +20,7 @@ namespace EPiServer.Marketing.KPI.Manager
     [ServiceConfiguration(ServiceType = typeof(IKpiManager), Lifecycle = ServiceInstanceScope.Singleton)]
     public class KpiManager : IKpiManager
     {
-        private IKpiDataAccess _dataAccess;        
+        private readonly Injected<IKpiDataAccess> _dataAccess;        
         private ILogger _logger;
         public bool DatabaseNeedsConfiguring;
 
@@ -31,37 +31,18 @@ namespace EPiServer.Marketing.KPI.Manager
         public KpiManager()
         {            
             _logger = LogManager.GetLogger();
-
-            try
-            {
-                _dataAccess = new KpiDataAccess();
-            }
-            catch (DatabaseDoesNotExistException)
-            {
-                DatabaseNeedsConfiguring = true;
-            }
-        }
-
-        /// <summary>
-        /// Constructor used for unit testing with a mocked service locator.
-        /// </summary>
-        /// <param name="serviceLocator"></param>
-        internal KpiManager(IServiceLocator serviceLocator)
-        {            
-            _dataAccess = serviceLocator.GetInstance<IKpiDataAccess>();
-            _logger = serviceLocator.GetInstance<ILogger>();
         }
 
         /// <inheritdoc />
         public IKpi Get(Guid kpiId)
         {
-            return ConvertToManagerKpi(_dataAccess.Get(kpiId));
+            return ConvertToManagerKpi(_dataAccess.Service.Get(kpiId));
         }
 
         /// <inheritdoc />
         public List<IKpi> GetKpiList()
         {
-            return _dataAccess.GetKpiList().Select(dalTest => ConvertToManagerKpi(dalTest)).ToList();
+            return _dataAccess.Service.GetKpiList().Select(dalTest => ConvertToManagerKpi(dalTest)).ToList();
         }
 
         /// <inheritdoc />
@@ -73,13 +54,13 @@ namespace EPiServer.Marketing.KPI.Manager
         /// <inheritdoc />
         public IList<Guid> Save(IList<IKpi> kpis)
         {
-            return _dataAccess.Save(ConvertToDalKpis(kpis));
+            return _dataAccess.Service.Save(ConvertToDalKpis(kpis));
         }
 
         /// <inheritdoc />
         public void Delete(Guid kpiId)
         {
-            _dataAccess.Delete(kpiId);
+            _dataAccess.Service.Delete(kpiId);
         }
 
         /// <inheritdoc />
@@ -115,7 +96,7 @@ namespace EPiServer.Marketing.KPI.Manager
         }
 
         /// <inheritdoc />
-        public long GetDatabaseVersion(DbConnection dbConnection, string schema, string contextKey, bool setupDataAccess = false)
+        public long GetDatabaseVersion(string schema, string contextKey, bool setupDataAccess = false)
         {
             if (DatabaseNeedsConfiguring)
             {
@@ -123,12 +104,7 @@ namespace EPiServer.Marketing.KPI.Manager
                 return 0;
             }
 
-            if (setupDataAccess)
-            {
-                _dataAccess = new KpiDataAccess();
-            }
-
-            return _dataAccess.GetDatabaseVersion(dbConnection, schema, contextKey);
+            return _dataAccess.Service.GetDatabaseVersion(schema, contextKey);
         }
 
         /// <inheritdoc />

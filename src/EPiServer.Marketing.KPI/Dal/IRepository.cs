@@ -37,7 +37,7 @@ namespace EPiServer.Marketing.KPI.Dal
         /// Add the object to the repository
         /// </summary>
         /// <param name="instance">Instance of the object to be added.</param>
-        void Add(object instance);
+        void Add<T>(T instance) where T : class;
 
         void DeleteKpi(object id);
 
@@ -75,13 +75,13 @@ namespace EPiServer.Marketing.KPI.Dal
         /// Add a detached object to the repository
         /// </summary>
         /// <param name="instance">instance of the object to attach and add</param>
-        void AddDetached(object instance);
+        void AddDetached<T>(T instance) where T : class;
 
         /// <summary>
         /// Update a detached object in the repository
         /// </summary>
         /// <param name="instance">instance of the object to attach and update</param>
-        void UpdateDetached(object instance);
+        void UpdateDetached<T>(T instance) where T : class;
 
         #endregion
 

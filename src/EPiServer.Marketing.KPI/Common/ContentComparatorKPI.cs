@@ -5,7 +5,7 @@ using EPiServer.ServiceLocation;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using EPiServer.Framework.Localization;
 using EPiServer.Marketing.KPI.Exceptions;
 using EPiServer.Web.Mvc.Html;
@@ -15,6 +15,7 @@ using System.Web;
 using System.Runtime.Caching;
 using EPiServer.Marketing.KPI.Common.Helpers;
 using System.Linq;
+using EPiServer.Web.Mvc;
 
 namespace EPiServer.Marketing.KPI.Common
 {
@@ -37,22 +38,12 @@ namespace EPiServer.Marketing.KPI.Common
         public IContent _content;
         public List<string>  _startpagepaths = new List<string>();
         private ObjectCache _cache;
-        private IKpiHelper kpiHelper;
-
-        public ContentComparatorKPI()
-        {
-        }
-
-        /// <summary>
-        /// ID of the content to be tested.
-        /// </summary>
-        /// <param name="contentGuid">ID of the content to be tested.</param>
+        private readonly Injected<IKpiHelper> _kpiHelper;
+        private readonly Injected<UrlHelper> _urlHelper;
+        private readonly Injected<IContentRepository> _contentRepository;
+        private readonly Injected<IContentVersionRepository> _contentVersionRepository;
+        private readonly Injected<IContentEvents> _contentEvents;
         public ContentComparatorKPI(Guid contentGuid)
-        {
-            ContentGuid = contentGuid;
-        }
-
-        internal ContentComparatorKPI(IServiceLocator serviceLocator, Guid contentGuid) : base(serviceLocator)
         {
             ContentGuid = contentGuid;
         }
@@ -63,8 +54,7 @@ namespace EPiServer.Marketing.KPI.Common
         {
             get
             {
-                var conversionLabel = _servicelocator.GetInstance<LocalizationService>()
-                    .GetString("/kpi/content_comparator_kpi/config_markup/conversion_label");
+                var conversionLabel = LocalizationService.Current.GetString("/kpi/content_comparator_kpi/config_markup/conversion_label");
 
                 return string.Format(base.UiMarkup, conversionLabel);
             }
@@ -80,13 +70,10 @@ namespace EPiServer.Marketing.KPI.Common
 
                 if (ContentGuid != Guid.Empty)
                 {
-                     var conversionDescription = ServiceLocator.Current.GetInstance<LocalizationService>()
-                        .GetString("/kpi/content_comparator_kpi/readonly_markup/conversion_selector_description");
+                     var conversionDescription = LocalizationService.Current.GetString("/kpi/content_comparator_kpi/readonly_markup/conversion_selector_description");
 
-                    var urlHelper = ServiceLocator.Current.GetInstance<UrlHelper>();
-                    var contentRepository = ServiceLocator.Current.GetInstance<IContentRepository>();
-                    var conversionContent = contentRepository.Get<IContent>(ContentGuid);
-                    var conversionLink = urlHelper.ContentUrl(conversionContent.ContentLink);
+                    var conversionContent = _contentRepository.Service.Get<IContent>(ContentGuid);
+                    var conversionLink = _urlHelper.Service.ContentUrl(conversionContent.ContentLink);
                     markup = string.Format(markup, conversionDescription, conversionLink,
                         conversionContent.Name);
                 }
@@ -98,14 +85,12 @@ namespace EPiServer.Marketing.KPI.Common
         /// <inheritdoc />
         public override void Validate(Dictionary<string, string> responseData)
         {
-            var contentRepo = _servicelocator.GetInstance<IContentRepository>();
-
             if (responseData["ConversionPage"] == "")
             {
-                throw new KpiValidationException(_servicelocator.GetInstance<LocalizationService>().GetString("/kpi/content_comparator_kpi/config_markup/error_conversionpage"));
+                throw new KpiValidationException(LocalizationService.Current.GetString("/kpi/content_comparator_kpi/config_markup/error_conversionpage"));
             }
-            var conversionContent = contentRepo.Get<IContent>(new ContentReference(responseData["ConversionPage"]));
-            var currentContent = contentRepo.Get<IContent>(new ContentReference(responseData["CurrentContent"]));
+            var conversionContent = _contentRepository.Service.Get<IContent>(new ContentReference(responseData["ConversionPage"]));
+            var currentContent = _contentRepository.Service.Get<IContent>(new ContentReference(responseData["CurrentContent"]));
 
             if (IsContentPublished(conversionContent) && !IsCurrentContent(conversionContent, currentContent))
             {
@@ -118,28 +103,27 @@ namespace EPiServer.Marketing.KPI.Common
         {
             _cache = MemoryCache.Default;
             var retval = false;
-            kpiHelper = _servicelocator.GetInstance<IKpiHelper>();
+            
             var ea = e as ContentEventArgs;
             if (ea != null)
             {
                 if (_content == null)
-                {
-                    var contentRepo = _servicelocator.GetInstance<IContentRepository>();
-                    _content = contentRepo.Get<IContent>(ContentGuid);
+                {                    
+                    _content = _contentRepository.Service.Get<IContent>(ContentGuid);
 
                     if (_cache.Contains("StartPagePaths") && _cache.Get("StartPagePaths") != null)
                     {
                         _startpagepaths = _cache.Get("StartPagePaths") as List<string>;
-                        if (!_startpagepaths.Contains(kpiHelper.GetUrl(ContentReference.StartPage)))
+                        if (!_startpagepaths.Contains(_kpiHelper.Service.GetUrl(ContentReference.StartPage)))
                         {
-                            _startpagepaths.Add(kpiHelper.GetUrl(ContentReference.StartPage));
+                            _startpagepaths.Add(_kpiHelper.Service.GetUrl(ContentReference.StartPage));
                             _cache.Remove("StartPagePaths");
                             _cache.Add("SiteStart", _startpagepaths, DateTimeOffset.MaxValue);
                         }
                     }
                     else
                     {
-                        _startpagepaths.Add(kpiHelper.GetUrl(ContentReference.StartPage));
+                        _startpagepaths.Add(_kpiHelper.Service.GetUrl(ContentReference.StartPage));
                         _cache.Add("SiteStart", _startpagepaths, DateTimeOffset.MaxValue);
                     }
                 }
@@ -149,14 +133,14 @@ namespace EPiServer.Marketing.KPI.Common
                     // if the target content is the start page, we also need to check 
                     // the path to make sure its not just a request for some other static
                     // resources such as css or jscript
-                    retval = (_startpagepaths.Contains(kpiHelper.GetRequestPath(), StringComparer.OrdinalIgnoreCase) 
+                    retval = (_startpagepaths.Contains(_kpiHelper.Service.GetRequestPath(), StringComparer.OrdinalIgnoreCase) 
                         && ContentGuid.Equals(ea.Content.ContentGuid));
                 }
                 else
                 {   
                     //We need to make sure the content being evaluated is the actual content being requested
                     //Addresses MAR-1226
-                    retval = (kpiHelper.GetUrl(_content.ContentLink).ToLower().Trim('/') == kpiHelper.GetRequestPath().ToLower().Trim('/') 
+                    retval = (_kpiHelper.Service.GetUrl(_content.ContentLink).ToLower().Trim('/') == _kpiHelper.Service.GetRequestPath().ToLower().Trim('/') 
                         && ContentGuid.Equals(ea.Content.ContentGuid));                    
                 }
             }
@@ -166,11 +150,10 @@ namespace EPiServer.Marketing.KPI.Common
 
         private bool IsContentPublished(IContent content)
         {
-            IContentVersionRepository repo = _servicelocator.GetInstance<IContentVersionRepository>();
-            var publishedContent = repo.LoadPublished(content.ContentLink);
+            var publishedContent = _contentVersionRepository.Service.LoadPublished(content.ContentLink);
             if (publishedContent == null)
             {
-                throw new KpiValidationException(_servicelocator.GetInstance<LocalizationService>().GetString("/kpi/content_comparator_kpi/config_markup/error_selected_notpublished"));
+                throw new KpiValidationException(LocalizationService.Current.GetString("/kpi/content_comparator_kpi/config_markup/error_selected_notpublished"));
             }
             return true;
         }
@@ -179,7 +162,7 @@ namespace EPiServer.Marketing.KPI.Common
         {
             if (conversionContent.ContentLink.ID == currentContent.ContentLink.ID)
             {
-                throw new KpiValidationException(_servicelocator.GetInstance<LocalizationService>().GetString("/kpi/content_comparator_kpi/config_markup/error_selected_samepage"));
+                throw new KpiValidationException(LocalizationService.Current.GetString("/kpi/content_comparator_kpi/config_markup/error_selected_samepage"));
             }
             return false;
         }
@@ -191,12 +174,10 @@ namespace EPiServer.Marketing.KPI.Common
         {
             add {
                 _eh = new EventHandler<ContentEventArgs>(value);
-                var service = _servicelocator.GetInstance<IContentEvents>();
-                service.LoadedContent += _eh;
+                _contentEvents.Service.LoadedContent += _eh;
             }
             remove {
-                var service = _servicelocator.GetInstance<IContentEvents>();
-                service.LoadedContent -= _eh;
+                _contentEvents.Service.LoadedContent -= _eh;
             }
         }
     }

@@ -15,6 +15,8 @@ using EPiServer.DataAbstraction;
 using System.Linq;
 using EPiServer.Marketing.KPI.Common.Helpers;
 using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace EPiServer.Marketing.KPI.Common
 {
@@ -31,7 +33,11 @@ namespace EPiServer.Marketing.KPI.Common
     public class StickySiteKpi : Kpi
     {
         private ObjectCache _sessionCache = MemoryCache.Default;
-        private IKpiHelper _stickyHelper;
+        protected readonly Injected<IKpiHelper> _stickyHelper;
+        protected readonly Injected<IHttpContextAccessor> _httpContextAccessor;
+        private readonly Injected<IContentRepository> _contentRepository;
+        private readonly Injected<IContentEvents> _contentEvents;
+        private readonly Injected<UrlResolver> _urlResolver;
 
         [DataMember]
         public Guid TestContentGuid;
@@ -42,27 +48,15 @@ namespace EPiServer.Marketing.KPI.Common
         [DataMember]
         public int Timeout;
 
-        [ExcludeFromCodeCoverage]
-        public StickySiteKpi()
-        {
-            _stickyHelper = new KpiHelper();
-        }
-
-        [ExcludeFromCodeCoverage]
-        internal StickySiteKpi(IServiceLocator locator, IKpiHelper helper) : base(locator)
-        {
-            _stickyHelper = helper;
-        }
-
         /// <inheritdoc />
         public override IKpiResult Evaluate(object sender, EventArgs e)
         {
-            var hasConverted = !_stickyHelper.IsInSystemFolder() &&
+            var cookie = _httpContextAccessor.Service.HttpContext.Request.Cookies[$"SSK_{TestContentGuid}"].FromLegacyCookieString();
+            var hasConverted = !_stickyHelper.Service.IsInSystemFolder() &&
                                e is ContentEventArgs eventArgs &&
                                eventArgs.Content != null &&
-                               eventArgs.Content.ContentGuid != TestContentGuid &&
-                               HttpContext.Current.Request.Cookies[$"SSK_{TestContentGuid}"] is HttpCookie cookie &&
-                               HttpContext.Current.Request.Path != cookie["path"] &&
+                               eventArgs.Content.ContentGuid != TestContentGuid &&                               
+                               _httpContextAccessor.Service.HttpContext.Request.Path != cookie["path"] &&
                                !IsSupportingContent();
 
             return new KpiConversionResult() { KpiId = Id, HasConverted = hasConverted };
@@ -74,22 +68,22 @@ namespace EPiServer.Marketing.KPI.Common
             if (responseData["Timeout"] == "" || responseData["CurrentContent"] == "")
             {
                 // should never happen if the markup is correct
-                var errormessage = _servicelocator.GetInstance<LocalizationService>()
+                var errormessage = LocalizationService.Current
                     .GetString("/kpi/stickysite_kpi/config_markup/error_internal");
                 throw new KpiValidationException(
                     string.Format(errormessage, "timeout=" + responseData["Timeout"] + " currentcontent=" + responseData["CurrentContent"]));
             }
 
             // save the kpi arguments
-            var contentRepo = _servicelocator.GetInstance<IContentRepository>();
-            var currentContent = contentRepo.Get<IContent>(new ContentReference(responseData["CurrentContent"]));
+            
+            var currentContent = _contentRepository.Service.Get<IContent>(new ContentReference(responseData["CurrentContent"]));
             TestContentGuid = currentContent.ContentGuid;
 
             bool isInt = int.TryParse(responseData["Timeout"], out Timeout);
             if (!isInt || Timeout < 1 || Timeout > 60)
             {
                 throw new KpiValidationException(
-                    _servicelocator.GetInstance<LocalizationService>()
+                    LocalizationService.Current
                     .GetString("/kpi/stickysite_kpi/config_markup/error_invalid_timeoutvalue"));
             }
 
@@ -103,7 +97,7 @@ namespace EPiServer.Marketing.KPI.Common
             {
                 string markup = base.UiMarkup;
 
-                var conversionLabel = _servicelocator.GetInstance<LocalizationService>()
+                var conversionLabel = LocalizationService.Current
                     .GetString("/kpi/stickysite_kpi/config_markup/conversion_label");
                 return string.Format(markup, conversionLabel);
             }
@@ -116,7 +110,7 @@ namespace EPiServer.Marketing.KPI.Common
             {
                 string markup = base.UiReadOnlyMarkup;
 
-                var conversionDescription = _servicelocator.GetInstance<LocalizationService>()
+                var conversionDescription = LocalizationService.Current
                     .GetString("/kpi/stickysite_kpi/readonly_markup/conversion_selector_description");
                 conversionDescription = string.Format(conversionDescription, Timeout);
                 markup = string.Format(markup, conversionDescription);
@@ -132,13 +126,11 @@ namespace EPiServer.Marketing.KPI.Common
             add
             {
                 _eh = new EventHandler<ContentEventArgs>(value);
-                var service = _servicelocator.GetInstance<IContentEvents>();
-                service.LoadedContent += _eh;
+                _contentEvents.Service.LoadedContent += _eh;
             }
             remove
             {
-                var service = _servicelocator.GetInstance<IContentEvents>();
-                service.LoadedContent -= _eh;
+                _contentEvents.Service.LoadedContent -= _eh;
             }
         }
 
@@ -146,16 +138,14 @@ namespace EPiServer.Marketing.KPI.Common
         [ExcludeFromCodeCoverage]
         public override void Initialize()
         {
-            var service = _servicelocator.GetInstance<IContentEvents>();
-            service.LoadedContent += AddSessionOnLoadedContent;
+            _contentEvents.Service.LoadedContent += AddSessionOnLoadedContent;
         }
 
         /// <inheritdoc />
         [ExcludeFromCodeCoverage]
         public override void Uninitialize()
         {
-            var service = _servicelocator.GetInstance<IContentEvents>();
-            service.LoadedContent -= AddSessionOnLoadedContent;
+            _contentEvents.Service.LoadedContent -= AddSessionOnLoadedContent;
         }
 
         /// <summary>
@@ -166,29 +156,36 @@ namespace EPiServer.Marketing.KPI.Common
         public void AddSessionOnLoadedContent(object sender, ContentEventArgs e)
         {
             var cookieKey = $"SSK_{TestContentGuid}";
-            var httpContext = HttpContext.Current;
+            var httpContext = _httpContextAccessor.Service.HttpContext;
 
-            if (!_stickyHelper.IsInSystemFolder() && e.Content != null && e.Content.ContentGuid == TestContentGuid)
+            if (!_stickyHelper.Service.IsInSystemFolder() && e.Content != null && e.Content.ContentGuid == TestContentGuid)
             {
-                if (!httpContext.Items.Contains(cookieKey) && httpContext.Request.Cookies[cookieKey] == null)
+                if (!httpContext.Items.ContainsKey(cookieKey) && httpContext.Request.Cookies[cookieKey] == null)
                 {
-                    var path = IsSupportingContent() ? httpContext.Request.UrlReferrer.AbsolutePath : httpContext.Request.Path;
+                    var path = IsSupportingContent() ? AbsolutePath(httpContext.Request.Path.Value) : httpContext.Request.Path.Value;
                     var contentId = TestContentGuid.ToString();
-                    var cookie = new HttpCookie(cookieKey)
+                    var option = new CookieOptions()
                     {
-                        ["path"] = path,
-                        ["contentguid"] = contentId,
-                        Expires = DateTime.Now.AddMinutes(Timeout),
-                        HttpOnly = true
+                        Expires= DateTime.Now.AddMinutes(Timeout),
+                        HttpOnly=true
                     };
-
+                    var cookieValue = new Dictionary<string, string>()
+                    {
+                        { "path", path },
+                        { "contentguid", contentId }
+                    };
                     if (!CookieExists(path, contentId) && IsContentBeingLoaded(path))
                     {
-                        httpContext.Response.Cookies.Add(cookie);
-                        HttpContext.Current.Items[cookieKey] = true; // we are done for this request. 
+                        httpContext.Response.Cookies.Append(cookieKey, cookieValue.ToLegacyCookieString(),option);
+                        httpContext.Items[cookieKey] = true; // we are done for this request. 
                     }
                 }
             }
+        }
+
+        public string AbsolutePath(string path)
+        {
+            return new Uri(new Uri(_httpContextAccessor.Service.HttpContext.Request.Scheme + "://" + _httpContextAccessor.Service.HttpContext.Request.Host.Value), path).ToString();
         }
 
         /// <summary>
@@ -211,18 +208,17 @@ namespace EPiServer.Marketing.KPI.Common
             {
                 testcontentPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                HttpContext.Current.Items[cacheKey] = true;    // we use this flag to keep us from processing more LoadedContent calls. 
+                _httpContextAccessor.Service.HttpContext.Items[cacheKey] = true;    // we use this flag to keep us from processing more LoadedContent calls. 
 
-                var contentRepo = _servicelocator.GetInstance<IContentRepository>();
-                var content = contentRepo.Get<IContent>(TestContentGuid);
-                var contentUrl = _servicelocator.GetInstance<UrlResolver>().GetUrl(content.ContentLink);
+                var content = _contentRepository.Service.Get<IContent>(TestContentGuid);
+                var contentUrl = _urlResolver.Service.GetUrl(content.ContentLink);
                 if (contentUrl != null)
                 {
                     testcontentPaths.Add(contentUrl);
                 }
                 else
                 {
-                    var parentContent = contentRepo.Get<IContent>(content.ParentLink);
+                    var parentContent = _contentRepository.Service.Get<IContent>(content.ParentLink);
 
                     var linkRepository = ServiceLocator.Current.GetInstance<IContentSoftLinkRepository>();
                     var referencingContentLinks = linkRepository.Load(content.ContentLink, true)
@@ -243,7 +239,7 @@ namespace EPiServer.Marketing.KPI.Common
                 };
                 _sessionCache.Add(cacheKey, testcontentPaths, policy);
 
-                HttpContext.Current.Items.Remove(cacheKey);
+                _httpContextAccessor.Service.HttpContext.Items.Remove(cacheKey);
             }
 
             return testcontentPaths.Contains(path);
@@ -251,13 +247,14 @@ namespace EPiServer.Marketing.KPI.Common
 
         private bool CookieExists(string path, string contentGuid)
         {
-            foreach (string cookieName in HttpContext.Current.Response.Cookies.Keys)
+            foreach (var cookieName in _httpContextAccessor.Service.HttpContext.Request.Cookies)
             {
-                if (cookieName.Contains("SSK_") && 
-                    HttpContext.Current.Response.Cookies[cookieName]["path"] == path && 
-                    HttpContext.Current.Response.Cookies[cookieName]["contentguid"] == contentGuid)
+                
+                if (cookieName.Key.Contains("SSK_"))
                 {
-                    return true;
+                    var cookieValue = _httpContextAccessor.Service.HttpContext.Request.Cookies[cookieName.Key].FromLegacyCookieString();
+
+                    return cookieValue["path"] == path && cookieValue["contentguid"] == contentGuid;
                 }
             }
 
@@ -270,12 +267,12 @@ namespace EPiServer.Marketing.KPI.Common
         /// <returns></returns>
         private bool IsSupportingContent()
         {
-            var pathExtensions = HttpContext.Current.Request.CurrentExecutionFilePathExtension;
+            var pathExtensions = Path.GetExtension(_httpContextAccessor.Service.HttpContext.Request.Path.Value);
 
             return pathExtensions == ".png" ||
                    pathExtensions == ".css" ||
-                   HttpContext.Current.Request.Path.IndexOf(SystemContentRootNames.GlobalAssets, StringComparison.OrdinalIgnoreCase) > 0 ||
-                   HttpContext.Current.Request.Path.IndexOf(SystemContentRootNames.ContentAssets, StringComparison.OrdinalIgnoreCase) > 0;
+                   _httpContextAccessor.Service.HttpContext.Request.Path.Value.IndexOf(SystemContentRootNames.GlobalAssets, StringComparison.OrdinalIgnoreCase) > 0 ||
+                   _httpContextAccessor.Service.HttpContext.Request.Path.Value.IndexOf(SystemContentRootNames.ContentAssets, StringComparison.OrdinalIgnoreCase) > 0;
         }
     }
 }

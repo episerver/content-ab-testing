@@ -58,7 +58,7 @@ namespace EPiServer.Marketing.KPI.Manager
         /// <param name="contextKey">The string used to identify the schema we are requesting the version of.</param>
         /// <param name="setupDataAccess">If this is run before the database is setup, we need to initialize the database access layer.  By default, this is false.</param>
         /// <returns>Database version of the KPI schema.</returns>
-        long GetDatabaseVersion(DbConnection dbConnection, string schema, string contextKey, bool setupDataAccess = false );
+        long GetDatabaseVersion(string schema, string contextKey, bool setupDataAccess = false );
 
         /// <summary>
         /// Save commerce settings to the database.
