@@ -1,66 +1,63 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using EPiServer.Marketing.Testing.Dal.EntityModel;
+﻿using EPiServer.Marketing.Testing.Dal.EntityModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.Mappings
 {
-    public class ABTestMap : EntityTypeConfiguration<DalABTest>
+    public class ABTestMap : IEntityTypeConfiguration<DalABTest>
     {
-        public ABTestMap()
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<DalABTest> builder)
         {
-            this.ToTable("tblABTest");
+            builder.ToTable("tblABTest");
 
-            this.HasKey(hk => hk.Id);
+            builder.HasKey(hk => hk.Id);
 
-            this.Property(m => m.Title)
+            builder.Property(m => m.Title)
                 .IsRequired();
 
-            this.Property(m => m.Description)
-                .IsOptional();
+            builder.Property(m => m.Description);
 
-            this.Property(m => m.Owner)
+            builder.Property(m => m.Owner)
                 .IsRequired();
 
-            this.Property(m => m.OriginalItemId)
+            builder.Property(m => m.OriginalItemId)
                 .IsRequired();
 
-            this.Property(m => m.State)
+            builder.Property(m => m.State)
                 .IsRequired();
 
-            this.Property(m => m.StartDate)
+            builder.Property(m => m.StartDate)
                 .IsRequired();
 
-            this.Property(m => m.EndDate)
+            builder.Property(m => m.EndDate)
                 .IsRequired();
 
-            this.Property(m => m.ParticipationPercentage)
+            builder.Property(m => m.ParticipationPercentage)
                 .IsRequired();
 
-            this.Property(m => m.LastModifiedBy)
-                .HasMaxLength(100)
-                .IsOptional();
+            builder.Property(m => m.LastModifiedBy)
+                .HasMaxLength(100);
 
-            this.Property(m => m.ExpectedVisitorCount)
-                .IsOptional();
+            builder.Property(m => m.ExpectedVisitorCount);
 
-            this.Property(m => m.ActualVisitorCount)
+            builder.Property(m => m.ActualVisitorCount)
                 .IsRequired();
 
-            this.Property(m => m.ConfidenceLevel)
+            builder.Property(m => m.ConfidenceLevel)
                 .IsRequired();
 
-            this.Property(m => m.ZScore)
+            builder.Property(m => m.ZScore)
                 .IsRequired();
 
-            this.Property(m => m.IsSignificant)
+            builder.Property(m => m.IsSignificant)
                 .IsRequired();
 
-            this.Property(m => m.ContentLanguage)
+            builder.Property(m => m.ContentLanguage)
                 .IsRequired();
 
-            this.Property(m => m.CreatedDate)
+            builder.Property(m => m.CreatedDate)
                 .IsRequired();
 
-            this.Property(m => m.ModifiedDate)
+            builder.Property(m => m.ModifiedDate)
                 .IsRequired();
 
         }

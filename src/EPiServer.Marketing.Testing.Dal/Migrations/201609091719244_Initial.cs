@@ -2,82 +2,105 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Testing.Migrations
 {
+    using Microsoft.EntityFrameworkCore.Migrations;
     using System;
-    using System.Data.Entity.Migrations;
     
     [ExcludeFromCodeCoverage]
-    public partial class Initial : DbMigration
+    public partial class Initial : Migration
     {
-        public override void Up()
+        protected override void Up(MigrationBuilder migrationBuilder)
         {
-            CreateTable(
-                "dbo.tblABTest",
-                c => new
+            migrationBuilder.CreateTable(
+                name: "dbo.tblABTest",
+                columns: table => new
                     {
-                        Id = c.Guid(nullable: false),
-                        Title = c.String(nullable: false),
-                        Description = c.String(),
-                        Owner = c.String(nullable: false),
-                        OriginalItemId = c.Guid(nullable: false),
-                        State = c.Int(nullable: false),
-                        StartDate = c.DateTime(nullable: false),
-                        EndDate = c.DateTime(nullable: false),
-                        ParticipationPercentage = c.Int(nullable: false),
-                        LastModifiedBy = c.String(maxLength: 100),
-                        ExpectedVisitorCount = c.Int(),
-                        ActualVisitorCount = c.Int(nullable: false),
-                        ConfidenceLevel = c.Double(nullable: false),
-                        ZScore = c.Double(nullable: false),
-                        IsSignificant = c.Boolean(nullable: false),
-                        CreatedDate = c.DateTime(nullable: false),
-                        ModifiedDate = c.DateTime(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id);
-            
-            CreateTable(
-                "dbo.tblABKeyPerformanceIndicator",
-                c => new
-                    {
-                        Id = c.Guid(nullable: false),
-                        TestId = c.Guid(nullable: false),
-                        KeyPerformanceIndicatorId = c.Guid(),
-                        CreatedDate = c.DateTime(nullable: false),
-                        ModifiedDate = c.DateTime(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.tblABTest", t => t.TestId, cascadeDelete: true)
-                .Index(t => t.TestId);
-            
-            CreateTable(
-                "dbo.tblABVariant",
-                c => new
-                    {
-                        Id = c.Guid(nullable: false),
-                        TestId = c.Guid(nullable: false),
-                        ItemId = c.Guid(nullable: false),
-                        ItemVersion = c.Int(nullable: false),
-                        IsWinner = c.Boolean(nullable: false),
-                        Conversions = c.Int(nullable: false),
-                        Views = c.Int(nullable: false),
-                        IsPublished = c.Boolean(nullable: false),
-                        CreatedDate = c.DateTime(nullable: false),
-                        ModifiedDate = c.DateTime(nullable: false),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("dbo.tblABTest", t => t.TestId, cascadeDelete: true)
-                .Index(t => t.TestId);
-            
+                        Id = table.Column<Guid>(nullable: false),
+                        Title = table.Column<String>(nullable: false),
+                        Description = table.Column<String>(),
+                        Owner = table.Column<String>(nullable: false),
+                        OriginalItemId = table.Column<Guid>(nullable: false),
+                        State = table.Column<int>(nullable: false),
+                        StartDate = table.Column<DateTime>(nullable: false),
+                        EndDate = table.Column<DateTime>(nullable: false),
+                        ParticipationPercentage = table.Column<int>(nullable: false),
+                        LastModifiedBy = table.Column<String>(maxLength: 100),
+                        ExpectedVisitorCount = table.Column<int>(),
+                        ActualVisitorCount = table.Column<int>(nullable: false),
+                        ConfidenceLevel = table.Column<Double>(nullable: false),
+                        ZScore = table.Column<Double>(nullable: false),
+                        IsSignificant = table.Column<Boolean>(nullable: false),
+                        CreatedDate = table.Column<DateTime>(nullable: false),
+                        ModifiedDate = table.Column<DateTime>(nullable: false),
+                    },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tblABTest", t => t.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "dbo.tblABKeyPerformanceIndicator",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    TestId = table.Column<Guid>(nullable: false),
+                    KeyPerformanceIndicatorId = table.Column<Guid>(),
+                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    ModifiedDate = table.Column<DateTime>(nullable: false),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tblABKeyPerformanceIndicator", t => t.Id);
+                    table.ForeignKey(
+                        name: "FK_tblABKeyPerformanceIndicator_tblABTest",
+                        column: t => t.TestId,
+                        principalTable: "dbo.tblABTest",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tblABKeyPerformanceIndicator_TestId",
+                table: "dbo.tblABKeyPerformanceIndicator",
+                column: "TestId");
+
+            migrationBuilder.CreateTable(
+                name: "dbo.tblABVariant",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    TestId = table.Column<Guid>(nullable: false),
+                    ItemId = table.Column<Guid>(nullable: false),
+                    ItemVersion = table.Column<int>(nullable: false),
+                    IsWinner = table.Column<Boolean>(nullable: false),
+                    Conversions = table.Column<int>(nullable: false),
+                    Views = table.Column<int>(nullable: false),
+                    IsPublished = table.Column<Boolean>(nullable: false),
+                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    ModifiedDate = table.Column<DateTime>(nullable: false),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tblABVariant", t => t.Id);
+                    table.ForeignKey(
+                        name: "FK_tblABVariant_tblABTest",
+                        column: t => t.TestId,
+                        principalTable: "dbo.tblABTest",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tblABVariant_TestId",
+                table: "dbo.tblABVariant",
+                column: "TestId");
+
         }
         
-        public override void Down()
+        protected override void Down(MigrationBuilder migrationBuilder)
         {
-            DropForeignKey("dbo.tblABVariant", "TestId", "dbo.tblABTest");
-            DropForeignKey("dbo.tblABKeyPerformanceIndicator", "TestId", "dbo.tblABTest");
-            DropIndex("dbo.tblABVariant", new[] { "TestId" });
-            DropIndex("dbo.tblABKeyPerformanceIndicator", new[] { "TestId" });
-            DropTable("dbo.tblABVariant");
-            DropTable("dbo.tblABKeyPerformanceIndicator");
-            DropTable("dbo.tblABTest");
+            migrationBuilder.DropTable(name: "dbo.tblABVariant");
+            migrationBuilder.DropTable(name: "dbo.tblABKeyPerformanceIndicator");
+            migrationBuilder.DropTable(name: "dbo.tblABTest");
         }
     }
 }

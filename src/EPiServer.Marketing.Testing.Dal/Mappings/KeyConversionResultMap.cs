@@ -1,35 +1,35 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using EPiServer.Marketing.Testing.Dal.EntityModel;
+﻿using EPiServer.Marketing.Testing.Dal.EntityModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.Mappings
 {
-    public class KeyConversionResultMap : EntityTypeConfiguration<DalKeyConversionResult>
+    public class KeyConversionResultMap : IEntityTypeConfiguration<DalKeyConversionResult>
     {
-        public KeyConversionResultMap()
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<DalKeyConversionResult> builder)
         {
-            this.ToTable("tblABKeyConversionResult");
+            builder.ToTable("tblABKeyConversionResult");
 
-            this.HasKey(m => m.Id);
+            builder.HasKey(m => m.Id);
 
-            this.Property(m => m.KpiId)
+            builder.Property(m => m.KpiId)
                 .IsRequired();
 
-            this.Property(m => m.Conversions)
+            builder.Property(m => m.Conversions)
                 .IsRequired();
 
-            this.Property(m => m.Weight)
+            builder.Property(m => m.Weight)
                 .IsRequired();
 
-            this.Property(m => m.SelectedWeight)
+            builder.Property(m => m.SelectedWeight)
                 .IsRequired();
 
-            this.Property(m => m.Performance)
+            builder.Property(m => m.Performance)
                 .IsRequired();
 
-            this.HasRequired(m => m.DalVariant)
+            builder.HasOne(m => m.DalVariant)
                 .WithMany(m => m.DalKeyConversionResults)
                 .HasForeignKey(m => m.VariantId)
-                .WillCascadeOnDelete();
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

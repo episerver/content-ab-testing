@@ -1,30 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.ModelConfiguration;
 using System.Linq;
 using System.Threading.Tasks;
 using EPiServer.Marketing.Testing.Dal.EntityModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.Mappings
 {
-    public class KeyValueResultMap : EntityTypeConfiguration<DalKeyValueResult>
+    public class KeyValueResultMap : IEntityTypeConfiguration<DalKeyValueResult>
     {
-        public KeyValueResultMap()
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<DalKeyValueResult> builder)
         {
-            this.ToTable("tblABKeyValueResult");
+            builder.ToTable("tblABKeyValueResult");
 
-            this.HasKey(m => m.Id);
+            builder.HasKey(m => m.Id);
 
-            this.Property(m => m.KpiId)
+            builder.Property(m => m.KpiId)
                 .IsRequired();
 
-            this.Property(m => m.Value)
+            builder.Property(m => m.Value)
                 .IsRequired();
 
-            this.HasRequired(m => m.DalVariant)
+            builder.HasOne(m => m.DalVariant)
                 .WithMany(m => m.DalKeyValueResults)
                 .HasForeignKey(m => m.VariantId)
-                .WillCascadeOnDelete();
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -1,26 +1,15 @@
 using System.Data.Common;
-using System.Data.Entity.Infrastructure;
 using System.Diagnostics.CodeAnalysis;
 using EPiServer.Marketing.Testing.Dal.EntityModel;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal
 {
-    using System.Data.Entity;
-
     public class DatabaseContext : DbContext
     {
         [ExcludeFromCodeCoverage]
-        public DatabaseContext()
-            : base("name=EPiServerDB")
+        public DatabaseContext(DbContextOptions options) : base(options)
         {
-            Database.SetInitializer<DatabaseContext>(null);
-        }
-
-        public DatabaseContext(DbConnection dbConn)
-            : base(dbConn, true)
-        {
-
         }
 
         public DbSet<DalABTest> ABTests { get; set; }
@@ -35,28 +24,24 @@ namespace EPiServer.Marketing.Testing.Dal
 
         public DbSet<DalKeyConversionResult> DalKeyConversionResults { get; set; }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder != null)
             {
                 this._modelBuilder = modelBuilder;
 
-                _modelBuilder.Configurations.Add(new Mappings.ABTestMap());
-                _modelBuilder.Configurations.Add(new Mappings.VariantMap());
-                _modelBuilder.Configurations.Add(new Mappings.KeyPerformanceIndicatorMap());
-                _modelBuilder.Configurations.Add(new Mappings.KeyFinancialResultMap());
-                _modelBuilder.Configurations.Add(new Mappings.KeyValueResultMap());
-                _modelBuilder.Configurations.Add(new Mappings.KeyConversionResultMap());
+                _modelBuilder.ApplyConfiguration(new Mappings.ABTestMap());
+                _modelBuilder.ApplyConfiguration(new Mappings.VariantMap());
+                _modelBuilder.ApplyConfiguration(new Mappings.KeyPerformanceIndicatorMap());
+                _modelBuilder.ApplyConfiguration(new Mappings.KeyFinancialResultMap());
+                _modelBuilder.ApplyConfiguration(new Mappings.KeyValueResultMap());
+                _modelBuilder.ApplyConfiguration(new Mappings.KeyConversionResultMap());
             }
         }
 
 
-        [ExcludeFromCodeCoverage]
-        public static string CreateDatabaseScript(DbContext context)
-        {
-            return ((IObjectContextAdapter) context).ObjectContext.CreateDatabaseScript();
-        }
+        
 
-        private DbModelBuilder _modelBuilder;
+        private ModelBuilder _modelBuilder;
     }
 }

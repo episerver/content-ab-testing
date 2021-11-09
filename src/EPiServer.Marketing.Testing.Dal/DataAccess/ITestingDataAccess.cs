@@ -28,6 +28,6 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
 
         void AddKpiResultData(Guid testId, int itemVersion, IDalKeyResult keyResult, int type);
 
-        long GetDatabaseVersion(DbConnection dbConnection, string schema, string contextKey);
+        long GetDatabaseVersion(string schema, string contextKey);
     }
 }

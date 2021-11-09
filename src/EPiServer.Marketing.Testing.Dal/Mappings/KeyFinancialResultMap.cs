@@ -1,35 +1,35 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using EPiServer.Marketing.Testing.Dal.EntityModel;
+﻿using EPiServer.Marketing.Testing.Dal.EntityModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.Mappings
 {
-    public class KeyFinancialResultMap : EntityTypeConfiguration<DalKeyFinancialResult>
+    public class KeyFinancialResultMap : IEntityTypeConfiguration<DalKeyFinancialResult>
     {
-        public KeyFinancialResultMap()
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<DalKeyFinancialResult> builder)
         {
-            this.ToTable("tblABKeyFinancialResult");
+            builder.ToTable("tblABKeyFinancialResult");
 
-            this.HasKey(m => m.Id);
+            builder.HasKey(m => m.Id);
 
-            this.Property(m => m.KpiId)
+            builder.Property(m => m.KpiId)
                 .IsRequired();
 
-            this.Property(m => m.Total)
+            builder.Property(m => m.Total)
                 .IsRequired();
 
-            this.Property(m => m.TotalMarketCulture)
+            builder.Property(m => m.TotalMarketCulture)
                 .IsRequired();
 
-            this.Property(m => m.ConvertedTotal)
+            builder.Property(m => m.ConvertedTotal)
                 .IsRequired();
 
-            this.Property(m => m.ConvertedTotalCulture)
+            builder.Property(m => m.ConvertedTotalCulture)
                 .IsRequired();
 
-            this.HasRequired(m => m.DalVariant)
+            builder.HasOne(m => m.DalVariant)
                 .WithMany(m => m.DalKeyFinancialResults)
                 .HasForeignKey(m => m.VariantId)
-                .WillCascadeOnDelete();
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

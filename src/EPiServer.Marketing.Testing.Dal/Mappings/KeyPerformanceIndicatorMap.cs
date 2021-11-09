@@ -1,24 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.ModelConfiguration;
 using EPiServer.Marketing.Testing.Dal.EntityModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.Mappings
 {
-    public class KeyPerformanceIndicatorMap : EntityTypeConfiguration<DalKeyPerformanceIndicator>
+    public class KeyPerformanceIndicatorMap : IEntityTypeConfiguration<DalKeyPerformanceIndicator>
     {
-        public KeyPerformanceIndicatorMap()
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<DalKeyPerformanceIndicator> builder)
         {
-            this.ToTable("tblABKeyPerformanceIndicator");
+            builder.ToTable("tblABKeyPerformanceIndicator");
 
-            this.HasKey(hk => hk.Id);
+            builder.HasKey(hk => hk.Id);
 
-            this.Property(m => m.KeyPerformanceIndicatorId)
-                .IsOptional();
+            builder.Property(m => m.KeyPerformanceIndicatorId);
 
-            this.HasRequired(m => m.DalABTest)
+            builder.HasOne(m => m.DalABTest)
                 .WithMany(m => m.KeyPerformanceIndicators)
                 .HasForeignKey(m => m.TestId)
-                .WillCascadeOnDelete();
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
