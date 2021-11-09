@@ -151,8 +151,8 @@ namespace EPiServer.Marketing.KPI.DataAccess
                 command.CommandText = sql;
                 command.CommandType = CommandType.Text;
 
-                command.Parameters.Add(new SqlParameter("@p0", "dbo"));
-                command.Parameters.Add(new SqlParameter("@p1", "Courses"));
+                command.Parameters.Add(new SqlParameter("@p0", schema));
+                command.Parameters.Add(new SqlParameter("@p1", table));
                 repository.DatabaseContext.Database.OpenConnection();
 
                 using (var result = command.ExecuteReader())

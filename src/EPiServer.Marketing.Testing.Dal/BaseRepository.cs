@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Migrations.History;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Transactions;
 using EPiServer.Marketing.Testing.Dal.EntityModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace EPiServer.Marketing.Testing.Dal
 {
@@ -25,12 +26,9 @@ namespace EPiServer.Marketing.Testing.Dal
         public BaseRepository(DatabaseContext dbContext)
         {
             DatabaseContext = dbContext;
+            HistoryRepository = dbContext.GetService<IHistoryRepository>();
         }
 
-        public BaseRepository(HistoryContext historyContext)
-        {
-            HistoryContext = historyContext;
-        }
         #endregion
 
         #region Public Properties
@@ -137,18 +135,18 @@ namespace EPiServer.Marketing.Testing.Dal
 
         public string GetDatabaseVersion(string contextKey)
         {
-            return HistoryContext.History.Where(r => r.ContextKey == contextKey).OrderByDescending(row => row.MigrationId).First().MigrationId;
+            return HistoryRepository.GetAppliedMigrations().Select(r => r.MigrationId).FirstOrDefault();
         }
 
         /// <summary>
         /// Add the given object to the database context.
         /// </summary>
         /// <param name="instance"></param>
-        public void Add(object instance)
+        public void Add<T>(T instance) where T : class
         {
             if (instance != null)
             {
-                DatabaseContext.Set(instance.GetType()).Add(instance);
+                DatabaseContext.Set<T>().Add(instance);
             }
         }
 
@@ -156,11 +154,11 @@ namespace EPiServer.Marketing.Testing.Dal
         /// Add a detached object to the database context.
         /// </summary>
         /// <param name="instance"></param>
-        public void AddDetached(object instance)
+        public void AddDetached<T>(T instance) where T : class
         {
             if (instance != null)
             {
-                DatabaseContext.Set(instance.GetType()).Attach(instance);
+                DatabaseContext.Set<T>().Attach(instance);
                 DatabaseContext.Entry(instance).State = EntityState.Added;
             }
         }
@@ -169,11 +167,11 @@ namespace EPiServer.Marketing.Testing.Dal
         /// Add a detached object to the database context.
         /// </summary>
         /// <param name="instance"></param>
-        public void UpdateDetached(object instance)
+        public void UpdateDetached<T>(T instance) where T : class
         {
             if (instance != null)
             {
-                DatabaseContext.Set(instance.GetType()).Attach(instance);
+                DatabaseContext.Set<T>().Attach(instance);
                 DatabaseContext.Entry(instance).State = EntityState.Modified;
             }
         }
@@ -203,7 +201,6 @@ namespace EPiServer.Marketing.Testing.Dal
                     if (DatabaseContext != null)
                     {
                         DatabaseContext.Dispose();
-                        DatabaseContext = null;
                     }
                 }
 
@@ -227,9 +224,9 @@ namespace EPiServer.Marketing.Testing.Dal
         #endregion
 
         #region Internal Members
-        public DatabaseContext DatabaseContext { get; private set; }
+        public readonly DatabaseContext DatabaseContext;
 
-        public HistoryContext HistoryContext { get; private set; }
+        public readonly IHistoryRepository HistoryRepository;
 
         #endregion
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
-using System.Data.Entity.Migrations.History;
 using System.Linq;
 using System.Linq.Expressions;
 using EPiServer.Marketing.Testing.Dal.EntityModel;
@@ -9,189 +9,76 @@ using EPiServer.Marketing.Testing.Dal.EntityModel.Enums;
 using EPiServer.Marketing.Testing.Dal.Exceptions;
 using EPiServer.Marketing.Testing.Dal.Mappings;
 using EPiServer.Marketing.Testing.Dal.Migrations;
+using EPiServer.ServiceLocation;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.DataAccess
 {
     internal class TestingDataAccess : ITestingDataAccess
     {
-        internal IRepository _repository;
+        public readonly Injected<IRepository> _repository;
         internal bool _UseEntityFramework;
 
         public TestingDataAccess()
         {
             _UseEntityFramework = true;
 
-            using (var dbContext = new DatabaseContext())
+            if (!HasTableNamed((BaseRepository)_repository.Service , DatabaseVersion.TableToCheckFor))
             {
-                var baseRepository = new BaseRepository(dbContext);
-
-                if (!HasTableNamed(baseRepository, DatabaseVersion.TableToCheckFor))
-                {
-                    // the sql scripts need to be run!
-                    throw new DatabaseDoesNotExistException();
-                }
-
-                var version = GetDatabaseVersion(dbContext.Database.Connection, "dbo", DatabaseVersion.ContextKey);
-
-                if (version < DatabaseVersion.RequiredDbVersion)
-                {
-                    throw new DatabaseNeedsUpdating();
-                }
+                // the sql scripts need to be run!
+                throw new DatabaseDoesNotExistException();
             }
-        }
 
-        internal TestingDataAccess(IRepository repository)
-        {
-            _repository = repository;
+            var version = GetDatabaseVersion("dbo", DatabaseVersion.ContextKey);
+
+            if (version < DatabaseVersion.RequiredDbVersion)
+            {
+                throw new DatabaseNeedsUpdating();
+            }
         }
 
         public void Archive(Guid testObjectId, Guid winningVariantId)
         {
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    ArchiveHelper(repository, testObjectId, winningVariantId);
-                }
-            }
-            else
-            {
-                ArchiveHelper(_repository, testObjectId, winningVariantId);
-            }
+            ArchiveHelper(_repository.Service, testObjectId, winningVariantId);
 
             SetTestState(testObjectId, DalTestState.Archived);
         }
 
         public void Delete(Guid testObjectId)
         {
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    DeleteHelper(repository, testObjectId);
-                }
-            }
-            else
-            {
-                DeleteHelper(_repository, testObjectId);
-            }
-
+            DeleteHelper(_repository.Service, testObjectId);
         }
 
         public IABTest Get(Guid testObjectId)
         {
-            IABTest test;
-
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    test = repository.GetById(testObjectId);
-                }
-            }
-            else
-            {
-                test = _repository.GetById(testObjectId);
-            }
-
-            return test;
+            return _repository.Service.GetById(testObjectId);
         }
 
         // TODO : rename to GetTestsByItemId
         public List<IABTest> GetTestByItemId(Guid originalItemId)
         {
-            List<IABTest> tests;
-
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    tests = repository.GetAll().Where(t => t.OriginalItemId == originalItemId).ToList();
-                }
-            }
-            else
-            {
-                tests = _repository.GetAll().Where(t => t.OriginalItemId == originalItemId).ToList();
-            }
-
-            return tests;
+            return _repository.Service.GetAll().Where(t => t.OriginalItemId == originalItemId).ToList();
         }
 
         public List<IABTest> GetTestList(DalTestCriteria criteria)
         {
-            List<IABTest> tests;
-
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    
-                    tests = GetTestListHelper(repository, criteria);
-                }
-            }
-            else
-            {
-                tests = GetTestListHelper(_repository, criteria);
-            }
-
-            return tests;
+            return GetTestListHelper(_repository.Service, criteria);
         }
 
         public void IncrementCount(Guid testId, int itemVersion, DalCountType resultType, Guid kpiId)
         {
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    IncrementCountHelper(repository, testId, itemVersion, resultType, kpiId);
-                }
-            }
-            else
-            {
-                IncrementCountHelper(_repository, testId, itemVersion, resultType, kpiId);
-            }
+            IncrementCountHelper(_repository.Service, testId, itemVersion, resultType, kpiId);
         }
 
         public void AddKpiResultData(Guid testId, int itemVersion, IDalKeyResult keyResult, int keyType)
         {
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    AddKpiResultDataHelper(repository, testId, itemVersion, keyResult, keyType);
-                }
-            }
-            else
-            {
-                AddKpiResultDataHelper(_repository, testId, itemVersion, keyResult, keyType);
-            }
+            AddKpiResultDataHelper(_repository.Service, testId, itemVersion, keyResult, keyType);
         }
 
         public Guid Save(IABTest testObject)
         {
-            Guid id;
-
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    id = SaveHelper(repository, testObject);
-                }
-            }
-            else
-            {
-                id = SaveHelper(_repository, testObject);
-            }
-
-            return id;
+            return SaveHelper(_repository.Service, testObject);
         }
 
         public IABTest Start(Guid testObjectId )
@@ -209,24 +96,9 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
             SetTestState(testObjectId, DalTestState.Done);
         }
 
-        public long GetDatabaseVersion(DbConnection dbConnection, string schema, string contextKey)
+        public long GetDatabaseVersion(string schema, string contextKey)
         {
-            long version = 0;
-
-            if (_UseEntityFramework)
-            {
-                using (var historyContext = new HistoryContext(dbConnection, schema))
-                {
-                    var repository = new BaseRepository(historyContext);
-                    version = GetDatabaseVersionHelper(repository, contextKey);
-                }
-            }
-            else
-            {
-                version = GetDatabaseVersionHelper(_repository, contextKey);
-            }
-
-            return version;
+            return GetDatabaseVersionHelper(_repository.Service, contextKey); ;
         }
 
         #region Private Helpers
@@ -508,22 +380,7 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
 
         private bool IsTestActive(Guid testId)
         {
-            bool isActive;
-
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    isActive = IsTestActiveHelper(repository, testId);
-                }
-            }
-            else
-            {
-                isActive = IsTestActiveHelper(_repository, testId);
-            }
-
-            return isActive;
+            return IsTestActiveHelper(_repository.Service, testId);
         }
 
         private bool IsTestActiveHelper(IRepository repo, Guid testId)
@@ -537,22 +394,7 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
 
         private IABTest SetTestState(Guid theTestId, DalTestState theState)
         {
-            IABTest test;
-
-            if (_UseEntityFramework)
-            {
-                using (var dbContext = new DatabaseContext())
-                {
-                    var repository = new BaseRepository(dbContext);
-                    test = SetTestStateHelper(repository, theTestId, theState);
-                }
-            }
-            else
-            {
-                test = SetTestStateHelper(_repository, theTestId, theState);
-            }
-
-            return test;
+            return SetTestStateHelper(_repository.Service, theTestId, theState);
         }
 
         private IABTest SetTestStateHelper(IRepository repo, Guid theTestId, DalTestState theState)
@@ -569,7 +411,24 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
             (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA=@p0 AND TABLE_NAME=@p1) THEN 1 ELSE 0 END";
 
-            return repository.DatabaseContext.Database.SqlQuery<int>(sql, schema, table).Single() == 1;
+            using (var command = repository.DatabaseContext.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = sql;
+                command.CommandType = CommandType.Text;
+
+                command.Parameters.Add(new SqlParameter("@p0", schema));
+                command.Parameters.Add(new SqlParameter("@p1", table));
+                repository.DatabaseContext.Database.OpenConnection();
+
+                using (var result = command.ExecuteReader())
+                {
+                    while (result.Read())
+                    {
+                        return (int)result[0] == 1;
+                    }
+                }
+            }
+            return false;
         }
         #endregion
     }

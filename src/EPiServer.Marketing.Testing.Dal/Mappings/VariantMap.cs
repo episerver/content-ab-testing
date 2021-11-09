@@ -1,39 +1,39 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.ModelConfiguration;
 using EPiServer.Marketing.Testing.Dal.EntityModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.Mappings
 {
-    public class VariantMap : EntityTypeConfiguration<DalVariant>
+    public class VariantMap : IEntityTypeConfiguration<DalVariant>
     {
-        public VariantMap()
+        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<DalVariant> builder)
         {
-            this.ToTable("tblABVariant");
+            builder.ToTable("tblABVariant");
 
-            this.HasKey(hk => hk.Id);
+            builder.HasKey(hk => hk.Id);
 
-            this.Property(m => m.ItemId)
+            builder.Property(m => m.ItemId)
                 .IsRequired();
 
-            this.Property(m => m.ItemVersion)
+            builder.Property(m => m.ItemVersion)
                 .IsRequired();
 
-            this.Property(m => m.IsWinner)
+            builder.Property(m => m.IsWinner)
                 .IsRequired();
 
-            this.Property(m => m.Views)
+            builder.Property(m => m.Views)
                 .IsRequired();
 
-            this.Property(m => m.Conversions)
+            builder.Property(m => m.Conversions)
                 .IsRequired();
 
-            this.Property(m => m.IsPublished)
+            builder.Property(m => m.IsPublished)
                 .IsRequired();
 
-            this.HasRequired(m => m.DalABTest)
+            builder.HasOne(m => m.DalABTest)
                 .WithMany(m => m.Variants)
                 .HasForeignKey(m => m.TestId)
-                .WillCascadeOnDelete();
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
