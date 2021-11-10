@@ -20,7 +20,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         public TestEventArgs(IMarketingTest test)
         {
             this.Test = test;
-            this.CurrentUser = PrincipalInfo.Current.Principal.Identity;
+            this.CurrentUser = PrincipalInfo.CurrentPrincipal.Identity;
         }
 
         /// <summary>

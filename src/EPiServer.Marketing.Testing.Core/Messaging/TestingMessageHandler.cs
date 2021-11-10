@@ -11,22 +11,12 @@ namespace EPiServer.Marketing.Testing.Messaging
     /// <inheritdoc />
     class TestingMessageHandler : ITestingMessageHandler
     {
-        private IServiceLocator _serviceLocator;
         private ObjectCache _sessionCache = MemoryCache.Default;
 
         [ExcludeFromCodeCoverage]
         public TestingMessageHandler()
         {
-            _serviceLocator = ServiceLocator.Current;
-        }
-
-        /// <summary>
-        /// Used specifically for unit tests.
-        /// </summary>
-        /// <param name="locator"></param>
-        internal TestingMessageHandler(IServiceLocator locator)
-        {
-            _serviceLocator = locator;
+            
         }
 
         /// <summary>
@@ -35,7 +25,7 @@ namespace EPiServer.Marketing.Testing.Messaging
         /// <param name="message"></param>
         public void Handle(UpdateViewsMessage message)
         {
-            var tm = _serviceLocator.GetInstance<ITestManager>();
+            var tm = ServiceLocator.Current.GetInstance<ITestManager>();
             tm.IncrementCount(message.TestId, message.ItemVersion, CountType.View, default(Guid), false);
         }
 
@@ -47,7 +37,7 @@ namespace EPiServer.Marketing.Testing.Messaging
         {
             if (ProcessMessage(message))
             {
-                var tm = _serviceLocator.GetInstance<ITestManager>();
+                var tm = ServiceLocator.Current.GetInstance<ITestManager>();
                 tm.IncrementCount(message.TestId, message.ItemVersion, CountType.Conversion, message.KpiId, false);
             }
         }
@@ -84,7 +74,7 @@ namespace EPiServer.Marketing.Testing.Messaging
         /// <param name="message"></param>
         public void Handle(AddKeyResultMessage message)
         {
-            var tm = _serviceLocator.GetInstance<ITestManager>();
+            var tm = ServiceLocator.Current.GetInstance<ITestManager>();
             tm.SaveKpiResultData(message.TestId, message.ItemVersion, message.Result, message.Type, false);
         }
     }
