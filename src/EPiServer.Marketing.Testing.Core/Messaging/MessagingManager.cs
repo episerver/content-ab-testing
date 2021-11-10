@@ -19,28 +19,15 @@ namespace EPiServer.Marketing.Testing.Messaging
     public class MessagingManager : IMessagingManager
     {
         private string QueName = "TestingQueue";
-        private IServiceLocator _serviceLocator;
         private MessageHandlerRegistry registry;
         private MessagingApplicationBuilder appBuilder;
         private InMemoryQueueStore _queueStore;
-        private ITestingMessageHandler _handler;
+        private readonly Injected<ITestingMessageHandler> _handler;
         private BlockingCollection<object> _queue;
 
         [ExcludeFromCodeCoverage]
         public MessagingManager()
         {
-            _serviceLocator = ServiceLocator.Current;
-            Init();
-        }
-
-        /// <summary>
-        /// Used specifically for unit tests.
-        /// </summary>
-        /// <param name="locator"></param>
-        internal MessagingManager(IServiceLocator locator, ITestingMessageHandler handler)
-        {
-            _serviceLocator = locator;
-            _handler = handler;
             Init();
         }
 
@@ -54,13 +41,9 @@ namespace EPiServer.Marketing.Testing.Messaging
             registry = new MessageHandlerRegistry();
             appBuilder = new MessagingApplicationBuilder();
 
-            // register the handler for each message
-            if (_handler == null)
-                _handler = new TestingMessageHandler();
-
-            registry.Register<UpdateViewsMessage>(_handler);
-            registry.Register<UpdateConversionsMessage>(_handler);
-            registry.Register<AddKeyResultMessage>(_handler);
+            registry.Register<UpdateViewsMessage>(_handler.Service);
+            registry.Register<UpdateConversionsMessage>(_handler.Service);
+            registry.Register<AddKeyResultMessage>(_handler.Service);
 
             // Create the dispatcher, queue store, and the memory reciever
             var messageDispatcher = new FanOutMessageDispatcher(registry);

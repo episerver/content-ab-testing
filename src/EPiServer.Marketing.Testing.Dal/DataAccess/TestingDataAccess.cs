@@ -420,15 +420,8 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
                 command.Parameters.Add(new SqlParameter("@p1", table));
                 repository.DatabaseContext.Database.OpenConnection();
 
-                using (var result = command.ExecuteReader())
-                {
-                    while (result.Read())
-                    {
-                        return (int)result[0] == 1;
-                    }
-                }
+                return ((int)command.ExecuteScalar()) == 1;
             }
-            return false;
         }
         #endregion
     }

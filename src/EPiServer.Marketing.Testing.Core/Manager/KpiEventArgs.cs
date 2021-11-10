@@ -29,7 +29,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         public KpiEventArgs(IKpi kpi, IMarketingTest marketingTest) : base(marketingTest)
         {
             this.Kpi = kpi;
-            CurrentUser = PrincipalInfo.Current.Principal.Identity;
+            CurrentUser = PrincipalInfo.CurrentPrincipal.Identity;
         }
 
         /// <summary>
