@@ -6,6 +6,7 @@ using EPiServer.Framework.Initialization;
 using EPiServer.Framework.Localization;
 using EPiServer.Framework.Localization.XmlResources;
 using System.Diagnostics.CodeAnalysis;
+using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.KPI.Commerce.Initializers
 {

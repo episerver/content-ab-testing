@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using EPiServer.Commerce.Catalog.Linking;
 using EPiServer.Commerce.Order;
+using EPiServer.Core;
 
 namespace EPiServer.Marketing.KPI.Commerce.Kpis
 {
@@ -25,16 +26,9 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
     public class PurchaseItemKpi : CommerceKpi
     {
         [ExcludeFromCodeCoverage]
-        public PurchaseItemKpi()
+        internal PurchaseItemKpi()
         {
             LocalizationSection = "purchaseitem";
-        }
-
-        [ExcludeFromCodeCoverage]
-        internal PurchaseItemKpi(IServiceLocator serivceLocator)
-        {
-            LocalizationSection = "purchaseitem";
-            _servicelocator = serivceLocator;
         }
 
         /// <inheritdoc />
@@ -42,17 +36,14 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
         {
             var retval = false;
 
-            var contentLoader = _servicelocator.GetInstance<IContentLoader>();
-            var referenceConverter = _servicelocator.GetInstance<ReferenceConverter>();
-
             var ea = e as OrderGroupEventArgs;
             var ordergroup = sender as IPurchaseOrder;
             if (ea != null && ordergroup != null)
             {
                 var contentLinks =
-                    referenceConverter.GetContentLinks(ordergroup.Forms.SelectMany(o => o.GetAllLineItems())
+                    _referenceConverter.Service.GetContentLinks(ordergroup.Forms.SelectMany(o => o.GetAllLineItems())
                         .Select(x => x.Code))?.Select(p => p.Value);
-                var skus = contentLoader.GetItems(contentLinks, CultureInfo.InvariantCulture).OfType<EntryContentBase>();
+                var skus = _contentLoader.Service.GetItems(contentLinks, CultureInfo.InvariantCulture).OfType<EntryContentBase>();
                 foreach (var sku in skus)
                 {
                     // if we are looking for an exact match at the entry level, 
@@ -72,7 +63,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
                         if (parentProductRef != null)
                         {
                             //Get the parent product using CMS API
-                            var parentProduct = contentLoader.Get<EntryContentBase>(parentProductRef);
+                            var parentProduct = _contentLoader.Service.Get<EntryContentBase>(parentProductRef);
                             retval = ContentGuid.Equals(parentProduct.ContentGuid);
                             if (retval)
                             {
