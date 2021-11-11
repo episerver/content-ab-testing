@@ -20,6 +20,11 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
     [DataContract]
     public abstract class CommerceKpi : Kpi
     {
+        protected readonly Injected<IContentLoader> _contentLoader;
+        protected readonly Injected<ReferenceConverter> _referenceConverter;
+        protected readonly Injected<IPublishedStateAssessor> _publishedStateAssessor;
+        protected readonly Injected<IContentRepository> _contentRepository;
+
         [ExcludeFromCodeCoverage]
         protected string LocalizationSection { get; set; }
 
@@ -43,20 +48,16 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
                 throw new KpiValidationException(LocalizationService.Current.GetString("/commercekpi/" + LocalizationSection + "/config_markup/error_conversionproduct"));
             }
 
-            //Get the currently configured content loader and reference converter from the service locator
-            var contentLoader = _servicelocator.GetInstance<IContentLoader>();
-            var referenceConverter = _servicelocator.GetInstance<ReferenceConverter>();
-
             //Get the correct product id as it's represented in EPiServer Commerce
             //In this example we arbitrarily use the integer 1
             var productIdFromCommerce = responseData["ConversionProduct"].Split('_')[0];
 
             //We use the content link builder to get the contentlink to our product
-            var productLink = referenceConverter.GetContentLink(Int32.Parse(productIdFromCommerce),
+            var productLink = _referenceConverter.Service.GetContentLink(Int32.Parse(productIdFromCommerce),
                 CatalogContentType.CatalogEntry, 0);
 
             //Get the product using CMS API
-            var content = contentLoader.Get<EntryContentBase>(productLink);
+            var content = _contentLoader.Service.Get<EntryContentBase>(productLink);
             if (!IsContentPublished(content))
             {
                 throw new KpiValidationException(LocalizationService.Current.GetString("/commercekpi/" + LocalizationSection + "/config_markup/error_not_published_product"));
@@ -67,8 +68,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
 
         private bool IsContentPublished(IContent content)
         {
-            var publishedStateAssessor = _servicelocator.GetInstance<IPublishedStateAssessor>();
-            return publishedStateAssessor.IsPublished(content, PagePublishedStatus.Published);
+            return _publishedStateAssessor.Service.IsPublished(content, PagePublishedStatus.Published);
         }
 
         /// <inheritdoc />
@@ -96,8 +96,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
 
                 if (!Guid.Empty.Equals(ContentGuid))
                 {
-                    var contentRepository = _servicelocator.GetInstance<IContentRepository>();
-                    var content = contentRepository.Get<IContent>(ContentGuid);
+                    var content = _contentRepository.Service.Get<IContent>(ContentGuid);
                     markup = string.Format(markup, conversionDescription,
                         content.ContentLink, content.Name);
                 }

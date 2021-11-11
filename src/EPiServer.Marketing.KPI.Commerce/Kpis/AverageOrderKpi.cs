@@ -1,21 +1,18 @@
 ﻿using EPiServer.Commerce.Order;
 using EPiServer.Marketing.KPI.Common.Attributes;
 using EPiServer.Marketing.KPI.Results;
-using EPiServer.ServiceLocation;
-using Mediachase.Commerce.Orders;
 using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
 using EPiServer.Framework.Localization;
 using Mediachase.Commerce.Markets;
-using System.Globalization;
 using Mediachase.Commerce.Shared;
-using Mediachase.Commerce;
 using EPiServer.Marketing.KPI.Manager;
 using EPiServer.Marketing.KPI.Exceptions;
 using EPiServer.Logging;
 using EPiServer.Marketing.KPI.Manager.DataClass;
 using System.Diagnostics.CodeAnalysis;
+using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.KPI.Commerce.Kpis
 {
@@ -31,20 +28,15 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
     public class AverageOrderKpi : CommerceKpi, IFinancialKpi
     {
         private ILogger _logger;
+        private readonly Injected<IMarketService> _marketService;
+        private readonly Injected<IKpiManager> _kpiManager;
+        private readonly Injected<IOrderGroupCalculator> _orderGroupCalculator;
 
         [ExcludeFromCodeCoverage]
-        public AverageOrderKpi()
+        internal AverageOrderKpi()
         {
             LocalizationSection = "averageorder";
-            _servicelocator = ServiceLocator.Current;
             _logger = LogManager.GetLogger();
-        }
-
-        [ExcludeFromCodeCoverage]
-        internal AverageOrderKpi(IServiceLocator servicelocator)
-        {
-            LocalizationSection = "averageorder";
-            _servicelocator = servicelocator;
         }
 
         /// <inheritdoc />
@@ -91,14 +83,11 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
         /// <inheritdoc />
         public override void Validate(Dictionary<string, string> responseData)
         {
-            var marketService = _servicelocator.GetInstance<IMarketService>();
-            var kpiManager = _servicelocator.GetInstance<IKpiManager>();
-
-            var commerceData = kpiManager.GetCommerceSettings();
+            var commerceData = _kpiManager.Service.GetCommerceSettings();
 
             if(commerceData == null)
             {
-                var defaultMarket = marketService.GetMarket("DEFAULT");
+                var defaultMarket = _marketService.Service.GetMarket("DEFAULT");
                 if(defaultMarket == null)
                 {
                     throw new KpiValidationException(LocalizationService.Current.GetString("/commercekpi/averageorder/config_markup/error_defaultmarketundefined"));
@@ -106,7 +95,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
             }
             else
             {
-                var preferredMarket = marketService.GetMarket(commerceData.CommerceCulture);
+                var preferredMarket = _marketService.Service.GetMarket(commerceData.CommerceCulture);
                 if(preferredMarket == null)
                 {
                     throw new KpiValidationException(LocalizationService.Current.GetString("/commercekpi/averageorder/config_markup/error_undefinedmarket"));
@@ -126,10 +115,10 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
             var ordergroup = sender as IPurchaseOrder;
             if (ordergroup != null)
             {
-                var orderTotal = _servicelocator.GetInstance<IOrderGroupCalculator>().GetOrderGroupTotals(ordergroup).SubTotal;
-                var orderMarket = _servicelocator.GetInstance<IMarketService>().GetMarket(ordergroup.MarketId);
+                var orderTotal = _orderGroupCalculator.Service.GetOrderGroupTotals(ordergroup).SubTotal;
+                var orderMarket = _marketService.Service.GetMarket(ordergroup.MarketId);
                 var orderCurrency = orderMarket.DefaultCurrency.CurrencyCode;
-                var preferredMarket = _servicelocator.GetInstance<IMarketService>().GetMarket(PreferredFinancialFormat.CommerceCulture);
+                var preferredMarket = _marketService.Service.GetMarket(PreferredFinancialFormat.CommerceCulture);
 
                 if (preferredMarket != null)
                 {

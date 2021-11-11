@@ -12,6 +12,8 @@ namespace EPiServer.Marketing.KPI.Commerce.Config
     [EPiServerDataStore(AutomaticallyCreateStore = true, AutomaticallyRemapStore = true)]
     public class CommerceKpiSettings : IDynamicData
     {
+        private static readonly Injected<IKpiManager> _kpiManager;
+        private static readonly Injected<IMarketService> _marketService;
         public Identity Id { get; set; }      
 
         public IMarket PreferredMarket { get; set; }
@@ -26,15 +28,13 @@ namespace EPiServer.Marketing.KPI.Commerce.Config
                 if (_currentSettings == null)
                 {
                     _currentSettings = new CommerceKpiSettings();
-                    var kpiManager = ServiceLocator.Current.GetInstance<IKpiManager>();
-                    var marketService = ServiceLocator.Current.GetInstance<IMarketService>();
 
-                    var preferredMarket = kpiManager.GetCommerceSettings();
+                    var preferredMarket = _kpiManager.Service.GetCommerceSettings();
 
                     _currentSettings.PreferredMarket = !string.IsNullOrEmpty(preferredMarket.CommerceCulture) ? 
-                        _currentSettings.PreferredMarket = marketService.GetMarket(preferredMarket.CommerceCulture)
+                        _currentSettings.PreferredMarket = _marketService.Service.GetMarket(preferredMarket.CommerceCulture)
                         :
-                        _currentSettings.PreferredMarket = marketService.GetMarket(MarketId.Default.Value);
+                        _currentSettings.PreferredMarket = _marketService.Service.GetMarket(MarketId.Default.Value);
                     
                 }
 
@@ -47,18 +47,16 @@ namespace EPiServer.Marketing.KPI.Commerce.Config
         /// </summary>
         public CommerceKpiSettings()
         {
-            var marketService = ServiceLocator.Current.GetInstance<IMarketService>();
-            PreferredMarket = marketService.GetMarket(MarketId.Default.Value); 
+            PreferredMarket = _marketService.Service.GetMarket(MarketId.Default.Value); 
         }
 
         [ExcludeFromCodeCoverage]
         public void Save()
         {
-            var kpiManager = ServiceLocator.Current.GetInstance<IKpiManager>();
             var settingsToSave = new CommerceData();
             settingsToSave.CommerceCulture = PreferredMarket.MarketId.Value;
             settingsToSave.preferredFormat = PreferredMarket.DefaultCurrency.Format;
-            kpiManager.SaveCommerceSettings(settingsToSave);
+            _kpiManager.Service.SaveCommerceSettings(settingsToSave);
             
             _currentSettings = this;
         }

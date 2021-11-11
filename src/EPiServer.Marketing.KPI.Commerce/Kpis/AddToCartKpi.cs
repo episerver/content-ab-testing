@@ -1,7 +1,6 @@
 ﻿using EPiServer.Commerce.Catalog.ContentTypes;
 using EPiServer.Marketing.KPI.Common.Attributes;
 using EPiServer.Marketing.KPI.Results;
-using EPiServer.ServiceLocation;
 using Mediachase.Commerce.Catalog;
 using Mediachase.Commerce.Orders;
 using System;
@@ -10,6 +9,7 @@ using System.Linq;
 using EPiServer.Commerce.Order;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using EPiServer.Core;
 
 namespace EPiServer.Marketing.KPI.Commerce.Kpis
 {
@@ -23,17 +23,11 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
         description_id = "/commercekpi/addtocart/description")]
     public class AddToCartKpi : CommerceKpi
     {
-        [ExcludeFromCodeCoverage]
-        public AddToCartKpi()
-        {
-            LocalizationSection = "addtocart";
-        }
 
         [ExcludeFromCodeCoverage]
-        internal AddToCartKpi(IServiceLocator serviceLocator)
+        internal AddToCartKpi()
         {
             LocalizationSection = "addtocart";
-            _servicelocator = serviceLocator;
         }
 
         /// <summary>
@@ -45,18 +39,15 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
         public override IKpiResult Evaluate(object sender, EventArgs e)
         {
             var retval = false;
-                
-            var contentLoader = _servicelocator.GetInstance<IContentLoader>();
-            var referenceConverter = _servicelocator.GetInstance<ReferenceConverter>();
 
             var ea = e as OrderGroupEventArgs;
             var ordergroup = sender as IOrderGroup;
             if (ea != null && ordergroup != null)
             {
                 var contentLinks =
-                    referenceConverter.GetContentLinks(ordergroup.Forms.SelectMany(o => o.GetAllLineItems())
+                    _referenceConverter.Service.GetContentLinks(ordergroup.Forms.SelectMany(o => o.GetAllLineItems())
                         .Select(x => x.Code))?.Select(p => p.Value);
-                var skus = contentLoader.GetItems(contentLinks, CultureInfo.InvariantCulture).OfType<EntryContentBase>();
+                var skus = _contentLoader.Service.GetItems(contentLinks, CultureInfo.InvariantCulture).OfType<EntryContentBase>();
                 foreach (var sku in skus)
                 {
                     // if we are looking for an exact match at the entry level, 
@@ -76,7 +67,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
                         if (parentProductRef != null)
                         {
                             //Get the parent product using CMS API
-                            var parentProduct = contentLoader.Get<EntryContentBase>(parentProductRef);
+                            var parentProduct = _contentLoader.Service.Get<EntryContentBase>(parentProductRef);
                             retval = ContentGuid.Equals(parentProduct.ContentGuid);
                             if (retval)
                             {

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <Product>EPiServer.Marketing.KPI.Commerce</Product>
@@ -7,10 +7,18 @@
     <NuspecFile>Package.nuspec</NuspecFile>
     <IsPackable>true</IsPackable>
     <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
+	<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+	<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+	<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+	<GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+	<GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+	<GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+	<GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+	<GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPiServer.Commerce.Core" Version="13.0.0" />
+    <PackageReference Include="EPiServer.Commerce.Core" Version="14.0.2" />
   </ItemGroup>
 
   <ItemGroup>
