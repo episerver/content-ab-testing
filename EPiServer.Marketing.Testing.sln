@@ -75,6 +75,8 @@ Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "Messaging", "Documentation\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPiServer.Marketing.KPI.Commerce.Test", "test\EPiServer.Marketing.KPI.Commerce.Test\EPiServer.Marketing.KPI.Commerce.Test.csproj", "{B7469734-B9AE-44AD-8D52-1F524146E27D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlloyMvcTemplates", "samples\EPiServer.Templates.Alloy.Mvc\AlloyMvcTemplates.csproj", "{19AFB89A-73EC-4DE5-9B45-F0C23C50B234}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +132,10 @@ Global
 		{B7469734-B9AE-44AD-8D52-1F524146E27D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7469734-B9AE-44AD-8D52-1F524146E27D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7469734-B9AE-44AD-8D52-1F524146E27D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19AFB89A-73EC-4DE5-9B45-F0C23C50B234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19AFB89A-73EC-4DE5-9B45-F0C23C50B234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19AFB89A-73EC-4DE5-9B45-F0C23C50B234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19AFB89A-73EC-4DE5-9B45-F0C23C50B234}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +149,7 @@ Global
 		{AA5E43C8-077B-4785-89F5-7B359DAD70AB} = {37A150D0-2DED-4E04-B413-A8456D9DB7D6}
 		{C2476336-E6E0-4A8B-AA13-2CF485964E63} = {37A150D0-2DED-4E04-B413-A8456D9DB7D6}
 		{B7469734-B9AE-44AD-8D52-1F524146E27D} = {4DCCE100-6879-491C-BCC9-85A6DA6B0EE7}
+		{19AFB89A-73EC-4DE5-9B45-F0C23C50B234} = {161B3773-B01D-4D63-BDE5-CA6A022DF4DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9E875CD0-1538-4604-B67F-7333D1D8D41B}

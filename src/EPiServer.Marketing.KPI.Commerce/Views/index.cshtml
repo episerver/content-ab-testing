@@ -1,4 +1,3 @@
-@model Episerver.Marketing.Kpi.Commerce.Internal.SettingsViewModel
 @using EPiServer.Framework.Web.Resources
 @using EPiServer.Shell.Navigation
  
@@ -27,15 +26,9 @@
     </style>
 </head>
 <body class="epi-workspace">
-    @Html.AntiForgeryToken()
     @Html.Raw(Html.CreatePlatformNavigationMenu())
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" 
-        data-epi-antiforgery-header-name="@Model.AntiforgeryOptions.HeaderName"
-        data-epi-antiforgery-form-field-name="@Model.AntiforgeryOptions.FormFieldName"
-        data-base-api-url="@Model.BaseApiUrl"
-        data-module-shell-path="@EPiServer.Shell.Paths.ProtectedRootPath" @Html.Raw(Html.ApplyPlatformNavigation())
-        style="z-index:auto;" ></div>
+    <div id="root" @Html.Raw(Html.ApplyPlatformNavigation()) style="z-index:auto;" data-module-shell-path="@EPiServer.Shell.Paths.ToResource("EPiServer.Marketing.KPI.Commerce", "")"></div>
     @ClientResources.RenderResources("kpi-commerce", new[] { ClientResourceType.Script })
 </body>
 </html>

@@ -219,3 +219,6 @@ ModelManifest.xml
 /BuildScripts/.sonarqube
 /BuildScripts/tools/Addins/Cake.Sonar.1.1.25
 /BuildScripts/tools/MSBuild.SonarQube.Runner.Tool.4.8.0
+
+# Alloy sample Module path
+/samples/EPiServe.Templates.Alloy.Mvc/modules/

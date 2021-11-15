@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)EPiServerProduct_PublicKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+</Project>
