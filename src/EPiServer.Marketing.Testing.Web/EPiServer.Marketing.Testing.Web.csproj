@@ -1,21 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="version.props" />
+  <Import Project="..\..\build\nuspec.props" />
+  <Import Project="..\..\build\DependencyVersions.props" />
   <PropertyGroup>
     <Product>EPiServer.Marketing.Testing.Web</Product>
     <TargetFramework>net5.0</TargetFramework>
     <OutputType>Library</OutputType>    
-    <NuspecFile>Package.nuspec</NuspecFile>
+    <NuspecFile>EPiServer.Marketing.Testing.nuspec</NuspecFile>
     <IsPackable>true</IsPackable>
     <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
+    <NuspecProperties>Configuration=$(Configuration);version=$(PackageVersion);mtVersion=$(MtVersion);mtMessageVersion=$(MtMessageVersion);uiVersion=$(UiVersion);uiNextMajorVersion=$(UiNextMajorVersion);cmsVersion=$(CmsVersion);cmsNextMajorVersion=$(CmsNextMajorVersion)</NuspecProperties>
+	<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EPiServer.CMS.AspNetCore" Version="12.1.0" />
-    <PackageReference Include="EPiServer.CMS.Core" Version="12.1.0" />
-    <PackageReference Include="EPiServer.CMS.UI" Version="12.1.0" />
-    <PackageReference Include="EPiServer.CMS.UI.Core" Version="12.1.0" />
-    <PackageReference Include="EPiServer.Framework" Version="12.1.0" />
-    <PackageReference Include="EPiServer.Framework.AspNet" Version="12.1.0" />
+    <PackageReference Include="EPiServer.CMS.AspNetCore" Version="$(CmsCoreVersionCommon)" />
+    <PackageReference Include="EPiServer.CMS.Core" Version="$(CmsCoreVersionCommon)" />
+    <PackageReference Include="EPiServer.CMS.UI" Version="$(CmsUiVersionCommon)" />
+    <PackageReference Include="EPiServer.CMS.UI.Core" Version="$(CmsUiVersionCommon)" />
+    <PackageReference Include="EPiServer.Framework" Version="$(CmsCoreVersionCommon)" />
+    <PackageReference Include="EPiServer.Framework.AspNetCore" Version="$(CmsCoreVersionCommon)" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.3" />
   </ItemGroup>

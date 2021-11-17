@@ -1,44 +1,42 @@
-param ([string]$configuration = "Release",
-	[string]$publishPackages = "false",
-	[string]$packageVersion = "")
+param ([string]$version = "",
+  [string]$mtVersion = "",
+  [string]$mtCommerceVersion = "",
+  [string]$mtMessageVersion = "",
+  [string]$configuration = "Release")
+$ErrorActionPreference = "Stop"
 
-#Make sure the script runs in the right context, might be wrong if started from e.g. .cmd file
-$cwd = Split-Path -parent $PSCommandPath
-pushd $cwd
+# Set location to the Solution directory
+(Get-Item $PSScriptRoot).Parent.FullName | Push-Location
 
-Write-Host "Pack artifacts"
-Write-Host $configuration
-Write-Host $publishPackages
-Write-Host $packageVersion
+Import-Module .\build\exechelper.ps1
 
-$artifactsPath = Resolve-Path "$cwd\..\artifacts"
+# Install .NET tooling
+exec .\build\dotnet-cli-install.ps1
 
-if (!(Test-Path $artifactsPath))
-{
-	New-Item -ItemType directory -Path $artifactsPath
-}
+[xml] $versionFile = Get-Content "./build/DependencyVersions.props"
+$node = $versionFile.SelectSingleNode("Project/PropertyGroup/CmsCoreVersionCommon")
+$cmsVersion = $node.InnerText
+$parts = $cmsVersion.Split(".")
+$major = [int]::Parse($parts[0]) + 1
+$cmsNextMajorVersion = ($major.ToString() + ".0.0") 
 
-# Creating NuGet packages
-#TODO: refactor to Powershell scripts
-& "$cwd\generatepackages"
-& "$cwd\generatepackagesformessaging"
-& "$cwd\generatepackagesfortestpages"
-& "$cwd\generatepackagesforkpi"
-& "$cwd\generatepackagesforkpicommerce"
+$uiNode = $versionFile.SelectSingleNode("Project/PropertyGroup/CmsUiVersionCommon")
+$uiVersion = $uiNode.InnerText
+$uiParts = $uiVersion.Split(".")
+$uiMajor = [int]::Parse($uiParts[0]) + 1
+$uiNextMajorVersion = ($uiMajor.ToString() + ".0.0") 
 
+$commerceNode = $versionFile.SelectSingleNode("Project/PropertyGroup/CmsCommerceVersionCommon")
+$commerceVersion = $commerceNode.InnerText
+$commerceParts = $commerceVersion.Split(".")
+$commerceMajor = [int]::Parse($commParts[0]) + 1
+$commerceNextMajorVersion = ($commerceMajor.ToString() + ".0.0") 
 
-# Creating daily site package.
-# Copying database file to the site folder:
-Write-Host "Pack daily site files"
-if (Test-Path $artifactsPath\DailySite.zip)
-{
-	Remove-Item $artifactsPath\DailySite.zip -Force
-}
+$mtParts = $mtVersion.Split(".")
+$mtMajor = [int]::Parse($mtParts[0]) + 1
+$mtNextMajorVersion = ($mtMajor.ToString() + ".0.0") 
 
-Copy-Item .\resources\AlloyEPiServerDB.mdf ..\samples\EPiServer.Templates.Alloy\App_Data
+# Packaging public packages
+exec "dotnet" "pack --no-restore --no-build -c $configuration /p:PackageVersion=$version /p:CmsVersion=$cmsVersion /p:CmsNextMajorVersion=$cmsNextMajorVersion /p:UiVersion=$uiVersion /p:UiNextMajorVersion=$uiNextMajorVersion /p:CommerceVersion=$commerceVersion /p:CommerceNextMajorVersion=$commerceNextMajorVersion /p:MtVersion=$mtVersion /p:MtCommerceVersion=$mtCommerceVersion /p:MtMessageVersion=$mtMessageVersion EPiServer.Marketing.Testing.sln"
 
-.\buildzip.ps1 $cwd\..\samples\EPiServer.Templates.Alloy $artifactsPath\DailySite.zip
-
-Copy-Item .\resources\ConnectionString.xmlupdate $artifactsPath
-
-& "$cwd\resources\nuget\nuget.exe" pack "$cwd\resources\DailySite.nuspec" -Prop Configuration=$configuration -Version $packageVersion -Verbosity detailed -NoDefaultExcludes -NoPackageAnalysis -BasePath $artifactsPath -OutputDirectory $artifactsPath
+Pop-Location

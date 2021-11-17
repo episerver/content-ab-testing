@@ -34,7 +34,9 @@ namespace EPiServer.Templates.Alloy.Mvc
         public void ConfigureServices(IServiceCollection services)
         {
             var dbPath = Path.Combine(_webHostingEnvironment.ContentRootPath, "App_Data\\Alloy.mdf");
+            var commDbPath = Path.Combine(_webHostingEnvironment.ContentRootPath, "App_Data\\AlloyCommerce.mdf");
             var connectionstring = _configuration.GetConnectionString("EPiServerDB") ?? $"Data Source=(LocalDb)\\MSSQLLocalDB;AttachDbFilename={dbPath};Initial Catalog=alloy_mvc_netcore;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=True";
+            var commconnectionstring = _configuration.GetConnectionString("EcfSqlConnection") ?? $"Data Source=(LocalDb)\\MSSQLLocalDB;AttachDbFilename={commDbPath};Initial Catalog=alloy_commerce_netcore;Connection Timeout=60;Integrated Security=True;MultipleActiveResultSets=True";
 
             services.Configure<SchedulerOptions>(o =>
             {
@@ -44,6 +46,7 @@ namespace EPiServer.Templates.Alloy.Mvc
             services.Configure<DataAccessOptions>(o =>
             {
                 o.SetConnectionString(connectionstring);
+                o.SetConnectionString(commconnectionstring);
             });
 
             services.AddCmsAspNetIdentity<ApplicationUser>();
@@ -63,7 +66,8 @@ namespace EPiServer.Templates.Alloy.Mvc
                 .AddCmsHtmlHelpers()
                 .AddCmsUI()
                 .AddAdmin()
-                .AddVisitorGroupsUI();
+                .AddVisitorGroupsUI()
+                .AddCommerce();
 
             services.AddEmbeddedLocalization<Startup>();
         }

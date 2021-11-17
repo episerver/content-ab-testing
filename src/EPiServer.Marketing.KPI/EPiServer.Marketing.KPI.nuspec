@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>EPiServer.Marketing.KPI</id>
+        <version>$version$</version>
+        <title>EPiServer KPI</title>
+        <authors>EPiServer</authors>
+        <owners>EPiServer</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Integrate EPiServer site with KPI package</description>
+        <copyright>Copyright EPiServer $Year$</copyright>
+        <releaseNotes>
+        </releaseNotes>
+        <tags>EPiServerModulePackage EPiServer KPI EPiServerBetaAddon</tags>
+        <dependencies>
+			<group targetFramework="net5.0">
+				<dependency id="EPiServer.CMS.AspNetCore.HtmlHelpers"  version="[$cmsVersion$,$cmsNextMajorVersion$)" />
+				<dependency id="EPiServer.CMS.UI.Core"  version="[$uiVersion$,$uiNextMajorVersion$)" />
+				<dependency id="Azure.Security.KeyVault.Secrets" version="[4.2.0,5)" />
+			</group>
+        </dependencies>
+    </metadata>
+	<files>
+		<file src="src\EPiServer.Marketing.KPI\license.txt" target="" />
+		<file src="src\EPiServer.Marketing.KPI\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.dll" target="lib\net5.0\" />
+		<file src="src\EPiServer.Marketing.KPI\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.pdb" target="lib\net5.0\" />
+		<file src="build\CopyZipFiles.targets" target="build\net5.0\EPiServer.Marketing.KPI.targets" />
+	</files>
+</package>

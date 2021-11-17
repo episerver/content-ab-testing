@@ -1,18 +1,7 @@
 <Project>
   <PropertyGroup>
-    <CmsCoreVersion>12.1.0</CmsCoreVersion>
-    <CmsUiVersion>12.1.0</CmsUiVersion>
-    <CmsCommerceVersion>14.0.3</CmsCommerceVersion>
-  </PropertyGroup>
-  <ItemGroup Condition = "'$(TargetFramework)' != 'net461'">
-    <PackageReference Update="EPiServer.Framework" Version="$(CmsCoreVersion)" />
-    <PackageReference Update="EPiServer.CMS.AspNetCore" Version="$(CmsCoreVersion)" />
-    <PackageReference Update="EPiServer.CMS.AspNetCore.HtmlHelpers" Version="$(CmsCoreVersion)" />
-    <PackageReference Update="EPiServer.CMS.AspNetCore.Templating" Version="$(CmsCoreVersion)" />
-    <PackageReference Update="EPiServer.CMS.UI" Version="$(CmsUiVersion)" />
-    <PackageReference Update="EPiServer.CMS.UI.Core" Version="$(CmsUiVersion)" />
-    <PackageReference Update="EPiServer.Hosting" Version="$(CmsCoreVersion)" />
-    <PackageReference Update="EPiServer.Commerce.Core" Version="$(CmsCommerceVersion)" />
-    <PackageReference Update="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-  </ItemGroup>
+    <CmsCoreVersionCommon>12.1.0</CmsCoreVersionCommon>
+	  <CmsUiVersionCommon>12.1.0</CmsUiVersionCommon>
+    <CmsCommerceVersionCommon>14.0.3</CmsCommerceVersionCommon>
+</PropertyGroup>
 </Project>
