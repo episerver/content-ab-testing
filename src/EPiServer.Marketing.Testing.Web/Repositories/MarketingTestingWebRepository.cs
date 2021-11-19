@@ -19,13 +19,14 @@ using Newtonsoft.Json;
 using EPiServer.Framework.Cache;
 using EPiServer.Marketing.Testing.Web.Config;
 using System.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace EPiServer.Marketing.Testing.Web.Repositories
 {
     [ServiceConfiguration(ServiceType = typeof(IMarketingTestingWebRepository), Lifecycle = ServiceInstanceScope.Singleton) ]
     public class MarketingTestingWebRepository : IMarketingTestingWebRepository
     {
-        private IServiceLocator _serviceLocator;
+        private IServiceProvider _serviceLocator;
         private ITestResultHelper _testResultHelper;
         private ITestManager _testManager;
         private ILogger _logger;
@@ -39,7 +40,7 @@ namespace EPiServer.Marketing.Testing.Web.Repositories
         [ExcludeFromCodeCoverage]
         public MarketingTestingWebRepository()
         {
-            int.TryParse(ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:TestMonitorSeconds"]?.ToString(), out int testMonitorValue);
+            int.TryParse(ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:TestMonitorSeconds"]?.ToString(), out int testMonitorValue);
 
             _serviceLocator = ServiceLocator.Current;
             _testResultHelper = _serviceLocator.GetInstance<ITestResultHelper>();
@@ -62,7 +63,7 @@ namespace EPiServer.Marketing.Testing.Web.Repositories
         /// For unit testing
         /// </summary>
         /// <param name="locator"></param>
-        internal MarketingTestingWebRepository(IServiceLocator locator, ILogger logger)
+        internal MarketingTestingWebRepository(IServiceProvider locator, ILogger logger)
         {
             _serviceLocator = locator;
             _testResultHelper = locator.GetInstance<ITestResultHelper>();

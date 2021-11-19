@@ -8,6 +8,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using EPiServer.Marketing.KPI;
+using Microsoft.AspNetCore.Http;
 
 namespace EPiServer.Marketing.Testing.Web.Helpers
 {
@@ -75,23 +77,27 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
                 varIndex = aTest.Variants.FindIndex(i => i.Id == testData.TestVariantId);
             }
 
-            var cookieData = new HttpCookie(COOKIE_PREFIX + testData.TestContentId.ToString() + _adminConfigTestSettingsHelper.GetCookieDelimeter() + aTest.ContentLanguage)
+            var cookieData = new Dictionary<string, string>()
             {
-                ["start"] = aTest.StartDate.ToString(CultureInfo.InvariantCulture),
-                ["vId"] = varIndex.ToString(),
-                ["viewed"] = testData.Viewed.ToString(),
-                ["converted"] = testData.Converted.ToString(),
+                {"start", aTest.StartDate.ToString(CultureInfo.InvariantCulture)},
+                {"vId", varIndex.ToString()},
+                {"viewed", testData.Viewed.ToString()},
+                {"converted", testData.Converted.ToString()}
+            };
+            var option = new CookieOptions()
+            {
                 Expires = aTest.EndDate,
                 HttpOnly = true
-
             };
+            var cookieName = COOKIE_PREFIX + testData.TestContentId.ToString() + _adminConfigTestSettingsHelper.GetCookieDelimeter() + aTest.ContentLanguage;
+            
             testData.KpiConversionDictionary.OrderBy(x => x.Key);
             for (var x = 0; x < testData.KpiConversionDictionary.Count; x++)
             {
-                cookieData["k" + x] = testData.KpiConversionDictionary.ToList()[x].Value.ToString();
+                cookieData.Add("k" + x, testData.KpiConversionDictionary.ToList()[x].Value.ToString());
             }
 
-            _httpContextHelper.AddCookie(cookieData);
+            _httpContextHelper.AddCookie(cookieName, cookieData.ToLegacyCookieString(), option);
         }
 
         /// <summary>
@@ -117,28 +123,29 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             var currentCulturename = cultureName != null ? cultureName : _episerverHelper.GetContentCultureinfo().Name;
             var cookieKey = COOKIE_PREFIX + testContentId + cookieDelimeter + currentCulturename;
             var cookie = _httpContextHelper.HasCookie(cookieKey)
-                ? _httpContextHelper.GetResponseCookie(cookieKey)
-                : _httpContextHelper.GetRequestCookie(cookieKey);
+                ? _httpContextHelper.GetRequestCookie(cookieKey)
+                : string.Empty;
 
-            if (cookie != null && !string.IsNullOrEmpty(cookie.Value))
+            if (!string.IsNullOrEmpty(cookie))
             {
-                if (cookie.Value.Contains("start"))
+                var cookieData = cookie.FromLegacyCookieString();
+                if (cookieData.ContainsKey("start"))
                 {
                     Guid outguid;
                     int outint = 0;
-                    retCookie.TestContentId = Guid.TryParse(cookie.Name.Substring(COOKIE_PREFIX.Length).Split(cookieDelimeter[0])[0], out outguid) ? outguid : Guid.Empty;
+                    retCookie.TestContentId = Guid.TryParse(cookieKey.Substring(COOKIE_PREFIX.Length).Split(cookieDelimeter[0])[0], out outguid) ? outguid : Guid.Empty;
 
                     bool outval;
 
-                    retCookie.TestStart = DateTime.Parse(cookie["start"], CultureInfo.InvariantCulture);
-                    retCookie.Viewed = bool.TryParse(cookie["viewed"], out outval) ? outval : false;
-                    retCookie.Converted = bool.TryParse(cookie["converted"], out outval) ? outval : false;
+                    retCookie.TestStart = DateTime.Parse(cookieData["start"], CultureInfo.InvariantCulture);
+                    retCookie.Viewed = bool.TryParse(cookieData["viewed"], out outval) ? outval : false;
+                    retCookie.Converted = bool.TryParse(cookieData["converted"], out outval) ? outval : false;
 
                     var test = _testRepo.GetActiveTestsByOriginalItemId(retCookie.TestContentId, currentCulture).FirstOrDefault();
 
                     if (test != null && retCookie.TestStart.ToString(CultureInfo.InvariantCulture) == test.StartDate.ToString(CultureInfo.InvariantCulture))
                     {
-                        var index = int.TryParse(cookie["vId"], out outint) ? outint : -1;
+                        var index = int.TryParse(cookieData["vId"], out outint) ? outint : -1;
                         retCookie.TestVariantId = index != -1 ? test.Variants[outint].Id : Guid.Empty;
                         retCookie.ShowVariant = index != -1 ? !test.Variants[outint].IsPublished : false;
                         retCookie.TestId = test.Id;
@@ -149,7 +156,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
                         for (var x = 0; x < test.KpiInstances.Count; x++)
                         {
                             bool converted = false;
-                            bool.TryParse(cookie["k" + x], out converted);
+                            bool.TryParse(cookieData["k" + x], out converted);
                             retCookie.KpiConversionDictionary.Add(test.KpiInstances[x].Id, converted);
                             retCookie.AlwaysEval = Attribute.IsDefined(test.KpiInstances[x].GetType(), typeof(AlwaysEvaluateAttribute));
                         }
@@ -175,10 +182,13 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             var cultureName = _episerverHelper.GetContentCultureinfo().Name;
             var cookieKey = COOKIE_PREFIX + testData.TestContentId.ToString() + cookieDelimeter + cultureName;
             _httpContextHelper.RemoveCookie(cookieKey);
-            HttpCookie expiredCookie = new HttpCookie(COOKIE_PREFIX + testData.TestContentId + cookieDelimeter + cultureName);
-            expiredCookie.HttpOnly = true;
-            expiredCookie.Expires = DateTime.Now.AddDays(-1d);
-            _httpContextHelper.AddCookie(expiredCookie);
+            var expiredCookie = COOKIE_PREFIX + testData.TestContentId + cookieDelimeter + cultureName;
+            var option = new CookieOptions()
+            {
+                Expires = DateTime.Now.AddDays(-1d),
+                HttpOnly = true
+            };
+            _httpContextHelper.AddCookie(expiredCookie, "", option);
         }
 
         /// <summary>
@@ -192,8 +202,12 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             var cultureName = _episerverHelper.GetContentCultureinfo().Name;
             var cookieKey = COOKIE_PREFIX + testData.TestContentId.ToString() + cookieDelimeter + cultureName;
             _httpContextHelper.RemoveCookie(cookieKey);
-            var resetCookie = new HttpCookie(COOKIE_PREFIX + testData.TestContentId + cookieDelimeter + cultureName) { HttpOnly = true };
-            _httpContextHelper.AddCookie(resetCookie);
+            var resetCookie = COOKIE_PREFIX + testData.TestContentId + cookieDelimeter + cultureName;
+            var option = new CookieOptions()
+            {
+                HttpOnly = true
+            };
+            _httpContextHelper.AddCookie(resetCookie, "", option);
             return new TestDataCookie();
         }
 
@@ -209,7 +223,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             var delimeter = _adminConfigTestSettingsHelper.GetCookieDelimeter()[0];
 
             //Get up to date cookies data for cookies which are actively being processed
-            var aResponseCookieKeys = _httpContextHelper.GetResponseCookieKeys();
+            var aResponseCookieKeys = _httpContextHelper.GetRequestCookieKeys();
             List<TestDataCookie> tdcList = (from name in aResponseCookieKeys
                                             where name.Contains(COOKIE_PREFIX)
                                             select GetTestDataFromCookie(name.Split(delimeter)[0].Substring(COOKIE_PREFIX.Length))).ToList();

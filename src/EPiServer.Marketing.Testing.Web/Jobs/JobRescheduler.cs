@@ -17,10 +17,10 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
     [ModuleDependency(typeof(MarketingTestingInitialization))]
     public class JobRescheduler : IInitializableModule
     {
-        private IServiceLocator _serviceLocator;
+        private IServiceProvider _serviceLocator;
 
         [ExcludeFromCodeCoverage]
-        internal JobRescheduler(IServiceLocator locator)
+        internal JobRescheduler(IServiceProvider locator)
         {
             _serviceLocator = locator;
         }

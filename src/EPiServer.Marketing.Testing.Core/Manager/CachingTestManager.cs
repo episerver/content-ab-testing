@@ -5,6 +5,8 @@ using EPiServer.Marketing.KPI.Manager.DataClass;
 using EPiServer.Marketing.KPI.Results;
 using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass.Enums;
+using EPiServer.ServiceLocation;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -29,6 +31,13 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         private readonly DefaultMarketingTestingEvents _events;
         private readonly int _cacheTimeout;
 
+        public CachingTestManager():this(
+            ServiceLocator.Current.GetInstance<ISynchronizedObjectInstanceCache>(),
+            ServiceLocator.Current.GetInstance<DefaultMarketingTestingEvents>(),
+            ServiceLocator.Current.GetInstance<ITestManager>()
+            )
+        { 
+        }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -37,14 +46,16 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         /// <param name="inner">Test manager to defer to when tests are not in the cache</param>
         /// <param name="logger">A logger.</param>
         /// <param name="cacheTimeout">Cache timeout in seconds.</param>
-        public CachingTestManager(ISynchronizedObjectInstanceCache cache, DefaultMarketingTestingEvents events, ITestManager inner,
-            ILogger logger, int cacheTimeout)
+        public CachingTestManager(ISynchronizedObjectInstanceCache cache, DefaultMarketingTestingEvents events, ITestManager inner)
         {
+            var configuredTimeout = ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:CacheTimeoutInMinutes"];
+            int.TryParse(configuredTimeout, out int timeout);
+
             _inner = inner;
             _events = events;
             _cache = cache;
-            _logger = logger;
-            _cacheTimeout = cacheTimeout;
+            _logger = LogManager.GetLogger();
+            _cacheTimeout = timeout;
         }
 
         /// <inheritdoc/>
@@ -112,9 +123,9 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         }
 
         /// <inheritdoc/>
-        public long GetDatabaseVersion(DbConnection dbConnection, string schema, string contextKey, bool populateCache = false)
+        public long GetDatabaseVersion(string schema, string contextKey, bool populateCache = false)
         {
-            return _inner.GetDatabaseVersion(dbConnection, schema, contextKey, populateCache);
+            return _inner.GetDatabaseVersion(schema, contextKey, populateCache);
         }
 
         /// <inheritdoc/>

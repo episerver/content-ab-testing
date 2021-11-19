@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
 using EPiServer.Marketing.Testing.Web.Repositories;
@@ -10,6 +9,7 @@ using EPiServer.Logging;
 using EPiServer.Marketing.Testing.Web.Models;
 using EPiServer.Marketing.Testing.Web.Helpers;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EPiServer.Marketing.Testing.Web.Controllers
 {
@@ -17,6 +17,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
     /// This is the main RestStore the UI components use to manage IMarketingTestObjects.
     /// </summary>
     [RestStore("ABTestStore")]
+    [ApiController]
     public class ABTestStore : RestControllerBase
     {
         private IMarketingTestingWebRepository _webRepo;
@@ -32,7 +33,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         }
 
         // For unit test support.
-        internal ABTestStore(IServiceLocator serviceLocator)
+        internal ABTestStore(IServiceProvider serviceLocator)
         {
             _webRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
             _episerverHelper = serviceLocator.GetInstance<IEpiserverHelper>();

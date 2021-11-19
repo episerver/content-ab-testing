@@ -1,4 +1,5 @@
 ﻿using EPiServer.Core;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,24 +54,11 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         string GetCookieValue(string cookieKey);
 
         /// <summary>
-        /// /// Returns the cookie from the HttpContext Response objects cookie collection.
-        /// </summary>
-        /// <param name="cookieKey">Cookie key value to search the collection with.</param>
-        /// <returns>The cookie found in the cookie collection.</returns>
-        HttpCookie GetResponseCookie(string cookieKey);
-
-        /// <summary>
         /// Returns the cookie from the HttpContext Request objects cookie collection.
         /// </summary>
         /// <param name="cookieKey">Cookie key value to search the collection with.</param>
         /// <returns>The cookie found in the cookie collection.</returns>
-        HttpCookie GetRequestCookie(string cookieKey);
-
-        /// <summary>
-        /// Gets all the keys from the HttpContext Response objects cookie collection.
-        /// </summary>
-        /// <returns>All the cookie keys.</returns>
-        string[] GetResponseCookieKeys();
+        string GetRequestCookie(string cookieKey);
 
         /// <summary>
         /// Gets all the cookie keys from the HttpContext Request objects cookie collection.
@@ -88,7 +76,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         /// Adds the cookie to the HttpContext's cookie collection.
         /// </summary>
         /// <param name="cookie">The cookie to add</param>
-        void AddCookie(HttpCookie cookie);
+        void AddCookie(string key, string value, CookieOptions options);
 
         /// <summary>
         /// Indicates whether the HttpContext response is in a writable state.
@@ -150,7 +138,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         /// Returns the encoding contained in the request
         /// </summary>
         /// <returns></returns>
-        Encoding GetContentEncoding();
+        string GetContentEncoding();
 
     }
 }

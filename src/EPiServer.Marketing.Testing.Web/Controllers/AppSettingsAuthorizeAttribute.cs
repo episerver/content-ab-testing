@@ -1,6 +1,8 @@
-﻿using System;
+﻿using EPiServer.ServiceLocation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Configuration;
-using System.Web.Mvc;
 
 namespace EPiServer.Marketing.Testing.Web.Controllers
 {
@@ -17,7 +19,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
             get { return base.Roles ?? String.Empty; }
             set
             {
-                var sRoles = ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:Roles"]?.ToString();
+                var sRoles = ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:Roles"]?.ToString();
                 if (!String.IsNullOrWhiteSpace(sRoles))
                 {
                     base.Roles = value + ',' + sRoles;

@@ -6,12 +6,13 @@ using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.ServiceLocation;
 using EPiServer.Marketing.Testing.Web.Helpers;
 using System.Linq;
+using System;
 
 namespace EPiServer.Marketing.Testing.Web.Queries
 {
     public class QueryHelper
     {
-        public List<IContent> GetTestContentList(IServiceLocator serviceLocator, TestState state)
+        public List<IContent> GetTestContentList(IServiceProvider serviceLocator, TestState state)
         {
             var contentRepository = serviceLocator.GetInstance<IContentRepository>();
             var webRepository = serviceLocator.GetInstance<IMarketingTestingWebRepository>();

@@ -1,4 +1,4 @@
-﻿using System.Web.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.Shell.Services.Rest;
 using System;
@@ -19,7 +19,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
     {
         private LocalizationService _localizationService;
         private IKpiWebRepository _kpiRepo;
-        private IServiceLocator _serviceLocator;
+        private IServiceProvider _serviceLocator;
         private static ILogger _logger;
 
         public KpiStore()
@@ -30,7 +30,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
             _kpiRepo = _serviceLocator.GetInstance<IKpiWebRepository>();
         }
 
-        internal KpiStore(IServiceLocator sl)
+        internal KpiStore(IServiceProvider sl)
         {
             _serviceLocator = sl;
             _logger = _serviceLocator.GetInstance<ILogger>();
@@ -62,7 +62,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         {
             List<IKpi> validKpiInstances = new List<IKpi>();
             Dictionary<string, string> kpiErrors = new Dictionary<string, string>();
-            ActionResult result = new RestStatusCodeResult((int)HttpStatusCode.InternalServerError, _localizationService.GetString("/abtesting/addtestview/error_conversiongoal"));
+            ActionResult result = new RestStatusCodeResult((int)HttpStatusCode.InternalServerError, LocalizationService.Current.GetString("/abtesting/addtestview/error_conversiongoal"));
 
             try
             {
@@ -101,7 +101,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
                     //Send back only errors or successful results for proper handling
                     if (kpiErrors.Count > 0)
                     {
-                        result = Rest(new Response() { status = false, errors = JsonConvert.SerializeObject(kpiErrors), message = _localizationService.GetString("/abtesting/addtestview/error_conversiongoal") });
+                        result = Rest(new Response() { status = false, errors = JsonConvert.SerializeObject(kpiErrors), message = LocalizationService.Current.GetString("/abtesting/addtestview/error_conversiongoal") });
 
                     }
                     else
@@ -113,7 +113,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
                 }
                 else
                 {
-                    result = Rest(new Response() { status = false, message = _localizationService.GetString("/abtesting/addtestview/error_conversiongoal") });
+                    result = Rest(new Response() { status = false, message = LocalizationService.Current.GetString("/abtesting/addtestview/error_conversiongoal") });
                 }
             }
             catch (Exception ex)
@@ -144,7 +144,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
                                 {
                                     try
                                     {
-                                        errors.Add(data[x]["widgetID"], _localizationService.GetString("/abtesting/addtestview/error_duplicate_kpi_values"));
+                                        errors.Add(data[x]["widgetID"], LocalizationService.Current.GetString("/abtesting/addtestview/error_duplicate_kpi_values"));
                                     }
                                     catch (ArgumentException) { //In this case we don't worry if a duplicate key exists as we expect it and just want to ignore it
                                     }
