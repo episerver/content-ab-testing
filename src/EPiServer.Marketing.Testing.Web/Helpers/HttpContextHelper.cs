@@ -1,6 +1,8 @@
 ﻿using EPiServer.Core;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Session;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -9,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Web.Configuration;
 
 namespace EPiServer.Marketing.Testing.Web.Helpers
 {
@@ -21,34 +22,44 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
     [ExcludeFromCodeCoverage]
     internal class HttpContextHelper : IHttpContextHelper
     {
+        private readonly Injected<IHttpContextAccessor> _httpContextAccessor;
         public bool HasItem(string itemId)
         {
-            return HttpContext.Current.Items.Contains(itemId);
+            return _httpContextAccessor.Service.HttpContext.Items.ContainsKey(itemId);
         }
 
         public string GetRequestParam(string itemId)
         {
-            return HttpContext.Current.Request.Params[itemId];
+            if (_httpContextAccessor.Service.HttpContext.Request.Query[itemId].Count > 0)
+                return _httpContextAccessor.Service.HttpContext.Request.Query[itemId].ToString();
+
+            if (_httpContextAccessor.Service.HttpContext.Request.Form[itemId].Count > 0)
+                return _httpContextAccessor.Service.HttpContext.Request.Form[itemId].ToString();
+
+            if (_httpContextAccessor.Service.HttpContext.Request.Cookies[itemId] != null)
+                return _httpContextAccessor.Service.HttpContext.Request.Cookies[itemId];
+            
+            return _httpContextAccessor.Service.HttpContext.GetServerVariable(itemId);
         }
 
         public void SetItemValue(string itemId, object value)
         {
-            HttpContext.Current.Items[itemId] = value;
+            _httpContextAccessor.Service.HttpContext.Items[itemId] = value;
         }
 
         public void RemoveItem(string itemId)
         {
-            HttpContext.Current.Items.Remove(itemId);
+            _httpContextAccessor.Service.HttpContext.Items.Remove(itemId);
         }
 
         public bool HasCookie(string cookieKey)
         {
-            return HttpContext.Current.Response.Cookies.AllKeys.Contains(cookieKey);
+            return _httpContextAccessor.Service.HttpContext.Request.Cookies.ContainsKey(cookieKey);
         }
 
         public string GetCookieValue(string cookieKey)
         {
-            var value = HttpContext.Current.Response.Cookies[cookieKey].Value;
+            var value = _httpContextAccessor.Service.HttpContext.Request.Cookies[cookieKey];
 
             var pattern = "\\r|\\n|%0d|%0a";
             var substrings = Regex.Split(value, pattern, RegexOptions.None, TimeSpan.FromSeconds(2));
@@ -56,107 +67,92 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             return substrings.FirstOrDefault();
         }
 
-        public HttpCookie GetResponseCookie(string cookieKey)
+        public string GetRequestCookie(string cookieKey)
         {
-            return HttpContext.Current.Response.Cookies.Get(cookieKey);
-        }
-
-        public HttpCookie GetRequestCookie(string cookieKey)
-        {
-            return HttpContext.Current.Request.Cookies.Get(cookieKey);
-        }
-
-        public string[] GetResponseCookieKeys()
-        {
-            return HttpContext.Current.Response.Cookies.AllKeys;
+            return _httpContextAccessor.Service.HttpContext.Request.Cookies[cookieKey];
         }
 
         public string[] GetRequestCookieKeys()
         {
-            return HttpContext.Current.Request.Cookies.AllKeys;
+            return _httpContextAccessor.Service.HttpContext.Request.Cookies.Select(x => x.Key).ToArray();
         }
 
         public void RemoveCookie(string cookieKey)
         {
-            HttpContext.Current.Response.Cookies.Remove(cookieKey);
-            HttpContext.Current.Request.Cookies.Remove(cookieKey);
+            _httpContextAccessor.Service.HttpContext.Response.Cookies.Delete(cookieKey);
         }
 
-        public void AddCookie(HttpCookie cookie)
+        public void AddCookie(string key, string value, CookieOptions options)
         {
-            HttpContext.Current.Response.Cookies.Add(cookie);
+            _httpContextAccessor.Service.HttpContext.Response.Cookies.Append(key, value, options);
         }
 
         public bool CanWriteToResponse()
         {
-            return HttpContext.Current.Response.Filter.CanWrite;
+            return _httpContextAccessor.Service.HttpContext.Response.Body.CanWrite;
         }
 
         public Stream GetResponseFilter()
         {
-            return HttpContext.Current.Response.Filter;
+            return _httpContextAccessor.Service.HttpContext.Response.Body;
         }
 
         public void SetResponseFilter(Stream stream)
         {
-            HttpContext.Current.Response.Filter = stream;
+            _httpContextAccessor.Service.HttpContext.Response.Body = stream;
         }
 
         public bool HasCurrentContext()
         {
-            return HttpContext.Current != null;
+            return _httpContextAccessor.Service.HttpContext != null;
         }
 
         public bool HasUserAgent()
         {
-            return HttpContext.Current.Request.UserAgent != null;
+            return _httpContextAccessor.Service.HttpContext.Request.Headers["User-Agent"].Count > 0;
         }
 
         public string RequestedUrl()
         {
-            return HttpContext.Current.Request.RawUrl;
+            return _httpContextAccessor.Service.HttpContext.Request.Path;
         }
 
         public ContentReference GetCurrentContentLink()
         {
             ContentReference retReference = null;
-            if (HttpContext.Current.Request.RequestContext != null)
+            if (_httpContextAccessor.Service.HttpContext != null)
             {
-                retReference =  HttpContext.Current.Request.RequestContext.GetContentLink();
+                retReference = _httpContextAccessor.Service.HttpContext.GetContentLink();
             }
             return retReference;
         }
 
         public HttpContext GetCurrentContext()
         {
-            return HttpContext.Current;
+            return _httpContextAccessor.Service.HttpContext;
         }
 
         public string GetSessionCookieName()
         {
             // returns the default cookie name if its not specified and/or if the key is completely missing from the web.config.
-            return ((SessionStateSection)WebConfigurationManager.GetSection("system.web/sessionState")).CookieName;
+            return SessionDefaults.CookieName;
         }
 
         public Dictionary<string, string> GetCurrentCookieCollection()
         {
             Dictionary<string,string> cookies = new Dictionary<string,string>();
-            var cookieCollection = GetCurrentContext()?.Request.Cookies.AllKeys;
-            if (cookieCollection != null)
+            var cookieCollection = GetCurrentContext()?.Request.Cookies.Select(x => x.Key).ToArray();
+            foreach (var cookieKey in cookieCollection)
             {
-                foreach (var cookieKey in cookieCollection)
-                {
-                    cookies.Add(cookieKey,GetCurrentContext().Request.Cookies[cookieKey].Value);
-
-                }
+                cookies.Add(cookieKey, GetCurrentContext().Request.Cookies[cookieKey]);
             }
 
             return cookies;
         }
 
-        public Encoding GetContentEncoding()
+        public string GetContentEncoding()
         {
-            return HttpContext.Current.Request.ContentEncoding;
+            return _httpContextAccessor.Service.HttpContext.Response.ContentType;
         }
     }
 }

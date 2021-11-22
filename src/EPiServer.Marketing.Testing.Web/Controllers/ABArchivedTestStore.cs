@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Web.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
 using EPiServer.Marketing.Testing.Web.Repositories;
@@ -11,6 +10,7 @@ using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass.Enums;
 using EPiServer.Core;
 using EPiServer.Marketing.Testing.Web.Helpers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EPiServer.Marketing.Testing.Web.Controllers
 {
@@ -18,6 +18,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
     /// This is the main RestSTore the UI compontents use to manage IMarketingTestObjects 
     /// </summary>
     [RestStore("ABArchivedTestStore")]
+    [ApiController]
     public class ABArchivedTestStore : RestControllerBase
     {
         private IMarketingTestingWebRepository _webRepo;
@@ -35,7 +36,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         }
 
         // For unit test support.
-        internal ABArchivedTestStore(IServiceLocator serviceLocator)
+        internal ABArchivedTestStore(IServiceProvider serviceLocator)
         {
             _webRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
             _episerverHelper = serviceLocator.GetInstance<IEpiserverHelper>();

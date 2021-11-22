@@ -4,32 +4,29 @@ using EPiServer.Marketing.KPI.Manager;
 using EPiServer.Marketing.KPI.Manager.DataClass;
 using EPiServer.Marketing.Testing.Web.Models;
 using EPiServer.ServiceLocation;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 
 namespace EPiServer.Marketing.Testing.Web.Repositories
 {
     [ServiceConfiguration(ServiceType = typeof(IKpiWebRepository), Lifecycle = ServiceInstanceScope.Singleton)]
     public class KpiWebRepository : IKpiWebRepository
     {
-        private IServiceLocator _locator;
-        private JavaScriptSerializer javascriptSerializer;
+        private IServiceProvider _locator;
         private IKpiManager kpiManager;
         private readonly string kpiTypeKey = "kpiType";      
 
         public KpiWebRepository()
         {
             _locator = ServiceLocator.Current;
-            javascriptSerializer = new JavaScriptSerializer();
             kpiManager = _locator.GetInstance<IKpiManager>();
         }
 
-        public KpiWebRepository(IServiceLocator sl)
+        public KpiWebRepository(IServiceProvider sl)
         {
             _locator = sl;
-            javascriptSerializer = new JavaScriptSerializer();
             kpiManager = _locator.GetInstance<IKpiManager>();
         }
-
+        
         /// <summary>
         /// Retrieves all KPIs available to the system.
         /// </summary>
@@ -60,11 +57,11 @@ namespace EPiServer.Marketing.Testing.Web.Repositories
         public List<Dictionary<string,string>> DeserializeJsonKpiFormCollection(string jsonFormDataCollection)
         {
             List<Dictionary<string, string>> kpiFormData = new List<Dictionary<string, string>>();
-            List<string> values = javascriptSerializer.Deserialize<List<string>>(jsonFormDataCollection);
+            List<string> values = JsonSerializer.Deserialize<List<string>>(jsonFormDataCollection);
             values.ForEach(value =>
             {
                 if (value.Contains(kpiTypeKey))
-                    kpiFormData.Add(javascriptSerializer.Deserialize<Dictionary<string, string>>(value));
+                    kpiFormData.Add(JsonSerializer.Deserialize<Dictionary<string, string>>(value));
             });
             return kpiFormData;
         }

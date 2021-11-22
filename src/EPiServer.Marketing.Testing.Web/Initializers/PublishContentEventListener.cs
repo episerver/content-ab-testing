@@ -23,7 +23,7 @@ namespace EPiServer.Marketing.Testing.Web.Initializers
     [ModuleDependency(typeof(MarketingTestingInitialization))]
     public class PublishContentEventListener : IInitializableModule
     {
-        private IServiceLocator _locator;
+        private IServiceProvider _locator;
         private static IList<IContent> _contentList = new List<IContent>();
         private static readonly Object _listLock = new Object();
 
@@ -32,7 +32,7 @@ namespace EPiServer.Marketing.Testing.Web.Initializers
         {
         }
 
-        internal PublishContentEventListener(IServiceLocator locator, IList<IContent> contentList)
+        internal PublishContentEventListener(IServiceProvider locator, IList<IContent> contentList)
         {
             _locator = locator;
             _contentList = contentList;

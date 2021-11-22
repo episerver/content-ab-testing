@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace EPiServer.Marketing.Testing.Web.ClientKPI
 {
-    internal interface IClientKpiInjector
+    public interface IClientKpiInjector
     {
         void ActivateClientKpis(List<IKpi> kpiInstances, TestDataCookie cookieData);
-        void AppendClientKpiScript();
+        string AppendClientKpiScript();
     }
 }

@@ -35,7 +35,7 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
     ]
     public class TestSchedulingJob : ScheduledJobBase
     {
-        private IServiceLocator _locator;
+        private IServiceProvider _locator;
         private AdminConfigTestSettings _config;
 
         [ExcludeFromCodeCoverage]
@@ -45,7 +45,7 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
             _config = AdminConfigTestSettings.Current;
         }
 
-        internal TestSchedulingJob(IServiceLocator locator)
+        internal TestSchedulingJob(IServiceProvider locator)
         {
             _locator = locator;
             _config = _locator.GetInstance<AdminConfigTestSettings>();
@@ -165,13 +165,6 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
                             TestId = test.Id.ToString(),
                             WinningContentLink = winningLink
                         };
-
-                        // We need to impersonate the user that created the test because the job may not have sufficient priviledges.  If there is no context(i.e. someone didn't force run the job) then 
-                        // the test creator will be used and the log will show this user name.
-                        if (HttpContext.Current == null)
-                        {
-                            PrincipalInfo.CurrentPrincipal = PrincipalInfo.CreatePrincipal(test.Owner);
-                        }
 
                         webRepo.PublishWinningVariant(storeModel);
                     }

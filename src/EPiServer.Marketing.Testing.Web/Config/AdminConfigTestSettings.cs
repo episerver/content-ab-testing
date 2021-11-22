@@ -2,6 +2,8 @@
 using EPiServer.Data.Dynamic;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.ServiceLocation;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Linq;
@@ -44,7 +46,7 @@ namespace EPiServer.Marketing.Testing.Web.Config
 
         internal static AdminConfigTestSettings _currentSettings;
         internal static DynamicDataStoreFactory _factory;
-        internal IServiceLocator _serviceLocator;
+        internal IServiceProvider _serviceLocator;
 
         /// <summary>
         /// Resets the config and forces a re-read of the settings from the db.
@@ -76,7 +78,7 @@ namespace EPiServer.Marketing.Testing.Web.Config
                     }
                 }
 
-                _currentSettings.PreviewStyleOverride = ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:PreviewStyleOverride"]?.ToString();
+                _currentSettings.PreviewStyleOverride = ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:PreviewStyleOverride"]?.ToString();
                 return _currentSettings;
             }
         }

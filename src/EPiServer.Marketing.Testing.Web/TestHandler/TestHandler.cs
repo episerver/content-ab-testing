@@ -21,9 +21,9 @@ using System.Globalization;
 namespace EPiServer.Marketing.Testing.Web
 {
     [ServiceConfiguration(ServiceType = typeof(ITestHandler), Lifecycle = ServiceInstanceScope.Singleton)]
-    internal class TestHandler : ITestHandler
+    public class TestHandler : ITestHandler
     {
-        private readonly IServiceLocator _serviceLocator;
+        private readonly IServiceProvider _serviceLocator;
         private readonly ITestingContextHelper _contextHelper;
         private readonly ITestDataCookieHelper _testDataCookieHelper;
         private readonly ILogger _logger;
@@ -60,7 +60,7 @@ namespace EPiServer.Marketing.Testing.Web
         }
 
         //To support unit testing
-        internal TestHandler(IServiceLocator serviceLocator, IHttpContextHelper httpContextHelper)
+        internal TestHandler(IServiceProvider serviceLocator, IHttpContextHelper httpContextHelper)
         {
             _serviceLocator = serviceLocator;
             _testDataCookieHelper = serviceLocator.GetInstance<ITestDataCookieHelper>();
