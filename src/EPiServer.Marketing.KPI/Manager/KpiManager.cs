@@ -22,7 +22,6 @@ namespace EPiServer.Marketing.KPI.Manager
     {
         private readonly Injected<IKpiDataAccess> _dataAccess;        
         private ILogger _logger;
-        public bool DatabaseNeedsConfiguring;
 
         /// <summary>
         /// Figures out if the database needs to be configured before setting up the data access layer.
@@ -98,12 +97,6 @@ namespace EPiServer.Marketing.KPI.Manager
         /// <inheritdoc />
         public long GetDatabaseVersion(string schema, string contextKey, bool setupDataAccess = false)
         {
-            if (DatabaseNeedsConfiguring)
-            {
-                DatabaseNeedsConfiguring = false;
-                return 0;
-            }
-
             return _dataAccess.Service.GetDatabaseVersion(schema, contextKey);
         }
 

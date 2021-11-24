@@ -17,6 +17,7 @@ using EPiServer.Web.Mvc.Html;
 using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.Admin;
 using EPiServer.Cms.UI.VisitorGroups;
+using System;
 
 namespace EPiServer.Templates.Alloy.Mvc
 {
@@ -29,14 +30,17 @@ namespace EPiServer.Templates.Alloy.Mvc
         {
             _webHostingEnvironment = webHostingEnvironment;
             _configuration = configuration;
+
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "App_Data");
+            AppDomain.CurrentDomain.SetData("DataDirectory", path);
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             var dbPath = Path.Combine(_webHostingEnvironment.ContentRootPath, "App_Data\\Alloy.mdf");
             var commDbPath = Path.Combine(_webHostingEnvironment.ContentRootPath, "App_Data\\AlloyCommerce.mdf");
-            var connectionstring = _configuration.GetConnectionString("EPiServerDB") ?? $"Data Source=(LocalDb)\\MSSQLLocalDB;AttachDbFilename={dbPath};Initial Catalog=alloy_mvc_netcore;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=True";
-            var commconnectionstring = _configuration.GetConnectionString("EcfSqlConnection") ?? $"Data Source=(LocalDb)\\MSSQLLocalDB;AttachDbFilename={commDbPath};Initial Catalog=alloy_commerce_netcore;Connection Timeout=60;Integrated Security=True;MultipleActiveResultSets=True";
+            var connectionstring = _configuration.GetConnectionString("EPiServerDB") ?? $"Data Source=(LocalDb)\\MSSQLLocalDB;AttachDbFilename={dbPath};Initial Catalog=mt_alloy_mvc_netcore;Integrated Security=True;Connect Timeout=30;MultipleActiveResultSets=True";
+            var commconnectionstring = _configuration.GetConnectionString("EcfSqlConnection") ?? $"Data Source=(LocalDb)\\MSSQLLocalDB;AttachDbFilename={commDbPath};Initial Catalog=mt_alloy_commerce_netcore;Connection Timeout=60;Integrated Security=True;MultipleActiveResultSets=True";
 
             services.Configure<SchedulerOptions>(o =>
             {
@@ -45,11 +49,20 @@ namespace EPiServer.Templates.Alloy.Mvc
 
             services.Configure<DataAccessOptions>(o =>
             {
-                o.SetConnectionString(connectionstring);
-                o.SetConnectionString(commconnectionstring);
+                o.ConnectionStrings.Add(new ConnectionStringOptions
+                {
+                    ConnectionString = connectionstring,
+                    Name = "EPiServerDB"
+                });
+                o.ConnectionStrings.Add(new ConnectionStringOptions
+                {
+                    ConnectionString = commconnectionstring,
+                    Name = "EcfSqlConnection"
+                });
             });
 
             services.AddCmsAspNetIdentity<ApplicationUser>();
+
 
             if (_webHostingEnvironment.IsDevelopment())
             {

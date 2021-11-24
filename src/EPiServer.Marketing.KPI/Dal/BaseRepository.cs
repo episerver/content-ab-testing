@@ -7,10 +7,12 @@ using EPiServer.Marketing.KPI.Dal.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.KPI.Dal
 {
     [ExcludeFromCodeCoverage]
+    [ServiceConfiguration(ServiceType = typeof(IRepository), Lifecycle = ServiceInstanceScope.Singleton)]
     public class BaseRepository : IRepository
     {
         #region Constants and Tables

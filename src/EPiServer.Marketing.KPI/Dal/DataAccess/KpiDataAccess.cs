@@ -15,19 +15,16 @@ using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.KPI.DataAccess
 {
+    [ServiceConfiguration(ServiceType = typeof(IKpiDataAccess), Lifecycle = ServiceInstanceScope.Singleton)]
     internal class KpiDataAccess : IKpiDataAccess
     {
         public readonly Injected<IRepository> _repository;
         internal bool _UseEntityFramework;
+        public bool IsDatabaseConfigured;
 
         [ExcludeFromCodeCoverage]
         public KpiDataAccess()
         {
-            if (!HasTableNamed((BaseRepository)_repository.Service, "tblKeyPerformaceIndicator"))
-            {
-                // the sql scripts need to be run!
-                throw new DatabaseDoesNotExistException();
-            }
         }
 
         /// <summary>
@@ -36,6 +33,10 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// <param name="kpiId">ID of the KPI to delete.</param>
         public void Delete(Guid kpiId)
         {
+            if (!IsDatabaseConfigured)
+            {
+                throw new DatabaseDoesNotExistException();
+            }
             DeleteHelper(_repository.Service, kpiId);
         }
 
@@ -52,6 +53,10 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// <returns>KPI object.</returns>
         public IDalKpi Get(Guid kpiId)
         {
+            if (!IsDatabaseConfigured)
+            {
+                throw new DatabaseDoesNotExistException();
+            }
             return GetHelper(_repository.Service, kpiId);
         }
 
@@ -66,6 +71,10 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// <returns>List of KPI objects.</returns>
         public List<IDalKpi> GetKpiList()
         {
+            if (!IsDatabaseConfigured)
+            {
+                throw new DatabaseDoesNotExistException();
+            }
             return GetKpiListHelper(_repository.Service);
         }
 
@@ -91,6 +100,10 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// <returns>The IDs of the KPI objects that were added/updated.</returns>
         public IList<Guid> Save(IList<IDalKpi> kpiObjects)
         {
+            if (!IsDatabaseConfigured)
+            {
+                throw new DatabaseDoesNotExistException();
+            }
             return SaveHelper(_repository.Service, kpiObjects);
         }
 
@@ -126,7 +139,13 @@ namespace EPiServer.Marketing.KPI.DataAccess
 
         public long GetDatabaseVersion(string schema, string contextKey)
         {
-            return GetDatabaseVersionHelper(_repository.Service, contextKey);
+            if (HasTableNamed((BaseRepository)_repository.Service, "tblKeyPerformaceIndicator"))
+            {
+                // the sql scripts need to be run!
+                IsDatabaseConfigured = true;
+            }
+
+            return IsDatabaseConfigured ? GetDatabaseVersionHelper(_repository.Service, contextKey) : 0 ;
         }
 
         private long GetDatabaseVersionHelper(IRepository repo, string contextKey)

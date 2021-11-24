@@ -16,7 +16,6 @@
 			<group targetFramework="net5.0">
 				<dependency id="EPiServer.CMS.AspNetCore.HtmlHelpers"  version="[$cmsVersion$,$cmsNextMajorVersion$)" />
 				<dependency id="EPiServer.CMS.UI.Core"  version="[$uiVersion$,$uiNextMajorVersion$)" />
-				<dependency id="Azure.Security.KeyVault.Secrets" version="[4.2.0,5)" />
 			</group>
         </dependencies>
     </metadata>

@@ -6,8 +6,8 @@ import axios from "axios";
 import { Snackbar, SnackbarAction } from "@rmwc/snackbar/dist/snackbar";
 import '@rmwc/snackbar/styles';
 
-const KpiCommerceSettings : React.FC = () => {
-    const [KpiCommerceSettings, setKpiCommerceSettings] = useState<KpiCommerceSettings>({} as KpiCommerceSettings);
+const KpiCommerceSettingsView : React.FC = () => {
+    const [kpiCommerceSettings, setKpiCommerceSettings] = useState<KpiCommerceSettings>({} as KpiCommerceSettings);
     const [snackBarMessage, setSnackBarMessage] = useState({ message: "", isOpen: false });
     const root = document.getElementById("root");
     const moduleUrl = root?.dataset.moduleShellPath;
@@ -24,7 +24,7 @@ const KpiCommerceSettings : React.FC = () => {
 
     const save = () => {
         axios.post(`${moduleUrl}Setting/Save`, {
-            preferredMarket: KpiCommerceSettings.preferredMarket
+            preferredMarket: kpiCommerceSettings.preferredMarket
         }).then(response => {
             if (response.status === 200) {
                 setSnackBarMessage({ message: response.data, isOpen: true });
@@ -35,7 +35,7 @@ const KpiCommerceSettings : React.FC = () => {
     return (
         <div className="kpi-commerce-container">
             <div className="header">
-                <Typography tag="h1" use="headline3">{KpiCommerceSettings.kpiCommerceConfigTitle}</Typography>
+                <Typography tag="h1" use="headline3">{kpiCommerceSettings.kpiCommerceConfigTitle}</Typography>
             </div>
             <Snackbar
                 open={snackBarMessage.isOpen}
@@ -49,17 +49,17 @@ const KpiCommerceSettings : React.FC = () => {
                 }
             />
 
-            <Card header={KpiCommerceSettings.preferredMarketDescription}>
+            <Card header={kpiCommerceSettings.preferredMarketDescription}>
                 <CardContentArea>
                     <ExposedDropdownMenu
-                        value={KpiCommerceSettings.preferredMarket}
-                        label={KpiCommerceSettings.preferredMarketLabel}
-                        options={KpiCommerceSettings.marketList}
+                        value={kpiCommerceSettings.preferredMarket}
+                        label={kpiCommerceSettings.preferredMarketLabel}
+                        options={kpiCommerceSettings.marketList}
                         onValueChange={changePreferredMarket}
                     />
                 </CardContentArea>
 
-                <TextButton contained onClick={save}>{KpiCommerceSettings.kpiCommerceSaveButton}</TextButton>
+                <TextButton contained onClick={save}>{kpiCommerceSettings.kpiCommerceSaveButton}</TextButton>
             </Card>
 
         </div>
@@ -67,4 +67,4 @@ const KpiCommerceSettings : React.FC = () => {
 };
 
 
-export default KpiCommerceSettings;
+export default KpiCommerceSettingsView;

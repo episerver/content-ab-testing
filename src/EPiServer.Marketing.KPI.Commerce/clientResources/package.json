@@ -6,7 +6,7 @@
   "author": "Optimizely",
   "license": "MIT",
   "scripts": {
-    "dev": "webpack --env env=dev --env bundle_mode=off --watch",
+    "dev": "webpack --env env=dev --env bundle_mode=off",
     "build": "webpack --env env=prod --env bundle_mode=off",
     "build:bundle-analyze": "webpack --env env=prod --env bundle_mode=on",
     "lint": "eslint --fix \"./src/**/*.{js,jsx,ts,tsx,json}\"",
