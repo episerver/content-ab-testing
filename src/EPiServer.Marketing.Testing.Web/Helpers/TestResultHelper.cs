@@ -3,6 +3,7 @@ using EPiServer.Core;
 using EPiServer.ServiceLocation;
 using EPiServer.Marketing.Testing.Web.Initializers;
 using EPiServer.Security;
+using System;
 
 namespace EPiServer.Marketing.Testing.Web.Helpers
 {
@@ -10,7 +11,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
     [ExcludeFromCodeCoverage]
     public class TestResultHelper : ITestResultHelper
     {
-        private IServiceLocator _serviceLocator;
+        private IServiceProvider _serviceLocator;
         private IContentRepository _contentRepository;
 
         public TestResultHelper()

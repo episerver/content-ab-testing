@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using EPiServer.Logging;
 using EPiServer.Marketing.Testing.Web.Config;
 using EPiServer.ServiceLocation;
@@ -12,6 +12,7 @@ using EPiServer.Shell.Services.Rest;
 namespace EPiServer.Marketing.Testing.Web.Controllers
 {
     [RestStore("ABTestConfigStore")]
+    [ApiController]
     public class ABTestConfigStore : RestControllerBase
     {
         private ILogger _logger;
@@ -25,7 +26,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         }
 
         // For unit test support.
-        internal ABTestConfigStore(IServiceLocator serviceLocator)
+        internal ABTestConfigStore(IServiceProvider serviceLocator)
         {
             _logger = serviceLocator.GetInstance<ILogger>();
             _settings = serviceLocator.GetInstance<AdminConfigTestSettings>();

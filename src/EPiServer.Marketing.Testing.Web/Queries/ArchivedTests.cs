@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using EPiServer.Core;
@@ -15,7 +16,7 @@ namespace EPiServer.Marketing.Testing.Web.Queries
     [ServiceConfiguration(typeof(IContentQuery))]
     public class ArchivedTestsQuery : QueryHelper, IContentQuery<TasksTestingQueryCategory>
     {
-        private IServiceLocator _serviceLocator;
+        private IServiceProvider _serviceLocator;
 
         [ExcludeFromCodeCoverage]
         public ArchivedTestsQuery()
@@ -24,7 +25,7 @@ namespace EPiServer.Marketing.Testing.Web.Queries
         }
 
         public ArchivedTestsQuery(
-            IServiceLocator mockServiceLocatorserviceLocator)
+            IServiceProvider mockServiceLocatorserviceLocator)
         {
             _serviceLocator = mockServiceLocatorserviceLocator;
         }

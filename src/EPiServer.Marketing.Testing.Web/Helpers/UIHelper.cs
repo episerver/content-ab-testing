@@ -1,14 +1,16 @@
 ﻿using EPiServer.Core;
 using EPiServer.ServiceLocation;
 using EPiServer.Shell;
+using EPiServer.Web;
 using EPiServer.Web.Mvc.Html;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Routing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Mvc;
 
 namespace EPiServer.Marketing.Testing.Web.Helpers
 {
@@ -16,7 +18,8 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
 
     public class UIHelper : IUIHelper
     {
-        private IServiceLocator _serviceLocator;
+        private readonly Injected<IHttpContextAccessor> _httpContextAccessor;
+        private IServiceProvider _serviceLocator;
 
         /// <summary>
         /// Default constructor
@@ -30,7 +33,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         /// unit tests should use this contructor and add needed services to the service locator as needed
         /// </summary>
         /// <param name="locator"></param>
-        internal UIHelper(IServiceLocator locator)
+        internal UIHelper(IServiceProvider locator)
         {
             _serviceLocator = locator;
         }
@@ -38,12 +41,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         public string getConfigurationURL()
         {
             //Build EPiServer URL to the configuration page
-            var uri = new Uri(HttpContext.Current.Request.Url.ToString());
-            var port = string.Empty;
-            if (uri.Port != 80)
-                port = ":" + uri.Port;
-
-            var requested = uri.Scheme + "://" + uri.Host + port;
+            var requested = _httpContextAccessor.Service.HttpContext.Request.Scheme + "://" + _httpContextAccessor.Service.HttpContext.Request.Host.Value;
             string settingsUrl = GetSettingsUrlString();
             return string.Format("{0}{1}", requested, settingsUrl);
         }
@@ -51,13 +49,13 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         private string GetSettingsUrlString()
         {
             // out: http://{DOMAIN}/{PROTECTED_PATH}/CMS/Admin/
-            var baseUrl = EPiServer.UriSupport.ResolveUrlFromUIBySettings("Admin/");
+            var baseUrl = UIPathResolver.Instance.CombineWithUI("Admin/");
 
             // out: /{PROTECTED_PATH}/{MODULE_NAME}/Views/Admin/Settings.aspx
             var targetResourcePath = Paths.ToResource(typeof(UIHelper), "TestingAdministration");
 
             // out: http://{DOMAIN}/{PROTECTED_PATH}/CMS/Admin/?customdefaultpage=/{PROTECTED_PATH}/{MODULE_NAME}/Views/Admin/Settings.aspx
-            return EPiServer.UriSupport.AddQueryString(baseUrl, "customdefaultpage", targetResourcePath);
+            return UriUtil.AddQueryString(baseUrl, "customdefaultpage", targetResourcePath);
         }
 
         public string GetAppRelativePath()
@@ -88,7 +86,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             var urlHelper = ServiceLocator.Current.GetInstance<UrlHelper>();
             return urlHelper.ContentUrl(contentLink);
 
-
+            
         }
     }
 }

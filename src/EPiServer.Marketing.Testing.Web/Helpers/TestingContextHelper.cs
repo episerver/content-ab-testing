@@ -21,7 +21,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
     [ServiceConfiguration(ServiceType = typeof(ITestingContextHelper), Lifecycle = ServiceInstanceScope.Singleton)]
     public class TestingContextHelper : ITestingContextHelper
     {
-        private readonly IServiceLocator _serviceLocator;
+        private readonly IServiceProvider _serviceLocator;
         private IHttpContextHelper _contextHelper;
         private IEpiserverHelper _episerverHelper;
         private IAggregatedPersonalizationEvaluator _aggregatedPersonalizationEvaluator;
@@ -42,7 +42,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         /// <param name="context"></param>
         /// <param name="mockServiceLocator"></param>
         [ExcludeFromCodeCoverage]
-        internal TestingContextHelper(IHttpContextHelper contextHelper, IServiceLocator mockServiceLocator, IEpiserverHelper episerverHelper)
+        internal TestingContextHelper(IHttpContextHelper contextHelper, IServiceProvider mockServiceLocator, IEpiserverHelper episerverHelper)
         {
             _contextHelper = contextHelper;
             _serviceLocator = mockServiceLocator;

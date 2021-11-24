@@ -21,6 +21,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
     /// <summary>
     /// Central point of access for test data and test manipulation.
     /// </summary>
+    [ServiceConfiguration(ServiceType = typeof(ITestManager), Lifecycle = ServiceInstanceScope.Singleton)]
     public class TestManager : ITestManager
     {        
         private readonly Injected<ITestingDataAccess> _dataAccess;
@@ -310,7 +311,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         }
 
         /// <inheritdoc />
-        public long GetDatabaseVersion(DbConnection dbConnection, string schema, string contextKey, bool populateCache = false)
+        public long GetDatabaseVersion(string schema, string contextKey, bool populateCache = false)
         {
             if (_databaseNeedsConfiguring)
             {

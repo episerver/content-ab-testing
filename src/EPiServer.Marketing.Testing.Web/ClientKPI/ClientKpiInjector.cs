@@ -5,6 +5,7 @@ using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Web.Helpers;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.ServiceLocation;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -65,7 +66,7 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
         /// Constructor
         /// </summary>
         /// <param name="serviceLocator">Dependency container</param>
-        internal ClientKpiInjector(IServiceLocator serviceLocator)
+        internal ClientKpiInjector(IServiceProvider serviceLocator)
         {
             _contextHelper = serviceLocator.GetInstance<ITestingContextHelper>();
             _testRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
@@ -91,12 +92,13 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
                     kpisToActivate.ForEach(kpi => _httpContextHelper.SetItemValue(kpi.Id.ToString(), true));
 
                     _httpContextHelper.RemoveCookie(ClientCookieName);
-                    _httpContextHelper.AddCookie(
-                        new HttpCookie(ClientCookieName)
+                    _httpContextHelper.AddCookie(ClientCookieName,
+                        JsonConvert.SerializeObject(kpisToActivate.ToDictionary(kpi => kpi.Id, kpi => cookieData)),
+                        new CookieOptions
                         {
-                            Value = JsonConvert.SerializeObject(kpisToActivate.ToDictionary(kpi => kpi.Id, kpi => cookieData))
-                        }
-                    );
+                            Expires = DateTime.Now.AddMinutes(60),
+                            HttpOnly = true
+                        });
                 }
             }
         }
@@ -104,7 +106,7 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
         /// <summary>
         /// Gets the associated script for a client KPI and appends it.
         /// </summary>
-        public void AppendClientKpiScript()
+        public string AppendClientKpiScript()
         {
             //Check if the current response has client kpis.  This lets us know we are in the correct response
             //so we don't inject scripts into an unrelated response stream.
@@ -142,9 +144,13 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
                         }
                     }
 
-                    Inject(clientKpiScript.ToString());
+                    //Remove the temporary cookie.
+                    _httpContextHelper.RemoveCookie(ClientCookieName);
+
+                    return clientKpiScript.ToString();
                 }
             }
+            return string.Empty;
         }
 
         /// <summary>
@@ -168,26 +174,6 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
         {
             return _contextHelper.IsHtmlContentType() &&
                      !_contextHelper.IsInSystemFolder() && (!cookieData.Converted || cookieData.AlwaysEval);
-        }
-
-        /// <summary>
-        /// Injects the specified script into the response stream.
-        /// </summary>
-        /// <param name="script">Script to inject</param>
-        private void Inject(string script)
-        {
-            //Remove the temporary cookie.
-            _httpContextHelper.RemoveCookie(ClientCookieName);
-
-            //Inject our script into the stream.
-            if (_httpContextHelper.CanWriteToResponse())
-            {
-                _httpContextHelper.SetResponseFilter(new ABResponseFilter(_httpContextHelper.GetResponseFilter(), script, _httpContextHelper.GetContentEncoding()));
-            }
-            else
-            {
-                _logger.Debug("AB Testing: Unable to attach client kpi to stream. Stream not in writeable state");
-            };
         }
         
         /// <summary>
