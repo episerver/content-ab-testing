@@ -132,9 +132,9 @@ namespace EPiServer.Marketing.KPI.Manager
         /// </summary>
         /// <param name="kpis">List of KPIs to save to the DB (i.e. contentcomparatorkpi, timeonpagekpi, etc.)</param>
         /// <returns>EF KPI object to save in the DB.</returns>
-        private List<IDalKpi> ConvertToDalKpis(IList<IKpi> kpis)
+        private List<DalKpi> ConvertToDalKpis(IList<IKpi> kpis)
         {
-            var dalKpis = new List<IDalKpi>();
+            var dalKpis = new List<DalKpi>();
 
             foreach (var kpi in kpis)
             {
@@ -168,7 +168,7 @@ namespace EPiServer.Marketing.KPI.Manager
         /// </summary>
         /// <param name="dalKpi">EF Kpi object.</param>
         /// <returns>User defined Kpi object.</returns>
-        private IKpi ConvertToManagerKpi(IDalKpi dalKpi)
+        private IKpi ConvertToManagerKpi(DalKpi dalKpi)
         {
             // split up saved assembly/class info
             var parts = dalKpi.ClassName.Split(',');

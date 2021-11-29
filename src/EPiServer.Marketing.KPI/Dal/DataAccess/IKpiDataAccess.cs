@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using EPiServer.Marketing.KPI.Dal;
 using EPiServer.Marketing.KPI.Dal.Model;
 
 namespace EPiServer.Marketing.KPI.DataAccess
 {
     public interface IKpiDataAccess
     {
-        IDalKpi Get(Guid kpiObjectId);
+        DalKpi Get(Guid kpiObjectId);
 
-        List<IDalKpi> GetKpiList();
+        List<DalKpi> GetKpiList();
 
-        Guid Save(IDalKpi kpiObject);
+        Guid Save(DalKpi kpiObject);
 
-        IList<Guid> Save(IList<IDalKpi> kpiObjects);
+        IList<Guid> Save(IList<DalKpi> kpiObjects);
 
         void Delete(Guid kpiObjectId);
 

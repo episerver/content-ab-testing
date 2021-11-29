@@ -1,28 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Migrations.History;
 using System.Linq;
 using System.Transactions;
 using EPiServer.Marketing.KPI.Dal;
 using EPiServer.Marketing.KPI.Dal.Model;
-
+using EPiServer.ServiceLocation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EPiServer.Marketing.KPI.Test
 {
+    [ServiceConfiguration(ServiceType = typeof(IRepository), Lifecycle = ServiceInstanceScope.Singleton)]
     internal class KpiTestRepository : IRepository
     {
         public KpiTestContext TestContext { get; set; }
-        public HistoryContext HistoryContext { get; set; }
+        public DatabaseContext DatabaseContext { get; set; }
+
+        public readonly IHistoryRepository HistoryRepository;
 
         public KpiTestRepository(KpiTestContext testContext)
         {
             TestContext = testContext;
         }
 
-        public KpiTestRepository(HistoryContext testContext)
+        public KpiTestRepository(DatabaseContext dbContext)
         {
-            HistoryContext = testContext;
+            HistoryRepository = dbContext.GetService<IHistoryRepository>();
         }
 
         public void Dispose()
@@ -85,12 +89,12 @@ namespace EPiServer.Marketing.KPI.Test
             return records;
         }
 
-        public IDalKpi GetById(object id)
+        public DalKpi GetById(object id)
         {
             return TestContext.Set<DalKpi>().Find(id);
         }
 
-        public IQueryable<IDalKpi> GetAll()
+        public IQueryable<DalKpi> GetAll()
         {
             return TestContext.Set<DalKpi>().AsQueryable();
         }
@@ -153,18 +157,18 @@ namespace EPiServer.Marketing.KPI.Test
 
         public string GetDatabaseVersion(string contextKey)
         {
-            return HistoryContext.History.Where(r => r.ContextKey == contextKey).OrderByDescending(row => row.MigrationId).First().MigrationId;
+            return HistoryRepository.GetAppliedMigrations().Select(r => r.MigrationId).FirstOrDefault();
         }
 
         /// <summary>
         /// Add the given object to the database context.
         /// </summary>
         /// <param name="instance"></param>
-        public void Add(object instance)
+        public void Add<T>(T instance) where T : class
         {
             if (instance != null)
             {
-                TestContext.Set(instance.GetType()).Add(instance);
+                TestContext.Set<T>().Add(instance);
             }
         }
 
@@ -172,11 +176,11 @@ namespace EPiServer.Marketing.KPI.Test
         /// Add a detached object to the database context.
         /// </summary>
         /// <param name="instance"></param>
-        public void AddDetached(object instance)
+        public void AddDetached<T>(T instance) where T : class
         {
             if (instance != null)
             {
-                TestContext.Set(instance.GetType()).Attach(instance);
+                TestContext.Set<T>().Attach(instance);
                 TestContext.Entry(instance).State = EntityState.Added;
             }
         }
@@ -185,11 +189,11 @@ namespace EPiServer.Marketing.KPI.Test
         /// Add a detached object to the database context.
         /// </summary>
         /// <param name="instance"></param>
-        public void UpdateDetached(object instance)
+        public void UpdateDetached<T>(T instance) where T : class
         {
             if (instance != null)
             {
-                TestContext.Set(instance.GetType()).Attach(instance);
+                TestContext.Set<T>().Attach(instance);
                 TestContext.Entry(instance).State = EntityState.Modified;
             }
         }

@@ -17,44 +17,54 @@ using EPiServer.Framework.Localization;
 using EPiServer.Marketing.KPI.Exceptions;
 using EPiServer.Marketing.KPI.Results;
 using EPiServer.Marketing.KPI.Common.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.KPI.Test
 {
     public class KPIManagerTests
     {
-        private Mock<IServiceLocator> _serviceLocator;
+        private Mock<IServiceProvider> _serviceLocator;
         private Mock<IKpiDataAccess> _kpiDataAccess;
         private Mock<IKpiHelper> _kpiHelper = new Mock<IKpiHelper>();
         LocalizationService _localizationservice = LocalizationService.Current;
+        public IServiceCollection Services { get; } = new ServiceCollection();
+
+        public KPIManagerTests()
+        {
+
+        }
+
         private DalKpi _testKpi = new DalKpi()
         {
             ClassName = "EPiServer.Marketing.KPI.Common.ContentComparatorKPI, EPiServer.Marketing.KPI",
-                Properties = "{\"ContentGuid\":\"b4d6245f-46b9-4938-b484-54b3deb80ddf\",\"UiMarkup\":\"<script>dojo.require(\\\"epi-cms/widget/ContentSelector\\\")</script>\\r\\n<p>\\r\\n    <label>Visitor navigates to page</label>\\r\\n    <span name=\\\"ConversionPage\\\"\\r\\n          id=\\\"ConversionPageWidget\\\"\\r\\n          data-dojo-type=\\\"epi-cms/widget/ContentSelector\\\"\\r\\n          data-dojo-props=\\\"repositoryKey:\'pages\',required: true, allowedTypes: [\'episerver.core.pagedata\'], allowedDndTypes: [], value: null\\\">\\r\\n        <script type=\\\"dojo/on\\\" data-dojo-event=\\\"change\\\">\\r\\n            var dependency = require(\\\"epi/dependency\\\")\\r\\n            var contextService = dependency.resolve(\\\"epi.shell.ContextService\\\");\\r\\n            var context = contextService.currentContext;\\r\\n            var currentContentInput = dojo.byId(\\\"CurrentContent\\\");\\r\\n            currentContentInput.value = context.id;\\r\\n        </script>\\r\\n    </span>\\r\\n    <div>\\r\\n        <input id=\\\"CurrentContent\\\" type=\\\"hidden\\\" name=\\\"CurrentContent\\\" />\\r\\n    </div>\\r\\n</p>\",\"UiReadOnlyMarkup\":\"<h4>Conversion goal</h4>\\r\\n<p>\\r\\n    <label>Visitor navigates to page</label><span class=\\\"dijitInline dijitReset digitIcon epi-iconPage\\\"></span><a href=\\\"/about-us/\\\" class=\\\"epi-visibleLink\\\">About us</a>\\r\\n</p>\",\"Id\":\"ee04f7a8-073d-4261-a0d4-2b36db652918\",\"ResultComparison\":0,\"FriendlyName\":\"Landing Page\",\"KpiResultType\":\"KpiConversionResult\",\"Description\":\"The chosen page is the one that a user must click on in order to count as a conversion.  Results: Views are the number of visitors that visit the page under test.  Conversions are the number of visitors that clicked through to the landing page at any point in the future while the test was running.\",\"CreatedDate\":\"2017-02-22T20:56:00.7531527Z\",\"ModifiedDate\":\"2017-02-22T20:56:00.7531527Z\",\"PreferredCommerceFormat\":{\"Id\":null,\"CommerceCulture\":\"DEFAULT\",\"preferredFormat\":null}}"
-            };
+            Properties = "{\"ContentGuid\":\"b4d6245f-46b9-4938-b484-54b3deb80ddf\",\"UiMarkup\":\"<script>dojo.require(\\\"epi-cms/widget/ContentSelector\\\")</script>\\r\\n<p>\\r\\n    <label>Visitor navigates to page</label>\\r\\n    <span name=\\\"ConversionPage\\\"\\r\\n          id=\\\"ConversionPageWidget\\\"\\r\\n          data-dojo-type=\\\"epi-cms/widget/ContentSelector\\\"\\r\\n          data-dojo-props=\\\"repositoryKey:\'pages\',required: true, allowedTypes: [\'episerver.core.pagedata\'], allowedDndTypes: [], value: null\\\">\\r\\n        <script type=\\\"dojo/on\\\" data-dojo-event=\\\"change\\\">\\r\\n            var dependency = require(\\\"epi/dependency\\\")\\r\\n            var contextService = dependency.resolve(\\\"epi.shell.ContextService\\\");\\r\\n            var context = contextService.currentContext;\\r\\n            var currentContentInput = dojo.byId(\\\"CurrentContent\\\");\\r\\n            currentContentInput.value = context.id;\\r\\n        </script>\\r\\n    </span>\\r\\n    <div>\\r\\n        <input id=\\\"CurrentContent\\\" type=\\\"hidden\\\" name=\\\"CurrentContent\\\" />\\r\\n    </div>\\r\\n</p>\",\"UiReadOnlyMarkup\":\"<h4>Conversion goal</h4>\\r\\n<p>\\r\\n    <label>Visitor navigates to page</label><span class=\\\"dijitInline dijitReset digitIcon epi-iconPage\\\"></span><a href=\\\"/about-us/\\\" class=\\\"epi-visibleLink\\\">About us</a>\\r\\n</p>\",\"Id\":\"ee04f7a8-073d-4261-a0d4-2b36db652918\",\"ResultComparison\":0,\"FriendlyName\":\"Landing Page\",\"KpiResultType\":\"KpiConversionResult\",\"Description\":\"The chosen page is the one that a user must click on in order to count as a conversion.  Results: Views are the number of visitors that visit the page under test.  Conversions are the number of visitors that clicked through to the landing page at any point in the future while the test was running.\",\"CreatedDate\":\"2017-02-22T20:56:00.7531527Z\",\"ModifiedDate\":\"2017-02-22T20:56:00.7531527Z\",\"PreferredCommerceFormat\":{\"Id\":null,\"CommerceCulture\":\"DEFAULT\",\"preferredFormat\":null}}"
+        };
 
         private DalKpi GetDalKpi()
         {
             return new DalKpi()
             {
-                ClassName = "EPiServer.Marketing.KPI.Common.ContentComparatorKPI, EPiServer.Marketing.KPI",
+                ClassName = "EPiServer.Marketing.KPI.Common.ContentComparatorKPI,EPiServer.Marketing.KPI",
                 Properties = "{\"ContentGuid\":\"b4d6245f-46b9-4938-b484-54b3deb80ddf\",\"UiMarkup\":\"<script>dojo.require(\\\"epi-cms/widget/ContentSelector\\\")</script>\\r\\n<p>\\r\\n    <label>Visitor navigates to page</label>\\r\\n    <span name=\\\"ConversionPage\\\"\\r\\n          id=\\\"ConversionPageWidget\\\"\\r\\n          data-dojo-type=\\\"epi-cms/widget/ContentSelector\\\"\\r\\n          data-dojo-props=\\\"repositoryKey:\'pages\',required: true, allowedTypes: [\'episerver.core.pagedata\'], allowedDndTypes: [], value: null\\\">\\r\\n        <script type=\\\"dojo/on\\\" data-dojo-event=\\\"change\\\">\\r\\n            var dependency = require(\\\"epi/dependency\\\")\\r\\n            var contextService = dependency.resolve(\\\"epi.shell.ContextService\\\");\\r\\n            var context = contextService.currentContext;\\r\\n            var currentContentInput = dojo.byId(\\\"CurrentContent\\\");\\r\\n            currentContentInput.value = context.id;\\r\\n        </script>\\r\\n    </span>\\r\\n    <div>\\r\\n        <input id=\\\"CurrentContent\\\" type=\\\"hidden\\\" name=\\\"CurrentContent\\\" />\\r\\n    </div>\\r\\n</p>\",\"UiReadOnlyMarkup\":\"<h4>Conversion goal</h4>\\r\\n<p>\\r\\n    <label>Visitor navigates to page</label><span class=\\\"dijitInline dijitReset digitIcon epi-iconPage\\\"></span><a href=\\\"/about-us/\\\" class=\\\"epi-visibleLink\\\">About us</a>\\r\\n</p>\",\"Id\":\"ee04f7a8-073d-4261-a0d4-2b36db652918\",\"ResultComparison\":0,\"FriendlyName\":\"Landing Page\",\"KpiResultType\":\"KpiConversionResult\",\"Description\":\"The chosen page is the one that a user must click on in order to count as a conversion.  Results: Views are the number of visitors that visit the page under test.  Conversions are the number of visitors that clicked through to the landing page at any point in the future while the test was running.\",\"CreatedDate\":\"2017-02-22T20:56:00.7531527Z\",\"ModifiedDate\":\"2017-02-22T20:56:00.7531527Z\",\"PreferredCommerceFormat\":{\"Id\":null,\"CommerceCulture\":\"DEFAULT\",\"preferredFormat\":null}}"
             };
         }
 
         private KpiManager GetUnitUnderTest()
         {
-            _serviceLocator = new Mock<IServiceLocator>();
+            _serviceLocator = new Mock<IServiceProvider>();
             _kpiDataAccess = new Mock<IKpiDataAccess>();
-            _kpiDataAccess.Setup(call => call.GetKpiList()).Returns(new List<IDalKpi>() { _testKpi });
-            _kpiDataAccess.Setup(dal => dal.GetDatabaseVersion(It.IsAny<DbConnection>(), It.IsAny<string>(), It.IsAny<string>())).Returns(1);
+            _kpiDataAccess.Setup(call => call.GetKpiList()).Returns(new List<DalKpi>() { _testKpi });
+            _kpiDataAccess.Setup(dal => dal.GetDatabaseVersion(It.IsAny<string>(), It.IsAny<string>())).Returns(1);
             _kpiHelper.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("teststring");
 
-            _serviceLocator.Setup(sl => sl.GetInstance<IKpiDataAccess>()).Returns(_kpiDataAccess.Object);
-            _serviceLocator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(_localizationservice);
-            _serviceLocator.Setup(sl => sl.GetInstance<IKpiHelper>()).Returns(_kpiHelper.Object);
+            Services.AddSingleton(_kpiDataAccess.Object);
+            Services.AddSingleton(_localizationservice);
+            Services.AddSingleton(_kpiHelper.Object);
+
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
 
             // Set our mocked service locator so calls like ServiceLocator.Current work properly. 
-            return new KpiManager(_serviceLocator.Object);
+            return new KpiManager();
         }
 
         [Fact]
@@ -74,12 +84,12 @@ namespace EPiServer.Marketing.KPI.Test
         {
             var theGuid = new Guid("A2AF4481-89AB-4D0A-B042-050FECEA60A3");
             var tm = GetUnitUnderTest();
-            var kpi = new Kpi(_serviceLocator.Object)
+            var kpi = new Kpi()
             {
                 Id = theGuid
             };
 
-            _kpiDataAccess.Setup(call => call.Save(It.IsAny<List<IDalKpi>>())).Returns(new List<Guid>() { theGuid });
+            _kpiDataAccess.Setup(call => call.Save(It.IsAny<List<DalKpi>>())).Returns(new List<Guid>() { theGuid });
 
             var id = tm.Save(kpi);
 
@@ -91,21 +101,21 @@ namespace EPiServer.Marketing.KPI.Test
         {
             var theGuid = new Guid("A2AF4481-89AB-4D0A-B042-050FECEA60A3");
             var tm = GetUnitUnderTest();
-            var kpi = new Kpi( _serviceLocator.Object )
-            {
-                Id = theGuid 
-            };
-
-            var kpi2 = new Kpi(_serviceLocator.Object)
+            var kpi = new Kpi()
             {
                 Id = theGuid
             };
 
-            var kpis = new List<IKpi>() { kpi, kpi2};
+            var kpi2 = new Kpi()
+            {
+                Id = theGuid
+            };
+
+            var kpis = new List<IKpi>() { kpi, kpi2 };
 
             tm.Save(kpis);
 
-            _kpiDataAccess.Verify(da => da.Save(It.Is<List<IDalKpi>>(arg => arg.Count == 2)),
+            _kpiDataAccess.Verify(da => da.Save(It.Is<List<DalKpi>>(arg => arg.Count == 2)),
                 "DataAcessLayer Save was never called or object did not match.");
         }
 
@@ -126,7 +136,7 @@ namespace EPiServer.Marketing.KPI.Test
             var kpi = new Kpi();
             var content = new Mock<IContent>();
             ContentEventArgs arg = new ContentEventArgs(new ContentReference()) { Content = content.Object };
-            Assert.Throws<NotImplementedException>(() => kpi.Evaluate(this,arg));
+            Assert.Throws<NotImplementedException>(() => kpi.Evaluate(this, arg));
         }
 
         [Fact]
@@ -142,10 +152,10 @@ namespace EPiServer.Marketing.KPI.Test
         {
             var manager = GetUnitUnderTest();
 
-            Assert.Equal(1, manager.GetDatabaseVersion(new SqlConnection(), "", ""));
+            Assert.Equal(1, manager.GetDatabaseVersion("", ""));
 
             manager.DatabaseNeedsConfiguring = true;
-            Assert.Equal(0, manager.GetDatabaseVersion(new SqlConnection(), "", ""));
+            Assert.Equal(0, manager.GetDatabaseVersion("", ""));
         }
 
 
