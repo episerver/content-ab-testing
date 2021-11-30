@@ -11,6 +11,8 @@ using EPiServer.Marketing.KPI.Exceptions;
 using EPiServer.Marketing.KPI.Test.Fakes;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
@@ -27,6 +29,9 @@ namespace EPiServer.Marketing.KPI.Test.Common
         private IContent _content100;
         private IContent _content200;
         private IContent _nullContent100;
+        protected readonly Injected<IHttpContextAccessor> _httpContextAccessor;
+        private Mock<IHttpContextAccessor> _httpContextAccessorMock;
+        public IServiceCollection Services { get; } = new ServiceCollection();
 
         private StickySiteKpi GetUnitUnderTest()
         {
@@ -35,6 +40,7 @@ namespace EPiServer.Marketing.KPI.Test.Common
             _nullContent100 = new BasicContent { ContentLink = new ContentReference(111, 112) };
             _stickyHelperMock = new Mock<IKpiHelper>();
             _stickyHelperMock.Setup(call => call.IsInSystemFolder()).Returns(false);
+            Services.AddSingleton(_stickyHelperMock.Object);
 
             var pageRef2 = new PageReference() { ID = 2, WorkID = 5 };
             var contentData = new PageData(pageRef2);
@@ -45,22 +51,26 @@ namespace EPiServer.Marketing.KPI.Test.Common
             _contentRepo.Setup(call => call.Get<IContent>(It.Is<ContentReference>(cf => cf == _content100.ContentLink))).Returns(_content100);
             _contentRepo.Setup(call => call.Get<IContent>(It.Is<ContentReference>(cf => cf == _content200.ContentLink))).Returns(_content200);
             _contentRepo.Setup(call => call.Get<IContent>(It.Is<ContentReference>(cf => cf == _nullContent100.ContentLink))).Returns(_nullContent100);
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentRepository>()).Returns(_contentRepo.Object);
+            Services.AddSingleton(_contentRepo.Object);
 
             _contentVersionRepo = new Mock<IContentVersionRepository>();
             _contentVersionRepo.Setup(call => call.LoadPublished(It.Is<ContentReference>(cf => cf != _content100))).Returns(new ContentVersion(ContentReference.EmptyReference, "", VersionStatus.Published, DateTime.Now, "", "", 1, "", true, false));
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentVersionRepository>()).Returns(_contentVersionRepo.Object);
+            Services.AddSingleton(_contentVersionRepo.Object);
 
-            _serviceLocator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(new FakeLocalizationService("whatever"));
+            Services.AddSingleton(new FakeLocalizationService("whatever"));
 
             _contentEvents = new Mock<IContentEvents>();
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentEvents>()).Returns(_contentEvents.Object);
+            Services.AddSingleton(_contentEvents.Object);
 
             _urlResolver = new Mock<UrlResolver>();
             _urlResolver.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("/alloy-plan/");
-            _serviceLocator.Setup(s1 => s1.GetInstance<UrlResolver>()).Returns(_urlResolver.Object);
+            Services.AddSingleton(_urlResolver.Object);
 
-            return new StickySiteKpi(_serviceLocator.Object, _stickyHelperMock.Object);
+            _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+            Services.AddSingleton(_httpContextAccessorMock.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
+            return new StickySiteKpi();
         }
 
         [Fact]
@@ -116,10 +126,10 @@ namespace EPiServer.Marketing.KPI.Test.Common
         [Fact]
         public void StickySiteKpi_AddSessionOnLoadedContent()
         {
-            Thread.Sleep(1000);
-            HttpContext.Current = FakeHttpContext.FakeContext("http://localhost:48594/alloy-plan/");
-
             var kpi = GetUnitUnderTest();
+
+            Thread.Sleep(1000);
+            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(new FakeHttpContext("http://localhost:48594/alloy-plan/").Current);
 
             kpi.AddSessionOnLoadedContent(new object(), new ContentEventArgs(new BasicContent()));
         }
@@ -127,11 +137,12 @@ namespace EPiServer.Marketing.KPI.Test.Common
         [Fact]
         public void StickySiteKpi_Evaluate()
         {
-            var t = FakeHttpContext.FakeContext("http://localhost:48594/alloy-plan/");
-            t.Request.Cookies.Add(new HttpCookie("SSK_" + Guid.Empty));
-            HttpContext.Current = t;
-
             var kpi = GetUnitUnderTest();
+
+            var fakeContextMock = new FakeHttpContext("http://localhost:48594/alloy-plan/");
+            fakeContextMock.AddCookie("SSK_" + Guid.Empty, "path=");
+            var t = fakeContextMock.Current;
+            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(t);
 
             var content3 = new Mock<IContent>();
             var arg = new ContentEventArgs(new ContentReference()) { Content = content3.Object };
@@ -144,16 +155,17 @@ namespace EPiServer.Marketing.KPI.Test.Common
         [Fact]
         public void MAR_914_KPI_VerifyKpiUsesUniqueContextSkipAttribute()
         {
-            var t = FakeHttpContext.FakeContext("http://localhost:48594/alloy-plan/");
-            HttpContext.Current = t;
-
             var kpi = GetUnitUnderTest();
+
+            var t = new FakeHttpContext("http://localhost:48594/alloy-plan/").Current;
+            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(t);
+
             kpi.TestContentGuid = _content100.ContentGuid;
             var arg = new ContentEventArgs(new ContentReference()) { Content = _content100 };
 
             kpi.AddSessionOnLoadedContent(new object(), arg);
 
-            Assert.True(t.Items.Contains("SSK_" + kpi.TestContentGuid.ToString()), "Skip Attribute not unique");
+            Assert.True(t.Items.ContainsKey("SSK_" + kpi.TestContentGuid.ToString()), "Skip Attribute not unique");
         }
     }
 }

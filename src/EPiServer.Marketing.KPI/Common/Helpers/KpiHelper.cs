@@ -13,7 +13,7 @@ namespace EPiServer.Marketing.KPI.Common.Helpers
     /// </summary>
     [ExcludeFromCodeCoverage]
     [ServiceConfiguration(ServiceType = typeof(IKpiHelper), Lifecycle = ServiceInstanceScope.Singleton)]
-    internal class KpiHelper : IKpiHelper
+    public class KpiHelper : IKpiHelper
     {
         protected readonly Injected<IHttpContextAccessor> _httpContextAccessor;
         

@@ -247,17 +247,20 @@ namespace EPiServer.Marketing.KPI.Common
 
         private bool CookieExists(string path, string contentGuid)
         {
-            foreach (var cookieName in _httpContextAccessor.Service.HttpContext.Request.Cookies)
+            var cookies = _httpContextAccessor.Service.HttpContext.Request.Cookies;
+            if (cookies.Count > 0) 
             {
-                
-                if (cookieName.Key.Contains("SSK_"))
+                foreach (var cookieName in _httpContextAccessor.Service.HttpContext.Request.Cookies)
                 {
-                    var cookieValue = _httpContextAccessor.Service.HttpContext.Request.Cookies[cookieName.Key].FromLegacyCookieString();
 
-                    return cookieValue["path"] == path && cookieValue["contentguid"] == contentGuid;
+                    if (cookieName.Key.Contains("SSK_"))
+                    {
+                        var cookieValue = _httpContextAccessor.Service.HttpContext.Request.Cookies[cookieName.Key].FromLegacyCookieString();
+
+                        return cookieValue["path"] == path && cookieValue["contentguid"] == contentGuid;
+                    }
                 }
             }
-
             return false;
         }
 

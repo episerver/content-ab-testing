@@ -1,5 +1,8 @@
 ﻿using EPiServer.Marketing.KPI.Common.Helpers;
 using EPiServer.Marketing.KPI.Test.Fakes;
+using EPiServer.ServiceLocation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -14,6 +17,15 @@ namespace EPiServer.Marketing.KPI.Test.Common
 {
     public class KpiHelperTests
     {
+        private Mock<IHttpContextAccessor> _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        public IServiceCollection Services { get; } = new ServiceCollection();
+
+        public KpiHelperTests()
+        {
+            Services.AddTransient(s => _httpContextAccessorMock.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+        }
+
         private IKpiHelper GetUnitUnderTest()
         {            
             return new KpiHelper();
@@ -22,8 +34,8 @@ namespace EPiServer.Marketing.KPI.Test.Common
         [Fact]
         public void GetRequestPath_ReturnsCurrentRequestedUrlPath()
         {
-            HttpContext.Current = FakeHttpContext.FakeContext("http://localhost:48594/alloy-plan/");
             var kpiHelper = GetUnitUnderTest();
+            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(new FakeHttpContext("http://localhost:48594/alloy-plan/").Current);
             Assert.True(kpiHelper.GetRequestPath() == "/alloy-plan/");
         }
 

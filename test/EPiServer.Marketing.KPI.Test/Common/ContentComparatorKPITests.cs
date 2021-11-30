@@ -14,6 +14,7 @@ using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
 using Xunit;
 using EPiServer.Marketing.KPI.Common.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.KPI.Test.Common
 {
@@ -21,7 +22,6 @@ namespace EPiServer.Marketing.KPI.Test.Common
     {
         private Guid LandingPageGuid = new Guid("A051E0AC-571A-4490-8909-854BA43B8E1E");
 
-        private Mock<IServiceLocator> _serviceLocator = new Mock<IServiceLocator>();
         private Mock<IContentRepository> _contentRepo;
         private Mock<IContentVersionRepository> _contentVersionRepo;
         private Mock<IContentEvents> _contentEvents;
@@ -33,6 +33,7 @@ namespace EPiServer.Marketing.KPI.Test.Common
         private IContent _content3;
         private IContent _nullContent;
         //private IContent _nullContentResult;
+        public IServiceCollection Services { get; } = new ServiceCollection();
 
         private ContentComparatorKPI GetUnitUnderTest()
         {
@@ -47,25 +48,27 @@ namespace EPiServer.Marketing.KPI.Test.Common
             _contentRepo.Setup(call => call.Get<IContent>(It.IsAny<Guid>())).Returns(contentData);
             _contentRepo.Setup(call => call.Get<IContent>(It.Is<ContentReference>(cf => cf == _content.ContentLink))).Returns(_content);
             _contentRepo.Setup(call => call.Get<IContent>(It.Is<ContentReference>(cf => cf == _content2.ContentLink))).Returns(_content2);
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentRepository>()).Returns(_contentRepo.Object);
+            Services.AddSingleton(_contentRepo.Object);
 
             _contentVersionRepo = new Mock<IContentVersionRepository>();
             _contentVersionRepo.Setup(call => call.LoadPublished(It.Is<ContentReference>(cf => cf != _content))).Returns(new ContentVersion(ContentReference.EmptyReference, "", VersionStatus.Published, DateTime.Now, "", "", 1, "", true, false));
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentVersionRepository>()).Returns(_contentVersionRepo.Object);
+            Services.AddSingleton(_contentVersionRepo.Object);
 
-            _serviceLocator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(new FakeLocalizationService("whatever"));
+            Services.AddSingleton<LocalizationService>(new FakeLocalizationService("whatever"));
 
             _contentEvents = new Mock<IContentEvents>();
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentEvents>()).Returns(_contentEvents.Object);
+            Services.AddSingleton(_contentEvents.Object);
 
             _urlResolver = new Mock<UrlResolver>();
             _urlResolver.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("testUrl");
-            _serviceLocator.Setup(s1 => s1.GetInstance<UrlResolver>()).Returns(_urlResolver.Object);
+            Services.AddSingleton(_urlResolver.Object);
 
             _kpiHelper.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("testUrl");
-            _serviceLocator.Setup(sl => sl.GetInstance<IKpiHelper>()).Returns(_kpiHelper.Object);
-            
-            return new ContentComparatorKPI(_serviceLocator.Object, LandingPageGuid);
+            Services.AddSingleton(_kpiHelper.Object);
+
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
+            return new ContentComparatorKPI(LandingPageGuid);
         }
 
         private ContentComparatorKPI GetUnitUnderTest2()
@@ -76,31 +79,32 @@ namespace EPiServer.Marketing.KPI.Test.Common
             var pageRef2 = new PageReference() { ID = 2, WorkID = 5 };
             var contentData = new PageData(pageRef2);
             ContentVersion ver = null;
-            _serviceLocator = new Mock<IServiceLocator>();
 
             _contentRepo = new Mock<IContentRepository>();
             _contentRepo.Setup(call => call.Get<IContent>(It.IsAny<Guid>())).Returns(contentData);
             _contentRepo.Setup(call => call.Get<IContent>(It.Is<ContentReference>(cf => cf == _content3.ContentLink))).Returns(_content3);
             _contentRepo.Setup(call => call.Get<IContent>(It.Is<ContentReference>(cf => cf == _nullContent.ContentLink))).Returns(_nullContent);
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentRepository>()).Returns(_contentRepo.Object);
+            Services.AddSingleton(_contentRepo.Object);
 
             _contentVersionRepo = new Mock<IContentVersionRepository>();
             _contentVersionRepo.Setup(call => call.LoadPublished(It.Is<ContentReference>(cf => cf == _nullContent))).Returns(ver);
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentVersionRepository>()).Returns(_contentVersionRepo.Object);
+            Services.AddSingleton(_contentVersionRepo.Object);
 
-            _serviceLocator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(new FakeLocalizationService("whatever"));
+            Services.AddSingleton<LocalizationService>(new FakeLocalizationService("whatever"));
 
             _contentEvents = new Mock<IContentEvents>();
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentEvents>()).Returns(_contentEvents.Object);
+            Services.AddSingleton(_contentEvents.Object);
 
             _urlResolver = new Mock<UrlResolver>();
             _urlResolver.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("testUrl");
-            _serviceLocator.Setup(s1 => s1.GetInstance<UrlResolver>()).Returns(_urlResolver.Object);
+            Services.AddSingleton(_urlResolver.Object);
 
             _kpiHelper.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("testUrl");
-            _serviceLocator.Setup(sl => sl.GetInstance<IKpiHelper>()).Returns(_kpiHelper.Object);
+            Services.AddSingleton(_kpiHelper.Object);
 
-            return new ContentComparatorKPI(_serviceLocator.Object, LandingPageGuid);
+            ServiceLocator.SetServiceProvider(Services.BuildServiceProvider());
+
+            return new ContentComparatorKPI(LandingPageGuid);
         }
         /** Removed for now because code is different in mar-455 and tests 
          * will be merged then.
@@ -128,7 +132,7 @@ namespace EPiServer.Marketing.KPI.Test.Common
         public void VerifyGet()
         {
             var kpi = GetUnitUnderTest();
-            Assert.True( kpi.ContentGuid.Equals(LandingPageGuid), "Evaluate should have returned true");
+            Assert.True(kpi.ContentGuid.Equals(LandingPageGuid), "Evaluate should have returned true");
         }
 
         [Fact]

@@ -1,4 +1,7 @@
-﻿using System.Data.Common;
+﻿using Microsoft.Extensions.Configuration;
+using EPiServer.ServiceLocation;
+using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 using System.Linq;
 using Xunit;
 
@@ -7,13 +10,10 @@ namespace EPiServer.Marketing.KPI.Test
     public class KpiDalTests : KpiTestBase
     {
         private KpiTestContext _context;
-        private DbConnection _dbConnection;
-
-
         public KpiDalTests()
         {
-            _dbConnection = Effort.DbConnectionFactory.CreateTransient();
-            _context = new KpiTestContext(_dbConnection);
+            var optionsBuilder = new DbContextOptionsBuilder<KpiTestContext>().UseInMemoryDatabase(databaseName: "episerver.testing").EnableServiceProviderCaching(false);
+            _context = new KpiTestContext(optionsBuilder.Options);
         }
 
         [Fact]
