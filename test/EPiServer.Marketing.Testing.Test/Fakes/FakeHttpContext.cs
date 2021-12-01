@@ -1,36 +1,59 @@
-﻿using System;
+﻿using HttpContextMoq;
+using HttpContextMoq.Extensions;
+using Microsoft.AspNetCore.Http;
+using Moq;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Web;
-using System.Web.SessionState;
 
 namespace EPiServer.Marketing.Testing.Test.Fakes
 {
+    /// <summary>
+    /// Fakes the httpcontext for unit testing
+    /// </summary>
     public class FakeHttpContext
     {
-        /// <summary>
-        /// Creates fake http context
-        /// </summary>
-        /// <param name="url">Url to create the context for</param>
-        /// <returns></returns>
-        public static HttpContext FakeContext(string url)
+        private Mock<HttpContext> _httpContextMock = new Mock<HttpContext>();
+
+        public HttpContext Current
+        {
+            get
+            {
+                return _httpContextMock.Object;
+            }
+        }
+
+        public FakeHttpContext(string url)
         {
             var uri = new Uri(url);
-            var httpRequest = new HttpRequest(string.Empty, uri.ToString(),
-                                                uri.Query.TrimStart('?'));
-            var stringWriter = new StringWriter();
-            var httpResponse = new HttpResponse(stringWriter);
-            var httpContext = new HttpContext(httpRequest, httpResponse);
 
-            var sessionContainer = new HttpSessionStateContainer("id",
-                                            new SessionStateItemCollection(),
-                                            new HttpStaticObjectsCollection(),
-                                            10, true, HttpCookieMode.AutoDetect,
-                                            SessionStateMode.InProc, false);
+            var _httpRequest = new Mock<HttpRequest>();
+            _httpRequest.Setup(x=>x.Path).Returns(uri.AbsolutePath);
+            var requestCookieMock = new Mock<IRequestCookieCollection>();
+            _httpRequest.Setup(x => x.Cookies).Returns(requestCookieMock.Object);
 
-            SessionStateUtility.AddHttpSessionStateToContext(
-                                                 httpContext, sessionContainer);
+            _httpContextMock.Setup(x => x.Request).Returns(_httpRequest.Object);
 
-            return httpContext;
+            var sessionMock = new Mock<ISession>();
+            _httpContextMock.Setup(x => x.Session).Returns(sessionMock.Object);
+
+            var _httpResponse = new Mock<HttpResponse>();
+            var responseCookieMock = new Mock<IResponseCookies>();
+            _httpResponse.Setup(x => x.Cookies).Returns(responseCookieMock.Object);
+            _httpContextMock.Setup(x => x.Response).Returns(_httpResponse.Object);
+
+            _httpContextMock.Setup(x => x.Items).Returns(new Dictionary<object, object>());
+        }
+
+        public void AddCookie(string name, string value = null)
+        {
+            var contextMock = new HttpContextMock();
+            contextMock.SetupRequestCookies(new Dictionary<string, string> {
+                { name, value }
+            });
+
+            _httpContextMock.Setup(x => x.Request.Cookies).Returns(contextMock.Request.Cookies);
         }
     }
 }

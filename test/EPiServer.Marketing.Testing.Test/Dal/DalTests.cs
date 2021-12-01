@@ -17,8 +17,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
 
         public DalTests()
         {
-            _dbConnection = Effort.DbConnectionFactory.CreateTransient();
-            _context = new TestContext(_dbConnection);
+            _context = new TestContext();
         }
 
         [Fact]
@@ -27,7 +26,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             var newTests = AddMultivariateTests(_context, 2);
             _context.SaveChanges();
 
-            Assert.Equal(_context.ABTests.Count(), 2);
+            Assert.Equal(2, _context.ABTests.Count());
         }
 
         [Fact]
@@ -39,7 +38,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             _context.ABTests.Remove(newTests[0]);
             _context.SaveChanges();
 
-            Assert.Equal(_context.ABTests.Count(), 2);
+            Assert.Equal(2, _context.ABTests.Count());
         }
 
         [Fact]
@@ -117,7 +116,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             test.Variants.Add(variant);
             _context.SaveChanges();
 
-            Assert.Equal(test.Variants.Count(), 1);
+            Assert.Single(test.Variants);
 
             Assert.Equal(1, _context.Variants.Count());
         }
@@ -155,7 +154,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             test.KeyPerformanceIndicators.Add(kpi);
             _context.SaveChanges();
 
-            Assert.Equal(1, test.KeyPerformanceIndicators.Count());
+            Assert.Single(test.KeyPerformanceIndicators);
 
             Assert.Equal(1, _context.KeyPerformanceIndicators.Count());
         }

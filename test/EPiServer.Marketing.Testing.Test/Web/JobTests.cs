@@ -9,7 +9,6 @@ using Xunit;
 using System.Globalization;
 using System.IO;
 using System.Web;
-using System.Web.SessionState;
 using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass.Enums;
 using EPiServer.Marketing.Testing.Test.Fakes;
@@ -17,15 +16,16 @@ using EPiServer.Marketing.Testing.Web.Helpers;
 using EPiServer.Marketing.Testing.Web.Models;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.Marketing.Testing.Web.Config;
+using Microsoft.AspNetCore.Http;
 
 namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class JobTests
     {
-        Mock<IServiceLocator> _locator = new Mock<IServiceLocator>();
+        Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<IMarketingTestingWebRepository> _webRepo = new Mock<IMarketingTestingWebRepository>();
         Mock<ITestingContextHelper> _contextHelper = new Mock<ITestingContextHelper>();
-
+        Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
         MyLS _ls = new MyLS();
         Mock<IScheduledJobRepository> _jobRepo = new Mock<IScheduledJobRepository>();
         private Guid TestToStart = Guid.NewGuid();
@@ -38,11 +38,11 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private TestSchedulingJob GetUnitUnderTest()
         {
-            _locator.Setup(sl => sl.GetInstance<ITestingContextHelper>()).Returns(_contextHelper.Object);
-            _locator.Setup(sl => sl.GetInstance<IMarketingTestingWebRepository>()).Returns(_webRepo.Object);
-            _locator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(_ls);
-            _locator.Setup(sl => sl.GetInstance<IScheduledJobRepository>()).Returns(_jobRepo.Object);
-            _locator.Setup(sl => sl.GetInstance<AdminConfigTestSettings>()).Returns(_config);
+            _locator.Setup(sl => sl.GetService(typeof(ITestingContextHelper))).Returns(_contextHelper.Object);
+            _locator.Setup(sl => sl.GetService(typeof(IMarketingTestingWebRepository))).Returns(_webRepo.Object);
+            _locator.Setup(sl => sl.GetService(typeof(LocalizationService))).Returns(_ls);
+            _locator.Setup(sl => sl.GetService(typeof(IScheduledJobRepository))).Returns(_jobRepo.Object);
+            _locator.Setup(sl => sl.GetService(typeof(AdminConfigTestSettings))).Returns(_config);
 
             var mtcm = new MarketingTestingContextModel() { DraftVersionContentLink = "draft", PublishedVersionContentLink = "published"};
 
@@ -158,7 +158,8 @@ namespace EPiServer.Marketing.Testing.Test.Web
         [Fact]
         public void ExcuteStopsTestAndAutoPublishes()
         {
-            HttpContext.Current = FakeHttpContext.FakeContext("http://localhost:48594/alloy-plan/");
+            _httpContextAccessor.Setup(x => x.HttpContext).Returns(new FakeHttpContext("http://localhost:48594/alloy-plan/").Current);
+            _locator.Setup(sl => sl.GetService(typeof(IHttpContextAccessor))).Returns(_httpContextAccessor.Object);
 
             var unit = GetUnitUnderTest();
             _config.AutoPublishWinner = true;

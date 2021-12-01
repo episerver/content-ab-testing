@@ -42,7 +42,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
                 .Returns(true)
                 .Returns(true)
                 .Returns(true)
-                .Returns(null)
+                .Returns((object)null)
                 .Returns(true);
 
             var invalidationActionInvocations = 0;
@@ -69,7 +69,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
         public void RemoteCacheSignal_Monitor_ACallbackErrorDoesNotDestabilizePolling()
         {
             _mockCache.SetupSequence(c => c.Get("validity-key"))
-                .Returns(null);
+                .Returns((object)null);
 
             var signal = new RemoteCacheSignal(_mockCache.Object, Mock.Of<ILogger>(), "validity-key", TimeSpan.FromMilliseconds(50));            
             signal.Monitor(

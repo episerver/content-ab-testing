@@ -30,7 +30,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
             _kpiRepo = _serviceLocator.GetInstance<IKpiWebRepository>();
         }
 
-        internal KpiStore(IServiceProvider sl)
+        public KpiStore(IServiceProvider sl)
         {
             _serviceLocator = sl;
             _logger = _serviceLocator.GetInstance<ILogger>();

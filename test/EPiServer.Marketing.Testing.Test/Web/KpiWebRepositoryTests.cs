@@ -17,14 +17,14 @@ namespace EPiServer.Marketing.Testing.Test.Web
     [ExcludeFromCodeCoverage]
     public class KpiWebRepositoryTests
     {
-        private Mock<IServiceLocator> _mockServiceLocator;
+        private Mock<IServiceProvider> _mockServiceLocator;
         private Mock<IKpiManager> _mockKpiManager;
         private List<Type> _kpiTypes;
         private Mock<IKpiHelper> _mockKpiHelper = new Mock<IKpiHelper>();
 
         private KpiWebRepository GetUnitUnderTest()
         {
-            _mockServiceLocator = new Mock<IServiceLocator>();
+            _mockServiceLocator = new Mock<IServiceProvider>();
 
             _kpiTypes = new List<Type>();//{   Name = "ContentComparatorKPI" FullName = "EPiServer.Marketing.KPI.Common.ContentComparatorKPI" };
             _kpiTypes.Add(typeof(ContentComparatorKPI));
@@ -32,10 +32,10 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
             _mockKpiManager = new Mock<IKpiManager>();
             _mockKpiManager.Setup(call => call.GetKpiTypes()).Returns(_kpiTypes);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IKpiManager>()).Returns(_mockKpiManager.Object);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IKpiManager))).Returns(_mockKpiManager.Object);
 
             _mockKpiHelper.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("testUrl");
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IKpiHelper>()).Returns(_mockKpiHelper.Object);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IKpiHelper))).Returns(_mockKpiHelper.Object);
 
 
             var aRepo = new KpiWebRepository(_mockServiceLocator.Object);

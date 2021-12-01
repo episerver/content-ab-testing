@@ -63,7 +63,7 @@ namespace EPiServer.Marketing.Testing.Web.Repositories
         /// For unit testing
         /// </summary>
         /// <param name="locator"></param>
-        internal MarketingTestingWebRepository(IServiceProvider locator, ILogger logger)
+        public MarketingTestingWebRepository(IServiceProvider locator, ILogger logger)
         {
             _serviceLocator = locator;
             _testResultHelper = locator.GetInstance<ITestResultHelper>();

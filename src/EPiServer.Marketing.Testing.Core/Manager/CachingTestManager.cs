@@ -19,10 +19,11 @@ namespace EPiServer.Marketing.Testing.Core.Manager
     /// The CachingTestManager class delivers marketing tests from a cache ,
     /// if possible, prior to deferring to another test manager.
     /// </summary>
+    [ServiceConfiguration(ServiceType = typeof(ITestManager), Lifecycle = ServiceInstanceScope.Singleton)]
     public class CachingTestManager : ITestManager
     {
         public const string MasterCacheKey = "epi/marketing/testing/masterkey";
-        internal const string AllTestsKey = "epi/marketing/testing/all";
+        public const string AllTestsKey = "epi/marketing/testing/all";
         private readonly object listLock = new object();
 
         private readonly ILogger _logger;
@@ -46,7 +47,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         /// <param name="inner">Test manager to defer to when tests are not in the cache</param>
         /// <param name="logger">A logger.</param>
         /// <param name="cacheTimeout">Cache timeout in seconds.</param>
-        public CachingTestManager(ISynchronizedObjectInstanceCache cache, DefaultMarketingTestingEvents events, ITestManager inner)
+        public CachingTestManager(ISynchronizedObjectInstanceCache cache, DefaultMarketingTestingEvents events, ITestManager inner, int? time=null)
         {
             var configuredTimeout = ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:CacheTimeoutInMinutes"];
             int.TryParse(configuredTimeout, out int timeout);
@@ -55,7 +56,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
             _events = events;
             _cache = cache;
             _logger = LogManager.GetLogger();
-            _cacheTimeout = timeout;
+            _cacheTimeout = time ?? timeout;
         }
 
         /// <inheritdoc/>
@@ -354,7 +355,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         /// <param name="contentGuid">ID of original content item</param>
         /// <param name="contentLanguage">Content language of original content item</param>
         /// <returns>Cache key</returns>
-        internal static string GetCacheKeyForVariant(Guid contentGuid, string contentLanguage)
+        public static string GetCacheKeyForVariant(Guid contentGuid, string contentLanguage)
         {
             return $"epi/marketing/testing/variants?originalItem={contentGuid}&culture={contentLanguage}";
         }

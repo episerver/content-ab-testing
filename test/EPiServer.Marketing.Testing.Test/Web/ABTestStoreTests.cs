@@ -17,7 +17,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class ABTestStoreTests
     {
-        Mock<IServiceLocator> _locator = new Mock<IServiceLocator>();
+        readonly Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<IMarketingTestingWebRepository> _webRepo = new Mock<IMarketingTestingWebRepository>();
         Mock<IEpiserverHelper> _episerverHelper = new Mock<IEpiserverHelper>();
 
@@ -25,9 +25,9 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private ABTestStore GetUnitUnderTest()
         {
-            _locator.Setup(sl => sl.GetInstance<ILogger>()).Returns(_logger.Object);
-            _locator.Setup(sl => sl.GetInstance<IMarketingTestingWebRepository>()).Returns(_webRepo.Object);
-            _locator.Setup(sl => sl.GetInstance<IEpiserverHelper>()).Returns(_episerverHelper.Object);
+            _locator.Setup(sl => sl.GetService(typeof(ILogger))).Returns(_logger.Object);
+            _locator.Setup(sl => sl.GetService(typeof(IMarketingTestingWebRepository))).Returns(_webRepo.Object);
+            _locator.Setup(sl => sl.GetService(typeof(IEpiserverHelper))).Returns(_episerverHelper.Object);
 
             ABTestStore testStore = new ABTestStore(_locator.Object);
             return testStore;

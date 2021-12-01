@@ -16,18 +16,18 @@ namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class PublishContentEventListenerTests
     {
-        Mock<IServiceLocator> _locator = new Mock<IServiceLocator>();
+        Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<IMarketingTestingWebRepository> _webRepo = new Mock<IMarketingTestingWebRepository>();
         Mock<IList<IContent>> _list = new Mock<IList<IContent>>();
         Mock<IEpiserverHelper> _mockEpiserverHelper;
 
         private PublishContentEventListener GetUnitUnderTest()
         {
-            _locator.Setup(sl => sl.GetInstance<IMarketingTestingWebRepository>()).Returns(_webRepo.Object);
-            _locator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(new FakeLocalizationService("whatever"));
+            _locator.Setup(sl => sl.GetService(typeof(IMarketingTestingWebRepository))).Returns(_webRepo.Object);
+            _locator.Setup(sl => sl.GetService(typeof(LocalizationService))).Returns(new FakeLocalizationService("whatever"));
             _mockEpiserverHelper = new Mock<IEpiserverHelper>();
             _mockEpiserverHelper.Setup(call => call.GetContentCultureinfo()).Returns(CultureInfo.GetCultureInfo("en-GB"));
-            _locator.Setup(s1 => s1.GetInstance<IEpiserverHelper>()).Returns(_mockEpiserverHelper.Object);
+            _locator.Setup(s1 => s1.GetService(typeof(IEpiserverHelper))).Returns(_mockEpiserverHelper.Object);
 
             return new PublishContentEventListener(_locator.Object, _list.Object);
         }
