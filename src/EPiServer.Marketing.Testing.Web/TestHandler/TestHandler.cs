@@ -60,7 +60,7 @@ namespace EPiServer.Marketing.Testing.Web
         }
 
         //To support unit testing
-        internal TestHandler(IServiceProvider serviceLocator, IHttpContextHelper httpContextHelper)
+        public TestHandler(IServiceProvider serviceLocator, IHttpContextHelper httpContextHelper)
         {
             _serviceLocator = serviceLocator;
             _testDataCookieHelper = serviceLocator.GetInstance<ITestDataCookieHelper>();
@@ -122,7 +122,7 @@ namespace EPiServer.Marketing.Testing.Web
         /// <param name="contentVersion">0 if published page, workID if draft</param>
         /// <returns>Number of active tests that were deleted from the system.</returns>
         /// <remarks>This works if the published version or the draft is deleted.</remarks>
-        internal int DeleteActiveTests(Guid contentGuid, int contentVersion)
+        public int DeleteActiveTests(Guid contentGuid, int contentVersion)
         {
             var contentCulture = _episerverHelper.GetContentCultureinfo();
             var testsDeleted = 0;
@@ -596,7 +596,7 @@ namespace EPiServer.Marketing.Testing.Web
         /// <summary>
         /// Initializes all the ProxyEventHandler's for all Kpi objects found in all active tests.
         /// </summary>
-        internal void enableProxyEventHandler()
+        public void enableProxyEventHandler()
         {
             foreach (var test in _testRepo.GetActiveTests())
             {
@@ -615,7 +615,7 @@ namespace EPiServer.Marketing.Testing.Web
         /// <summary>
         /// Disables all the ProxyEventHandler's for all Kpi objects found in all active tests. 
         /// </summary>
-        internal void disableProxyEventHandler()
+        public void disableProxyEventHandler()
         {
             foreach (var test in _testRepo.GetActiveTests())
             {

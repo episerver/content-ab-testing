@@ -20,7 +20,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
     [ServiceConfiguration(ServiceType = typeof(IHttpContextHelper), Lifecycle = ServiceInstanceScope.Singleton)]
 
     [ExcludeFromCodeCoverage]
-    internal class HttpContextHelper : IHttpContextHelper
+    public class HttpContextHelper : IHttpContextHelper
     {
         private readonly Injected<IHttpContextAccessor> _httpContextAccessor;
         public bool HasItem(string itemId)
@@ -65,6 +65,19 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             var substrings = Regex.Split(value, pattern, RegexOptions.None, TimeSpan.FromSeconds(2));
             
             return substrings.FirstOrDefault();
+        }
+
+        public string GetResponseCookie(string cookieName)
+        {
+            foreach (var headers in _httpContextAccessor.Service.HttpContext.Response.Headers.Values)
+                foreach (var header in headers)
+                    if (header.StartsWith($"{cookieName}="))
+                    {
+                        var p1 = header.IndexOf('=');
+                        var p2 = header.IndexOf(';');
+                        return header.Substring(p1 + 1, p2 - p1 - 1);
+                    }
+            return null;
         }
 
         public string GetRequestCookie(string cookieKey)

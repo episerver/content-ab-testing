@@ -20,7 +20,7 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
         private IServiceProvider _serviceLocator;
 
         [ExcludeFromCodeCoverage]
-        internal JobRescheduler(IServiceProvider locator)
+        public JobRescheduler(IServiceProvider locator)
         {
             _serviceLocator = locator;
         }

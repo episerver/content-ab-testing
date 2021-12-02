@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Migrations.History;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Transactions;
 using EPiServer.Marketing.Testing.Dal;
 using EPiServer.Marketing.Testing.Dal.EntityModel;
 using EPiServer.Marketing.Testing.Test.Dal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace EPiServer.Marketing.Testing.Test.Core
 {
     internal class TestRepository : IRepository
     {
         public TestContext TestContext { get; set; }
-        public HistoryContext HistoryContext { get; set; }
 
         public TestRepository(TestContext testContext)
         {
             TestContext = testContext;
-        }
-
-        public TestRepository(HistoryContext testContext)
-        {
-            HistoryContext = testContext;
         }
 
         public void Dispose()
@@ -77,14 +73,14 @@ namespace EPiServer.Marketing.Testing.Test.Core
 
         public void Save(object instance)
         {
-            TestContext.Entry(instance).State = System.Data.Entity.EntityState.Modified;
+            TestContext.Entry(instance).State = EntityState.Modified;
         }
 
-        public void Add(object instance)
+        public void Add<T>(T instance) where T : class
         {
             if (instance != null)
             {
-                TestContext.Set(instance.GetType()).Add(instance);
+                TestContext.Set<T>().Add(instance);
             }
         }
 
@@ -168,15 +164,15 @@ namespace EPiServer.Marketing.Testing.Test.Core
 
         public string GetDatabaseVersion(string contextKey)
         {
-            return HistoryContext.History.Where(r => r.ContextKey == contextKey).OrderByDescending(row => row.MigrationId).First().MigrationId;
+            throw new NotImplementedException();
         }
 
-        public void AddDetached(object instance)
+        public void AddDetached<T>(T instance) where T : class
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateDetached(object instance)
+        public void UpdateDetached<T>(T instance) where T : class
         {
             throw new NotImplementedException();
         }

@@ -25,7 +25,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
     {
         internal Mock<ITestManager> _mockTestManager;
         internal Mock<ILogger> _mockLogger;
-        internal Mock<IServiceLocator> _mockServiceLocator;
+        internal Mock<IServiceProvider> _mockServiceLocator;
         internal Mock<ITestResultHelper> _mockTestResultHelper;
         internal Mock<IMarketingTestingWebRepository> _mockMarketingTestingWebRepository;
         internal Mock<IKpiManager> _mockKpiManager;
@@ -40,7 +40,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
         private MarketingTestingWebRepository GetUnitUnderTest()
         {
             _mockLogger = new Mock<ILogger>();
-            _mockServiceLocator = new Mock<IServiceLocator>();
+            _mockServiceLocator = new Mock<IServiceProvider>();
             _mockTestResultHelper = new Mock<ITestResultHelper>();
             _mockHttpHelper = new Mock<IHttpContextHelper>();
             _mockKpiManager = new Mock<IKpiManager>();
@@ -50,15 +50,15 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _mockTestHandler = new Mock<ITestHandler>();
             _mockCacheSignal = new Mock<ICacheSignal>();
 
-            _mockServiceLocator.Setup(sl => sl.GetInstance<ITestManager>()).Returns(_mockTestManager.Object);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IKpiHelper>()).Returns(_mockKpiHelper.Object);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IKpiManager>()).Returns(_mockKpiManager.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<ITestResultHelper>()).Returns(_mockTestResultHelper.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<IMarketingTestingWebRepository>()).Returns(_mockMarketingTestingWebRepository.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<IHttpContextHelper>()).Returns(_mockHttpHelper.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<IEpiserverHelper>()).Returns(_mockEpiserverHelper.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<ITestHandler>()).Returns(_mockTestHandler.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<ICacheSignal>()).Returns(_mockCacheSignal.Object);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(ITestManager))).Returns(_mockTestManager.Object);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IKpiHelper))).Returns(_mockKpiHelper.Object);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IKpiManager))).Returns(_mockKpiManager.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(ITestResultHelper))).Returns(_mockTestResultHelper.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IMarketingTestingWebRepository))).Returns(_mockMarketingTestingWebRepository.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IHttpContextHelper))).Returns(_mockHttpHelper.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IEpiserverHelper))).Returns(_mockEpiserverHelper.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(ITestHandler))).Returns(_mockTestHandler.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(ICacheSignal))).Returns(_mockCacheSignal.Object);
 
             var aRepo = new MarketingTestingWebRepository(_mockServiceLocator.Object, _mockLogger.Object);
             return aRepo;
@@ -420,7 +420,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             };
 
             var webRepo = GetUnitUnderTest();
-            var kpi = new ContentComparatorKPI(_mockServiceLocator.Object,Guid.NewGuid());
+            var kpi = new ContentComparatorKPI(Guid.NewGuid());
             _mockKpiManager.Setup(call => call.Get(It.IsAny<Guid>())).Returns(kpi);
             _mockTestManager.Setup(call => call.Save(It.IsAny<IMarketingTest>())).Returns(new Guid());
 

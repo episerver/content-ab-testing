@@ -8,7 +8,11 @@
     <IsPackable>true</IsPackable>
     <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
   </PropertyGroup>
-
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedLangFiles\**\*" />
+    <EmbeddedResource Include="EmbeddedScriptFiles\**\*" />
+    <EmbeddedResource Include="SchemaUpdater\Testing.zip" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EPiServer.CMS.AspNetCore" Version="12.0.3" />
     <PackageReference Include="EPiServer.CMS.Core" Version="12.0.3" />

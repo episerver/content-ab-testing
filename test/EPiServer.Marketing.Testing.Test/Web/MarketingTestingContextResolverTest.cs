@@ -16,7 +16,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class MarketingTestingContextResolverTest
     {
-        private Mock<IServiceLocator> _serviceLocator;
+        private Mock<IServiceProvider> _serviceLocator;
         private Mock<IMarketingTestingWebRepository> _mockTestingRespository;
         private Mock<ITestingContextHelper> _mockTestingContextHelper;
         private MarketingTestingContextResolver _marketingTestingContextResolver;
@@ -63,12 +63,12 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private MarketingTestingContextResolver GetUnitUnderTest()
         {
-            _serviceLocator = new Mock<IServiceLocator>();
+            _serviceLocator = new Mock<IServiceProvider>();
             _mockTestingRespository = new Mock<IMarketingTestingWebRepository>();
             _mockTestingContextHelper = new Mock<ITestingContextHelper>();
 
-            _serviceLocator.Setup(sl => sl.GetInstance<IMarketingTestingWebRepository>()).Returns(_mockTestingRespository.Object);
-            _serviceLocator.Setup(sl => sl.GetInstance<ITestingContextHelper>()).Returns(_mockTestingContextHelper.Object);
+            _serviceLocator.Setup(sl => sl.GetService(typeof(IMarketingTestingWebRepository))).Returns(_mockTestingRespository.Object);
+            _serviceLocator.Setup(sl => sl.GetService(typeof(ITestingContextHelper))).Returns(_mockTestingContextHelper.Object);
             
             return new MarketingTestingContextResolver(_serviceLocator.Object);
         }

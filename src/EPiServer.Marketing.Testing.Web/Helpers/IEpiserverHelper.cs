@@ -7,7 +7,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
     /// <summary>
     /// Encapsulates all the items within the Episerver CMS API that can not be mocked on its own. Static items, classes without an interface, etc.
     /// </summary>
-    internal interface IEpiserverHelper
+    public interface IEpiserverHelper
     {
         /// <summary>
         /// Returns the Episerver root CMS Path

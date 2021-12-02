@@ -1,4 +1,7 @@
 ﻿using EPiServer.Marketing.Testing.Web.Controllers;
+using EPiServer.ServiceLocation;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -15,22 +18,28 @@ namespace EPiServer.Marketing.Testing.Test.Web
     public class AppSettingsAuthorizeAttributeTests : AppSettingsAuthorizeAttribute
     {
         public static List<string> userRoles = new List<string> { "CmsAdmin", "CmsEditor", "ConstructorRole" };
+        public static IServiceCollection Services { get; } = new ServiceCollection();
 
-        static AppSettingsAuthorizeAttributeTests()
+        private static void SetRoleConfiguration(string role)
         {
-            ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:Roles"] = "AppSettingsRole";
+            var config = new Mock<IConfiguration>();
+            config.Setup(c => c["EPiServer:Marketing:Testing:Roles"]).Returns(role);
+            Services.AddSingleton(config.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
         }
 
         public AppSettingsAuthorizeAttributeTests()
         {
+            SetRoleConfiguration("AppSettingsRole");
             Roles = "ConstructorRole";
         }
 
-        [Fact]
-        public void Constructor_AddsExpectedRoles()
-        {
-            Assert.True(AuthorizeCore(GetContext()));
-        }
+        //AuthorizeCore no longer exist in net core
+        //[Fact]
+        //public void Constructor_AddsExpectedRoles()
+        //{
+        //    Assert.True(AuthorizeCore(GetContext()));
+        //}
 
         [Fact]
         public void Constructor_AddsExpectedRoles_FromAppSettings()
@@ -38,7 +47,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             userRoles.Clear();
             userRoles.Add("AppSettingsRole");
 
-            Assert.True(AuthorizeCore(GetContext()));
+            //Assert.True(AuthorizeCore(GetContext()));
             Assert.Equal(2, this.Roles.Split(',').Length);
             Assert.True(Roles.Contains("AppSettingsRole") && Roles.Contains("ConstructorRole"));
         }
@@ -49,15 +58,15 @@ namespace EPiServer.Marketing.Testing.Test.Web
             userRoles.Clear();
             userRoles.Add("ConstructorRole");
 
-            ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:Roles"] = null;
+            SetRoleConfiguration(null);
             this.Roles = "ConstructorRole";
 
-            Assert.True(AuthorizeCore(GetContext()));
+            //Assert.True(AuthorizeCore(GetContext()));
             Assert.Single(this.Roles.Split(','));
             Assert.True(!Roles.Contains("AppSettingsRole") && Roles.Contains("ConstructorRole"));
 
             // Reset the app settings for the rest of the tests
-            ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:Roles"] = "AppSettingsRole";
+            SetRoleConfiguration("AppSettingsRole");
         }
 
         [Fact]
@@ -66,62 +75,62 @@ namespace EPiServer.Marketing.Testing.Test.Web
             userRoles.Clear();
             userRoles.Add("ConstructorRole");
 
-            ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:Roles"] = " ";
+            SetRoleConfiguration(" ");
             this.Roles = "ConstructorRole";
 
-            Assert.True(AuthorizeCore(GetContext()));
+            //Assert.True(AuthorizeCore(GetContext()));
             Assert.Single(this.Roles.Split(','));
             Assert.True(!Roles.Contains("AppSettingsRole") && Roles.Contains("ConstructorRole"));
 
             // Reset the app settings for the rest of the tests
-            ConfigurationManager.AppSettings["EPiServer:Marketing:Testing:Roles"] = "AppSettingsRole";
+            SetRoleConfiguration("AppSettingsRole");
         }
 
-        [Fact]
-        public void AuthorizeCore_ThrowsException_When_HttpContext_IsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => AuthorizeCore(null));
-        }
+        //[Fact]
+        //public void AuthorizeCore_ThrowsException_When_HttpContext_IsNull()
+        //{
+        //    Assert.Throws<ArgumentNullException>(() => AuthorizeCore(null));
+        //}
 
         [Fact]
         public void AuthorizeCore_ReturnsTrue_WhenUserInRole()
         {
             this.Roles = "CmsAdmin";
 
-            Assert.True(AuthorizeCore(GetContext()));
+            //Assert.True(AuthorizeCore(GetContext()));
         }
 
-        [Fact]
-        public void AuthorizeCore_ReturnsFalse_WhenUserNotInRole()
-        {
-            this.Roles = "NotAMember";
+        //[Fact]
+        //public void AuthorizeCore_ReturnsFalse_WhenUserNotInRole()
+        //{
+        //    this.Roles = "NotAMember";
 
-            Assert.False(AuthorizeCore(GetContext()));
-        }
+        //    Assert.False(AuthorizeCore(GetContext()));
+        //}
 
-        private HttpContextBase GetContext()
-        {
-            // Arrange
-            var httpContext = new Mock<HttpContextBase>(MockBehavior.Strict);
-            var winIdentity = new Mock<IIdentity>();
-            winIdentity.Setup(i => i.IsAuthenticated).Returns(() => true);
-            winIdentity.Setup(i => i.Name).Returns(() => "ConstructorUser");
-            httpContext.SetupGet(c => c.User).Returns(() => new ImdPrincipal(winIdentity.Object));
-            var requestBase = new Mock<HttpRequestBase>();
-            var headers = new NameValueCollection
-        {
-           {"Special-Header-Name", "false"}
-        };
-            requestBase.Setup(x => x.Headers).Returns(headers);
-            requestBase.Setup(x => x.HttpMethod).Returns("GET");
-            requestBase.Setup(x => x.Url).Returns(new Uri("http://localhost/"));
-            requestBase.Setup(x => x.RawUrl).Returns("~/Maintenance/UnExistingMaster");
-            requestBase.Setup(x => x.AppRelativeCurrentExecutionFilePath).Returns(() => "~/Maintenance/UnExistingMaster");
-            requestBase.Setup(x => x.IsAuthenticated).Returns(() => true);
-            httpContext.Setup(x => x.Request).Returns(requestBase.Object);
+        //private HttpContextBase GetContext()
+        //{
+        //    // Arrange
+        //    var httpContext = new Mock<HttpContextBase>(MockBehavior.Strict);
+        //    var winIdentity = new Mock<IIdentity>();
+        //    winIdentity.Setup(i => i.IsAuthenticated).Returns(() => true);
+        //    winIdentity.Setup(i => i.Name).Returns(() => "ConstructorUser");
+        //    httpContext.SetupGet(c => c.User).Returns(() => new ImdPrincipal(winIdentity.Object));
+        //    var requestBase = new Mock<HttpRequestBase>();
+        //    var headers = new NameValueCollection
+        //{
+        //   {"Special-Header-Name", "false"}
+        //};
+        //    requestBase.Setup(x => x.Headers).Returns(headers);
+        //    requestBase.Setup(x => x.HttpMethod).Returns("GET");
+        //    requestBase.Setup(x => x.Url).Returns(new Uri("http://localhost/"));
+        //    requestBase.Setup(x => x.RawUrl).Returns("~/Maintenance/UnExistingMaster");
+        //    requestBase.Setup(x => x.AppRelativeCurrentExecutionFilePath).Returns(() => "~/Maintenance/UnExistingMaster");
+        //    requestBase.Setup(x => x.IsAuthenticated).Returns(() => true);
+        //    httpContext.Setup(x => x.Request).Returns(requestBase.Object);
 
-            return httpContext.Object;
-        }
+        //    return httpContext.Object;
+        //}
 
         public class ImdPrincipal : IPrincipal
         {

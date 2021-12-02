@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.DataAccess
 {
-    internal class TestingDataAccess : ITestingDataAccess
+    public class TestingDataAccess : ITestingDataAccess
     {
         public readonly Injected<IRepository> _repository;
         internal bool _UseEntityFramework;
@@ -36,6 +36,11 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
             {
                 throw new DatabaseNeedsUpdating();
             }
+        }
+
+        public TestingDataAccess(IRepository repository)
+        {
+            _repository.Service = repository;
         }
 
         public void Archive(Guid testObjectId, Guid winningVariantId)
@@ -76,7 +81,7 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
             AddKpiResultDataHelper(_repository.Service, testId, itemVersion, keyResult, keyType);
         }
 
-        public Guid Save(IABTest testObject)
+        public Guid Save(DalABTest testObject)
         {
             return SaveHelper(_repository.Service, testObject);
         }
@@ -274,7 +279,7 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
             repo.SaveChanges();
         }
 
-        private Guid SaveHelper(IRepository repo, IABTest testObject)
+        private Guid SaveHelper(IRepository repo, DalABTest testObject)
         {
             var id = testObject.Id;
 

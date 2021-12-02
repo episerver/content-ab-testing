@@ -56,7 +56,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
             return aTest;
         }
 
-        internal static IABTest ConvertToDalTest(IMarketingTest theManagerTest)
+        internal static DalABTest ConvertToDalTest(IMarketingTest theManagerTest)
         {
             if (Guid.Empty == theManagerTest.Id)
             {

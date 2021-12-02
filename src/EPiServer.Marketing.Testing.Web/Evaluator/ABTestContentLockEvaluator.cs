@@ -13,7 +13,7 @@ namespace EPiServer.Marketing.Testing.Web.Evaluator
         private IMarketingTestingWebRepository _webRepo;
         private IContentRepository _contentRepo;
         private IEpiserverHelper _episerverHelper;
-        internal string _abLockId = "ActiveABTestLock";
+        public string _abLockId = "ActiveABTestLock";
 
         [ExcludeFromCodeCoverage]
         public ABTestLockEvaluator()
@@ -23,7 +23,7 @@ namespace EPiServer.Marketing.Testing.Web.Evaluator
             _episerverHelper = ServiceLocator.Current.GetInstance<IEpiserverHelper>();
         }
 
-        internal ABTestLockEvaluator(IMarketingTestingWebRepository theWebRepo, IContentRepository theContentRepo, IEpiserverHelper theEpiHelper)
+        public ABTestLockEvaluator(IMarketingTestingWebRepository theWebRepo, IContentRepository theContentRepo, IEpiserverHelper theEpiHelper)
         {
             _webRepo = theWebRepo;
             _contentRepo = theContentRepo;

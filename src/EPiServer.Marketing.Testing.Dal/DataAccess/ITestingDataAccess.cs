@@ -14,7 +14,7 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
 
         List<IABTest> GetTestList(DalTestCriteria criteria);
 
-        Guid Save(IABTest testObject);
+        Guid Save(DalABTest testObject);
 
         void Delete(Guid testObjectId);
 

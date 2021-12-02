@@ -7,11 +7,13 @@ using EPiServer.Marketing.Testing.Dal.EntityModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.Testing.Dal
 {
     [ExcludeFromCodeCoverage]
-    internal class BaseRepository : IRepository
+    [ServiceConfiguration(ServiceType = typeof(IRepository), Lifecycle = ServiceInstanceScope.Transient)]
+    public class BaseRepository : IRepository
     {
         #region Constants and Tables
         #endregion

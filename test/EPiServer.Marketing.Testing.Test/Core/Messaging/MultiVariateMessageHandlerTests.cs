@@ -8,12 +8,13 @@ using EPiServer.Marketing.Testing.Core.DataClass.Enums;
 using EPiServer.Marketing.Testing.Core.Manager;
 using EPiServer.Marketing.Testing.Core.Messaging.Messages;
 using Xunit;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.Testing.Test.Core.Messaging
 {
     public class MultiVariateMessageHandlerTests
     {
-        private Mock<IServiceLocator> _serviceLocator;
+        public IServiceCollection Services { get; } = new ServiceCollection();
         private Mock<ITestManager> _testManager;
 
         static Guid testGuid = Guid.NewGuid();
@@ -33,11 +34,12 @@ namespace EPiServer.Marketing.Testing.Test.Core.Messaging
 
         private TestingMessageHandler GetUnitUnderTest()
         {
-            _serviceLocator = new Mock<IServiceLocator>();
             _testManager = new Mock<ITestManager>();
-            _serviceLocator.Setup(sl => sl.GetInstance<ITestManager>()).Returns(_testManager.Object);
 
-            return new TestingMessageHandler(_serviceLocator.Object);
+            Services.AddSingleton(_testManager.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
+            return new TestingMessageHandler();
         }
 
         [Fact]

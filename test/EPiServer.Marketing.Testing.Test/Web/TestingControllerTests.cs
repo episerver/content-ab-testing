@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Web.Http;
 using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass.Enums;
 using EPiServer.Marketing.Testing.Core.Manager;
@@ -18,12 +16,15 @@ using EPiServer.Marketing.KPI.Manager;
 using EPiServer.Marketing.KPI.Manager.DataClass;
 using EPiServer.Marketing.KPI.Manager.DataClass.Enums;
 using EPiServer.Marketing.KPI.Results;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class TestingControllerTests
     {
-        private Mock<IServiceLocator> _mockServiceLocator;
+        private Mock<IServiceProvider> _mockServiceLocator;
         private Mock<IMarketingTestingWebRepository> _marketingTestingRepoMock;
         private Mock<IMessagingManager> _messagingManagerMock;
         private Mock<ITestDataCookieHelper> _testDataCookieHelperMock;
@@ -33,7 +34,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private TestingController GetUnitUnderTest()
         {
-            _mockServiceLocator = new Mock<IServiceLocator>();
+            _mockServiceLocator = new Mock<IServiceProvider>();
             _marketingTestingRepoMock = new Mock<IMarketingTestingWebRepository>();
             _testManagerMock = new Mock<ITestManager>();
             _messagingManagerMock = new Mock<IMessagingManager>();
@@ -42,30 +43,25 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _kpiWebRepoMock = new Mock<IKpiWebRepository>();
             contextHelper = new Mock<IHttpContextHelper>();
             
-            _mockServiceLocator.Setup(s1 => s1.GetInstance<ITestDataCookieHelper>()).Returns(_testDataCookieHelperMock.Object);
-            _mockServiceLocator.Setup(s1 => s1.GetInstance<IMarketingTestingWebRepository>()).Returns(_marketingTestingRepoMock.Object);
-            _mockServiceLocator.Setup(s1 => s1.GetInstance<IMessagingManager>()).Returns(_messagingManagerMock.Object);
-            _mockServiceLocator.Setup(s1 => s1.GetInstance<ITestDataCookieHelper>()).Returns(_testDataCookieHelperMock.Object);
-            _mockServiceLocator.Setup(s1 => s1.GetInstance<ITestManager>()).Returns(_testManagerMock.Object);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IKpiWebRepository>()).Returns(_kpiWebRepoMock.Object);
+            _mockServiceLocator.Setup(s1 => s1.GetService(typeof(ITestDataCookieHelper))).Returns(_testDataCookieHelperMock.Object);
+            _mockServiceLocator.Setup(s1 => s1.GetService(typeof(IMarketingTestingWebRepository))).Returns(_marketingTestingRepoMock.Object);
+            _mockServiceLocator.Setup(s1 => s1.GetService(typeof(IMessagingManager))).Returns(_messagingManagerMock.Object);
+            _mockServiceLocator.Setup(s1 => s1.GetService(typeof(ITestDataCookieHelper))).Returns(_testDataCookieHelperMock.Object);
+            _mockServiceLocator.Setup(s1 => s1.GetService(typeof(ITestManager))).Returns(_testManagerMock.Object);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IKpiWebRepository))).Returns(_kpiWebRepoMock.Object);
             
-            return new TestingController(contextHelper.Object, _mockServiceLocator.Object)
-            {
-                Request = new System.Net.Http.HttpRequestMessage(),
-                Configuration = new HttpConfiguration()
-            };            
+            return new TestingController(contextHelper.Object, _mockServiceLocator.Object);            
         }
 
         [Fact]
         public void UpdateConversion_Uses_ConfigurationSpecified_SessionID_Name()
         {
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", Guid.NewGuid().ToString()),
-                new KeyValuePair<string, string>("itemVersion", "1"),
-                new KeyValuePair<string, string>("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString()),
-            };
-            var data = new FormDataCollection(pairs);
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", Guid.NewGuid().ToString());
+            pairs.Add("itemVersion", "1");
+            pairs.Add("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString());
+            
+            var data = new FormCollection(pairs);
 
             var controller = GetUnitUnderTest();
             var result = controller.UpdateConversion(data);
@@ -76,16 +72,15 @@ namespace EPiServer.Marketing.Testing.Test.Web
         [Fact]
         public void UpdateConversion_Returns_BadRequest_If_TestID_Is_Null()
         {
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("itemVersion", "1"),
-                new KeyValuePair<string, string>("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString()),
-            };
-            var data = new FormDataCollection(pairs);
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("itemVersion", "1");
+            pairs.Add("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString());
+            
+            var data = new FormCollection(pairs);
 
             var controller = GetUnitUnderTest();
-            var result = controller.UpdateConversion(data);
-            Assert.True(result.StatusCode == HttpStatusCode.BadRequest);
+            var result = controller.UpdateConversion(data) as BadRequestObjectResult;
+            Assert.True(result.StatusCode == (int)HttpStatusCode.BadRequest);
         }
 
         [Fact]
@@ -93,18 +88,18 @@ namespace EPiServer.Marketing.Testing.Test.Web
         {
             var TestGuid = Guid.NewGuid();
             var KpiGuid = Guid.NewGuid();
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", TestGuid.ToString()),
-                new KeyValuePair<string, string>("itemVersion", "1"),
-                new KeyValuePair<string, string>("kpiId", KpiGuid.ToString()),
-            };
-            var data = new FormDataCollection(pairs);
+            
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", TestGuid.ToString());
+            pairs.Add("itemVersion", "1");
+            pairs.Add("kpiId", KpiGuid.ToString());
+
+            var data = new FormCollection(pairs);
 
             var controller = GetUnitUnderTest();
-            var result = controller.UpdateConversion(data);
+            var result = controller.UpdateConversion(data) as OkObjectResult;
 
-            Assert.True(result.StatusCode == HttpStatusCode.OK);
+            Assert.True(result.StatusCode == (int)HttpStatusCode.OK);
             _messagingManagerMock.Verify(m => m.EmitUpdateConversion(It.Is<Guid>(g => g.Equals(TestGuid)), It.Is<int>(v => v == 1), It.Is<Guid>(g => g.Equals(KpiGuid)), It.IsAny<string>()), "Did not emit message with proper arguments");
         }
 
@@ -114,9 +109,9 @@ namespace EPiServer.Marketing.Testing.Test.Web
         {
             var controller = GetUnitUnderTest();
 
-            var result = controller.GetAllTests();
+            var result = controller.GetAllTests() as OkObjectResult;
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
         }
 
         [Fact]
@@ -124,9 +119,9 @@ namespace EPiServer.Marketing.Testing.Test.Web
         {
             var controller = GetUnitUnderTest();
 
-            var result = controller.GetTest(Guid.NewGuid().ToString());
+            var result = controller.GetTest(Guid.NewGuid().ToString()) as OkObjectResult;
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
         }
 
         [Fact]
@@ -138,24 +133,24 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var controller = GetUnitUnderTest();
             _marketingTestingRepoMock.Setup(call => call.GetTestById(It.Is<Guid>(g => g == id), It.IsAny<bool>())).Returns(test);
 
-            var result = controller.GetTest(id.ToString());
-            var response = result.Content.ReadAsStringAsync();
+            var result = controller.GetTest(id.ToString()) as OkObjectResult;
+            var response = result.Value as string;
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            Assert.Contains(id.ToString(), response.Result);
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+            Assert.Contains(id.ToString(), response);
         }
 
         [Fact]
         public void SaveKpiResult_Financial_Returns_OK_Request()
         {
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", Guid.NewGuid().ToString()),
-                new KeyValuePair<string, string>("itemVersion", "1"),
-                new KeyValuePair<string, string>("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString()),
-                new KeyValuePair<string, string>("total", "3")
-            };
-            var data = new FormDataCollection(pairs);
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", Guid.NewGuid().ToString());
+            pairs.Add("itemVersion", "1");
+            pairs.Add("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString());
+            pairs.Add("total", "3");
+
+            var data = new FormCollection(pairs);
+
             var cookie = new TestDataCookie();
             cookie.KpiConversionDictionary.Add(Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f"), false);
 
@@ -163,22 +158,22 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _testDataCookieHelperMock.Setup(call => call.GetTestDataFromCookie(It.IsAny<string>(), It.IsAny<string>())).Returns(cookie);
             _marketingTestingRepoMock.Setup(call => call.GetTestById(It.IsAny<Guid>(), It.IsAny<bool>())).Returns(new ABTest());
 
-            var result = controller.SaveKpiResult(data);
+            var result = controller.SaveKpiResult(data) as OkObjectResult;
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
         }
 
         [Fact]
         public void SaveKpiResult_Returns_OK_Request()
         {
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", Guid.NewGuid().ToString()),
-                new KeyValuePair<string, string>("itemVersion", "1"),
-                new KeyValuePair<string, string>("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString()),
-                new KeyValuePair<string, string>("total", "3")
-            };
-            var data = new FormDataCollection(pairs);
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", Guid.NewGuid().ToString());
+            pairs.Add("itemVersion", "1");
+            pairs.Add("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString());
+            pairs.Add("total", "3");
+
+            var data = new FormCollection(pairs);
+
             var cookie = new TestDataCookie();
             cookie.KpiConversionDictionary.Add(Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f"), false);
 
@@ -186,44 +181,43 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _testDataCookieHelperMock.Setup(call => call.GetTestDataFromCookie(It.IsAny<string>(), It.IsAny<string>())).Returns(cookie);
             _marketingTestingRepoMock.Setup(call => call.GetTestById(It.IsAny<Guid>(), It.IsAny<bool>())).Returns(new ABTest());
 
-            var result = controller.SaveKpiResult(data);
+            var result = controller.SaveKpiResult(data) as OkObjectResult;
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
         }
 
         [Fact]
         public void SaveKpiResult_Returns_Bad_Request()
         {
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", ""),
-                new KeyValuePair<string, string>("itemVersion", "1"),
-                new KeyValuePair<string, string>("keyResultType", "1"),
-                new KeyValuePair<string, string>("kpiId", Guid.NewGuid().ToString()),
-                new KeyValuePair<string, string>("total", "3")
-            };
-            var data = new FormDataCollection(pairs);
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", "");
+            pairs.Add("itemVersion", "1");
+            pairs.Add("keyResultType", "1");
+            pairs.Add("kpiId", Guid.NewGuid().ToString());
+            pairs.Add("total", "3");
+
+            var data = new FormCollection(pairs);
 
             var controller = GetUnitUnderTest();
             _kpiWebRepoMock.Setup(call => call.GetKpiInstance(It.IsAny<Guid>())).Returns(new Kpi());
 
-            var result = controller.SaveKpiResult(data);
+            var result = controller.SaveKpiResult(data) as BadRequestObjectResult;
 
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
         }
 
         [Fact]
         public void SaveKpiResult_handles_full_range_of_itemversions()
         {
             // item versions can go up to int 32 ranges
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", Guid.NewGuid().ToString()),
-                new KeyValuePair<string, string>("itemVersion", "1695874"),
-                new KeyValuePair<string, string>("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString()),
-                new KeyValuePair<string, string>("total", "3")
-            };
-            var data = new FormDataCollection(pairs);
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", Guid.NewGuid().ToString());
+            pairs.Add("itemVersion", "1695874");
+            pairs.Add("kpiId", Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f").ToString());
+            pairs.Add("total", "3");
+
+            var data = new FormCollection(pairs);
+
             var cookie = new TestDataCookie();
             cookie.KpiConversionDictionary.Add(Guid.Parse("bb53bed8-978a-456d-9fd7-6a2bea1bf66f"), false);
 
@@ -231,45 +225,41 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _testDataCookieHelperMock.Setup(call => call.GetTestDataFromCookie(It.IsAny<string>(), It.IsAny<string>())).Returns(cookie);
             _marketingTestingRepoMock.Setup(call => call.GetTestById(It.IsAny<Guid>(), It.IsAny<bool>())).Returns(new ABTest());
 
-            var result = controller.SaveKpiResult(data);
+            var result = controller.SaveKpiResult(data) as OkObjectResult;
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
         }
 
         [Fact]
         public void UpdateView_Returns_OK_Request()
         {
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", Guid.NewGuid().ToString()),
-                new KeyValuePair<string, string>("itemVersion", "1")
-            };
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", Guid.NewGuid().ToString());
+            pairs.Add("itemVersion", "1");
 
-            var data = new FormDataCollection(pairs);
+            var data = new FormCollection(pairs);
 
             var controller = GetUnitUnderTest();
 
-            var result = controller.UpdateView(data);
+            var result = controller.UpdateView(data) as OkResult;
 
-            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
         }
 
         [Fact]
         public void UpdateView_Returns_Bad_Request()
         {
-            var pairs = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("testId", ""),
-                new KeyValuePair<string, string>("itemVersion", "1")
-            };
+            var pairs = new Dictionary<string, StringValues>();
+            pairs.Add("testId", "");
+            pairs.Add("itemVersion", "1");
 
-            var data = new FormDataCollection(pairs);
+            var data = new FormCollection(pairs);
 
             var controller = GetUnitUnderTest();
 
-            var result = controller.UpdateView(data);
+            var result = controller.UpdateView(data) as BadRequestObjectResult;
 
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
         }
     }
 

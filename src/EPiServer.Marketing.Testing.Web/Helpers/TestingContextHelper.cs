@@ -42,7 +42,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         /// <param name="context"></param>
         /// <param name="mockServiceLocator"></param>
         [ExcludeFromCodeCoverage]
-        internal TestingContextHelper(IHttpContextHelper contextHelper, IServiceProvider mockServiceLocator, IEpiserverHelper episerverHelper)
+        public TestingContextHelper(IHttpContextHelper contextHelper, IServiceProvider mockServiceLocator, IEpiserverHelper episerverHelper)
         {
             _contextHelper = contextHelper;
             _serviceLocator = mockServiceLocator;

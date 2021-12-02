@@ -32,7 +32,7 @@ namespace EPiServer.Marketing.Testing.Web.Initializers
         {
         }
 
-        internal PublishContentEventListener(IServiceProvider locator, IList<IContent> contentList)
+        public PublishContentEventListener(IServiceProvider locator, IList<IContent> contentList)
         {
             _locator = locator;
             _contentList = contentList;

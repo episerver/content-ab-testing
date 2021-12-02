@@ -6,6 +6,8 @@ using EPiServer.Marketing.Testing.Web.Controllers;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.ServiceLocation;
 using EPiServer.Shell.Services.Rest;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -19,20 +21,38 @@ namespace EPiServer.Marketing.Testing.Test.Web
     [ExcludeFromCodeCoverage]
     public class ABTestConfigStoreTests
     {
-        Mock<IServiceLocator> _locator = new Mock<IServiceLocator>();
+        public IServiceCollection Services { get; } = new ServiceCollection();
+        Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<ILogger> _logger = new Mock<ILogger>();
         Mock<DynamicDataStoreFactory> _factory = new Mock<DynamicDataStoreFactory>();
         Mock<DynamicDataStore> _store = new Mock<DynamicDataStore>();
         Mock<AdminConfigTestSettings> _settings = new Mock<AdminConfigTestSettings>();
         Mock<IMarketingTestingWebRepository> _webRepo = new Mock<IMarketingTestingWebRepository>();
 
+        public ABTestConfigStoreTests()
+        {
+            var _mockIConfiguration = new Mock<IConfiguration>();
+            _mockIConfiguration.Setup(x => x["EPiServer:Marketing:Testing:PreviewStyleOverride"]).Returns("testing");
+            Services.AddSingleton(_mockIConfiguration.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+        }
+
         private ABTestConfigStore GetUnitUnderTest()
         {
-            _locator.Setup(sl => sl.GetInstance<ILogger>()).Returns(_logger.Object);
-            _locator.Setup(sl => sl.GetInstance<AdminConfigTestSettings>()).Returns(_settings.Object);
-            _locator.Setup(sl => sl.GetInstance<IMarketingTestingWebRepository>()).Returns(_webRepo.Object);
+            Services.AddSingleton(_logger.Object);
+            Services.AddSingleton(_settings.Object);
+            Services.AddSingleton(_webRepo.Object);
 
-            var testStore = new ABTestConfigStore(_locator.Object);
+            // mock the datastore in epi
+            var ddsMock = new Mock<DynamicDataStore>(null);
+            var ddsFactoryMock = new Mock<DynamicDataStoreFactory>();
+            ddsFactoryMock.Setup(x => x.GetStore(typeof(AdminConfigTestSettings))).Returns(ddsMock.Object);
+            DynamicDataStoreFactory.Instance = ddsFactoryMock.Object;
+
+            AdminConfigTestSettings._factory = ddsFactoryMock.Object;
+            AdminConfigTestSettings._currentSettings = null;
+            
+            var testStore = new ABTestConfigStore();
             return testStore;
         }
 
@@ -72,7 +92,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
             var settings = new AdminConfigTestSettings();
             settings._serviceLocator = _locator.Object;
-            _locator.Setup(sl => sl.GetInstance<IMarketingTestingWebRepository>()).Returns(_webRepo.Object);
+            _locator.Setup(sl => sl.GetService(typeof(IMarketingTestingWebRepository))).Returns(_webRepo.Object);
 
             settings.Save();
 

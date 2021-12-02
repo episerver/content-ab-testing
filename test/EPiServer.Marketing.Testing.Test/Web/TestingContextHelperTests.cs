@@ -21,12 +21,13 @@ using EPiServer.Marketing.KPI.Common.Helpers;
 using EPiServer.Personalization;
 using System.Web;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class TestingContextHelperTests
     {
-        private Mock<IServiceLocator> _mockServiceLocator = new Mock<IServiceLocator>();
+        private Mock<IServiceProvider> _mockServiceLocator = new Mock<IServiceProvider>();
         private Mock<IContentRepository> _mockContentRepository;
         private Mock<IContentVersionRepository> _mockContentVersionRepository;
         private Mock<IUIHelper> _mockUIHelper;
@@ -38,7 +39,8 @@ namespace EPiServer.Marketing.Testing.Test.Web
         private Mock<IContent> testVariantData = new Mock<IContent>();
         private Mock<IContent> testConversionContent = new Mock<IContent>();
         private Mock<IAggregatedPersonalizationEvaluator> _personalizationEvaluator = new Mock<IAggregatedPersonalizationEvaluator>();
-
+        private Mock<IContentLanguageAccessor> languageAccessor = new Mock<IContentLanguageAccessor>();
+        public IServiceCollection Services { get; } = new ServiceCollection();
         LocalizationService _localizationService = new FakeLocalizationService("test");
 
         private IMarketingTest test;
@@ -47,7 +49,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private TestingContextHelper GetUnitUnderTest()
         {
-            _mockServiceLocator = new Mock<IServiceLocator>();
+            _mockServiceLocator = new Mock<IServiceProvider>();
             _mockContentRepository = new Mock<IContentRepository>();
             _mockKpiManager = new Mock<IKpiManager>();
             _mockContentVersionRepository = new Mock<IContentVersionRepository>();
@@ -59,18 +61,22 @@ namespace EPiServer.Marketing.Testing.Test.Web
             testConversionContent = new Mock<IContent>();
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en");
-            ContentLanguage.PreferredCulture = CultureInfo.GetCultureInfo("en");
+            //ContentLanguage.PreferredCulture = CultureInfo.GetCultureInfo("en");
 
-            _mockServiceLocator.Setup(call => call.GetInstance<IContentRepository>())
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IContentRepository)))
               .Returns(_mockContentRepository.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<IContentVersionRepository>())
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IContentVersionRepository)))
                 .Returns(_mockContentVersionRepository.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<IKpiHelper>()).Returns(_mockKpiHelper.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<IUIHelper>()).Returns(_mockUIHelper.Object);
-            _mockServiceLocator.Setup(call => call.GetInstance<IKpiManager>()).Returns(_mockKpiManager.Object);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(_localizationService);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IAggregatedPersonalizationEvaluator>()).Returns(_personalizationEvaluator.Object);
-            _personalizationEvaluator.Setup(m => m.Personalize()).Returns(true); 
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IKpiHelper))).Returns(_mockKpiHelper.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IUIHelper))).Returns(_mockUIHelper.Object);
+            _mockServiceLocator.Setup(call => call.GetService(typeof(IKpiManager))).Returns(_mockKpiManager.Object);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(LocalizationService))).Returns(_localizationService);
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IAggregatedPersonalizationEvaluator))).Returns(_personalizationEvaluator.Object);
+            _personalizationEvaluator.Setup(m => m.Personalize()).Returns(true);
+
+            languageAccessor.Setup(l => l.Language).Returns(CultureInfo.GetCultureInfo("en"));
+            Services.AddSingleton<IContentLanguageAccessor>(languageAccessor.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
 
             return new TestingContextHelper(_mockContextHelper.Object, _mockServiceLocator.Object, _mockEpiserverHelper.Object);
         }
@@ -111,10 +117,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
         {
             var testContextHelper = GetUnitUnderTest();
 
-            var httpRequest = new HttpRequest("", "http://mySomething/myUrl", "");
-            var stringWriter = new StringWriter();
-            var httpResponse = new HttpResponse(stringWriter);
-            var httpContextMock = new HttpContext(httpRequest, httpResponse);
+            var httpContextMock = (new FakeHttpContext("http://mySomething/myUrl")).Current;
             httpContextMock.Items.Add("InSystemFolder", expectedResult);
 
             _mockContextHelper.Setup(ch => ch.HasCurrentContext()).Returns(true);
@@ -122,7 +125,6 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _mockContextHelper.Setup(ch => ch.GetCurrentContext()).Returns(httpContextMock);
 
             var result = testContextHelper.IsInSystemFolder();
-            _mockContextHelper.VerifyAll();
             Assert.Equal(expectedResult, result);
         }
 
@@ -391,7 +393,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 KeyValueResults = new List<KeyValueResult>()
             };
 
-            var kpi = new ContentComparatorKPI(_mockServiceLocator.Object, Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
+            var kpi = new ContentComparatorKPI(Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
@@ -472,7 +474,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 KeyValueResults = new List<KeyValueResult>()
             };
 
-            var kpi = new ContentComparatorKPI(_mockServiceLocator.Object, Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
+            var kpi = new ContentComparatorKPI(Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
@@ -563,7 +565,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 KeyValueResults = new List<KeyValueResult>()
             };
 
-            var kpi = new ContentComparatorKPI(_mockServiceLocator.Object, Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
+            var kpi = new ContentComparatorKPI(Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
@@ -656,7 +658,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
                .Returns(new ContentVersion(new ContentReference(10, 100), "testName", VersionStatus.CheckedOut, DateTime.Now, "me", "me", 0, "en", false, false));
             _mockUIHelper.Setup(call => call.getEpiUrlFromLink(It.IsAny<ContentReference>())).Returns("TestLink");
            
-            var kpi = new ContentComparatorKPI(_mockServiceLocator.Object, Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
+            var kpi = new ContentComparatorKPI(Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
             {
                 CreatedDate = DateTime.UtcNow,
                 ModifiedDate = DateTime.UtcNow,
@@ -721,7 +723,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 KeyValueResults = new List<KeyValueResult>()
             };
 
-            var kpi = new ContentComparatorKPI(_mockServiceLocator.Object, Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
+            var kpi = new ContentComparatorKPI(Guid.Parse("10acbb11-693a-4f20-8602-b766152bf3bb"))
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
@@ -753,7 +755,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var aPage = new PageData(new PageReference(1));
 
             var testContextHelper = GetUnitUnderTest();
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IPageRouteHelper>()).Returns(new FakePageRouteHelper(aPage));
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IPageRouteHelper))).Returns(new FakePageRouteHelper(aPage));
 
             var result = testContextHelper.IsRequestedContent(aPage);
 
@@ -767,7 +769,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var aPage2 = new PageData(new PageReference(2));
 
             var testContextHelper = GetUnitUnderTest();
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IPageRouteHelper>()).Returns(new FakePageRouteHelper(aPage));
+            _mockServiceLocator.Setup(sl => sl.GetService(typeof(IPageRouteHelper))).Returns(new FakePageRouteHelper(aPage));
 
             var result = testContextHelper.IsRequestedContent(aPage2);
 

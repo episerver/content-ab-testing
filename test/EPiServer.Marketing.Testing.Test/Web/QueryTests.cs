@@ -21,7 +21,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class QueryTests
     {
-        private Mock<IServiceLocator> _serviceLocator;
+        private Mock<IServiceProvider> _serviceLocator;
         private FakeLocalizationService _localizationService;
         private Mock<IContentRepository> _contentRepository;
         private Mock<IMarketingTestingWebRepository> _webRepository;
@@ -31,9 +31,9 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         IContent someContent = new BasicContent() { Name = "thisone" };
 
-        private IServiceLocator GetUnitUnderTest()
+        private IServiceProvider GetUnitUnderTest()
         {
-            _serviceLocator = new Mock<IServiceLocator>();
+            _serviceLocator = new Mock<IServiceProvider>();
             
             _localizationService = new FakeLocalizationService("test");
             _contentRepository = new Mock<IContentRepository>();
@@ -42,10 +42,10 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
             _webRepository = new Mock<IMarketingTestingWebRepository>();
 
-            _serviceLocator.Setup(call => call.GetInstance<LocalizationService>()).Returns(_localizationService);
-            _serviceLocator.Setup(call => call.GetInstance<IContentRepository>()).Returns(_contentRepository.Object);
-            _serviceLocator.Setup(call => call.GetInstance<IMarketingTestingWebRepository>()).Returns(_webRepository.Object);
-            _serviceLocator.Setup(sl => sl.GetInstance<IEpiserverHelper>()).Returns(_mockEpiserverHelper.Object);
+            _serviceLocator.Setup(call => call.GetService(typeof(LocalizationService))).Returns(_localizationService);
+            _serviceLocator.Setup(call => call.GetService(typeof(IContentRepository))).Returns(_contentRepository.Object);
+            _serviceLocator.Setup(call => call.GetService(typeof(IMarketingTestingWebRepository))).Returns(_webRepository.Object);
+            _serviceLocator.Setup(sl => sl.GetService(typeof(IEpiserverHelper))).Returns(_mockEpiserverHelper.Object);
 
             return _serviceLocator.Object;
         }
@@ -78,7 +78,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             Assert.Equal(1, results.Items.Count);
             Assert.NotNull(query.DisplayName);
             Assert.NotNull(query.Name);
-            Assert.NotNull(query.SortOrder);
+            Assert.NotEqual(0, query.SortOrder);
             Assert.Equal(_editor, query.PlugInAreas);
             Assert.True(query.CanHandleQuery(new ContentQueryParameters()));
         }
@@ -110,7 +110,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             Assert.Equal(1, results.Items.Count);
             Assert.NotNull(query.DisplayName);
             Assert.NotNull(query.Name);
-            Assert.NotNull(query.SortOrder);
+            Assert.NotEqual(0, query.SortOrder);
             Assert.Equal(_editor, query.PlugInAreas);
             Assert.True(query.CanHandleQuery(new ContentQueryParameters()));
         }
@@ -141,7 +141,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             Assert.Equal(1, results.Items.Count);
             Assert.NotNull(query.DisplayName);
             Assert.NotNull(query.Name);
-            Assert.NotNull(query.SortOrder);
+            Assert.NotEqual(0, query.SortOrder);
             Assert.Equal(_editor, query.PlugInAreas);
             Assert.True(query.CanHandleQuery(new ContentQueryParameters()));
         }
@@ -187,7 +187,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             Assert.Equal(1, results.Items.Count);
             Assert.NotNull(query.DisplayName);
             Assert.NotNull(query.Name);
-            Assert.NotNull(query.SortOrder);
+            Assert.NotEqual(0, query.SortOrder);
             Assert.Equal(_editor, query.PlugInAreas);
             Assert.True(query.CanHandleQuery(new ContentQueryParameters()));
         }
