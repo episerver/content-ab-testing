@@ -16,7 +16,7 @@ namespace EPiServer.Marketing.Messaging.Tests
             registry.Register<int>(new Mock<IMessageHandler<int>>().Object);
             registry.Register<int>(new Mock<IMessageHandler<int>>().Object);
 
-            Assert.Equal(1, registry.Get<string>().Count());
+            Assert.Single(registry.Get<string>());
             Assert.Equal(2, registry.Get<int>().Count());
         }
 
