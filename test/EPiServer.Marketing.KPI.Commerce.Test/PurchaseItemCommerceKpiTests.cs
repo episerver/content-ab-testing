@@ -11,6 +11,8 @@ using System.Globalization;
 using EPiServer.Core;
 using EPiServer.Marketing.KPI.Commerce.Test.Fakes;
 using Xunit;
+using Microsoft.Extensions.DependencyInjection;
+using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.KPI.Commerce.Test
 {
@@ -18,19 +20,21 @@ namespace EPiServer.Marketing.KPI.Commerce.Test
     public class PurchaseItemCommerceKpiTests : CommerceKpiTestsBase
     {
         private Guid _kpiId = Guid.Parse("c1327f8f-4063-48b0-a35a-61b9a37d3901");
-
+        private IServiceCollection Services { get; } = new ServiceCollection();
         private PurchaseItemKpi GetUnitUnderTest()
         {
             var synchronizedObjectInstanceCache = new Mock<ISynchronizedObjectInstanceCache>();
             _mockReferenceConverter = new Mock<ReferenceConverter>(
-                new EntryIdentityResolver(synchronizedObjectInstanceCache.Object),
-                new NodeIdentityResolver(synchronizedObjectInstanceCache.Object));
+                new EntryIdentityResolver(synchronizedObjectInstanceCache.Object, new CatalogOptions()),
+                new NodeIdentityResolver(synchronizedObjectInstanceCache.Object, new CatalogOptions()));
 
-            _mockServiceLocator.Setup(loc => loc.GetInstance<IContentLoader>()).Returns(_mockContentLoader.Object);
-            _mockServiceLocator.Setup(loc => loc.GetInstance<ReferenceConverter>()).Returns(_mockReferenceConverter.Object);
-            _mockServiceLocator.Setup(loc => loc.GetInstance<IContentRepository>()).Returns(_mockContentRepository.Object);
+            Services.AddSingleton(_mockContentLoader.Object);
+            Services.AddSingleton(_mockReferenceConverter.Object);
+            Services.AddSingleton(_mockContentRepository.Object);
 
-            return new PurchaseItemKpi(_mockServiceLocator.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
+            return new PurchaseItemKpi();
         }
 
         [Fact]
