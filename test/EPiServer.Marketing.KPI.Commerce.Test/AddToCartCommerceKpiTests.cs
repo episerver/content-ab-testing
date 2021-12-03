@@ -19,7 +19,8 @@ using EPiServer.Marketing.Testing.Test.Fakes;
 using Mediachase.Commerce;
 using Mediachase.Commerce.Inventory;
 using Mediachase.Commerce.Markets;
-
+using Microsoft.Extensions.DependencyInjection;
+using EPiServer.ServiceLocation;
 
 namespace EPiServer.Marketing.KPI.Commerce.Test
 {
@@ -28,21 +29,23 @@ namespace EPiServer.Marketing.KPI.Commerce.Test
     {
         private Guid _kpiId = Guid.Parse("c1327f8f-4063-48b0-a35a-61b9a37d3901");
         private Guid _contentGuid = Guid.Parse("cbe9f6ed-3d20-47b0-93da-0d76d5c095a7");
-
+        private IServiceCollection Services { get; } = new ServiceCollection();
 
         private AddToCartKpi GetUnitUnderTest()
         {
             var synchronizedObjectInstanceCache = new Mock<ISynchronizedObjectInstanceCache>();
             _mockReferenceConverter = new Mock<ReferenceConverter>(
-                new EntryIdentityResolver(synchronizedObjectInstanceCache.Object),
-                new NodeIdentityResolver(synchronizedObjectInstanceCache.Object));
+                new EntryIdentityResolver(synchronizedObjectInstanceCache.Object, new CatalogOptions()),
+                new NodeIdentityResolver(synchronizedObjectInstanceCache.Object, new CatalogOptions()));
 
-            _mockServiceLocator.Setup(loc => loc.GetInstance<IContentLoader>()).Returns(_mockContentLoader.Object);
-            _mockServiceLocator.Setup(loc => loc.GetInstance<ReferenceConverter>()).Returns(_mockReferenceConverter.Object);
-            _mockServiceLocator.Setup(loc => loc.GetInstance<IContentRepository>()).Returns(_mockContentRepository.Object);
-            _mockServiceLocator.Setup(loc => loc.GetInstance<IPublishedStateAssessor>()).Returns(_mockPublishedStateAssossor.Object);
+            Services.AddSingleton(_mockContentLoader.Object);
+            Services.AddSingleton(_mockReferenceConverter.Object);
+            Services.AddSingleton(_mockContentRepository.Object);
+            Services.AddSingleton(_mockPublishedStateAssossor.Object);
 
-            return new AddToCartKpi(_mockServiceLocator.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
+            return new AddToCartKpi();
         }
 
         [Fact]

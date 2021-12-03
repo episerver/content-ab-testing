@@ -3,8 +3,10 @@ using EPiServer.Logging;
 using EPiServer.Marketing.KPI.Commerce.Kpis;
 using EPiServer.Marketing.KPI.Exceptions;
 using EPiServer.Marketing.KPI.Manager;
+using EPiServer.ServiceLocation;
 using Mediachase.Commerce;
 using Mediachase.Commerce.Markets;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -21,20 +23,24 @@ namespace EPiServer.Marketing.KPI.Commerce.Test
         private Currency _defaultCurrency;
         private MyLogger _logger = new MyLogger();
 
+        private IServiceCollection Services { get; } = new ServiceCollection();
+
         private AverageOrderKpi GetUnitUnderTest()
         {
             commerceData = new CommerceData();
             commerceData.CommerceCulture = "English";
             commerceData.preferredFormat = new System.Globalization.NumberFormatInfo();
 
-            _defaultCurrency = Currency.USD;          
+            _defaultCurrency = Currency.USD;
 
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IMarketService>()).Returns(_mockMarketService.Object);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IKpiManager>()).Returns(_mockKpiManager.Object);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<IOrderGroupCalculator>()).Returns(_mockOrderGroupCalculator.Object);
-            _mockServiceLocator.Setup(sl => sl.GetInstance<ILogger>()).Returns(_logger);
+            Services.AddSingleton(_mockMarketService.Object);
+            Services.AddSingleton(_mockKpiManager.Object);
+            Services.AddSingleton(_mockOrderGroupCalculator.Object);
+            Services.AddSingleton(_logger);
 
-            return new AverageOrderKpi(_mockServiceLocator.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
+            return new AverageOrderKpi();
         }
 
         [Fact]

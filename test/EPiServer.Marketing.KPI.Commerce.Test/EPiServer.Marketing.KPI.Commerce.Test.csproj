@@ -12,17 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Castle.Windsor" Version="4.1.0" />
-    <PackageReference Include="DotNetZip" Version="1.10.1" />
-    <PackageReference Include="EPiServer.Commerce" Version="13.0.0" />
-    <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
-    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.3" />
-    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.3" />
-    <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
-    <PackageReference Include="Moq" Version="4.7.145" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Castle.Core" Version="4.4.1" />
+    <PackageReference Include="Castle.Windsor" Version="5.1.1" />
+    <PackageReference Include="log4net" Version="2.0.13" />
+    <PackageReference Include="Moq" Version="4.16.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.1" />
     <PackageReference Include="xunit.assert" Version="2.3.1" />

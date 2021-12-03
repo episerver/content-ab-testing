@@ -25,7 +25,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
     {
 
         [ExcludeFromCodeCoverage]
-        internal AddToCartKpi()
+        public AddToCartKpi()
         {
             LocalizationSection = "addtocart";
         }
