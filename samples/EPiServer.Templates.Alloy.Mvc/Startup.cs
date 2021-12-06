@@ -18,6 +18,8 @@ using EPiServer.Cms.Shell;
 using EPiServer.Cms.UI.Admin;
 using EPiServer.Cms.UI.VisitorGroups;
 using System;
+using EPiServer.Framework.Hosting;
+using EPiServer.Web.Hosting;
 
 namespace EPiServer.Templates.Alloy.Mvc
 {
@@ -66,7 +68,7 @@ namespace EPiServer.Templates.Alloy.Mvc
 
             if (_webHostingEnvironment.IsDevelopment())
             {
-                
+                services.AddUIMappedFileProviders(_webHostingEnvironment.ContentRootPath, @"..\..\");
                 services.Configure<ClientResourceOptions>(uiOptions =>
                 {
                     uiOptions.Debug = true;
@@ -75,11 +77,7 @@ namespace EPiServer.Templates.Alloy.Mvc
 
             services.AddMvc();
             services.AddAlloy();
-            services.AddCmsHost()
-                .AddCmsHtmlHelpers()
-                .AddCmsUI()
-                .AddAdmin()
-                .AddVisitorGroupsUI()
+            services.AddCms()
                 .AddCommerce();
 
             services.AddEmbeddedLocalization<Startup>();
@@ -103,11 +101,38 @@ namespace EPiServer.Templates.Alloy.Mvc
             {
                 endpoints.MapContent();
                 endpoints.MapControllerRoute("Register", "/Register", new { controller = "Register", action = "Index" });
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+        }
+    }
+
+    internal static class IntenalServiceCollectionExtensions
+    {
+        public static IServiceCollection AddUIMappedFileProviders(this IServiceCollection services, string applicationRootPath, string uiSolutionRelativePath)
+        {
+            services.Configure<ClientResourceOptions>(o => o.Debug = true);
+
+            var uiSolutionFolder = Path.Combine(applicationRootPath, uiSolutionRelativePath);
+            EnsureDictionary(new DirectoryInfo(Path.Combine(applicationRootPath, "modules/_protected")));
+            services.Configure<CompositeFileProviderOptions>(c =>
+            {
+                c.BasePathFileProviders.Add(new MappingPhysicalFileProvider("/EPiServer/EPiServer.Marketing.KPI.Commerce", string.Empty, Path.Combine(uiSolutionFolder, @"src\EPiServer.Marketing.KPI.Commerce")));
+                c.BasePathFileProviders.Add(new MappingPhysicalFileProvider("/EPiServer/EPiServer.Marketing.KPI", string.Empty, Path.Combine(uiSolutionFolder, @"src\EPiServer.Marketing.KPI")));
+            });
+            return services;
+        }
+
+        private static void EnsureDictionary(DirectoryInfo directoryInfo)
+        {
+            if (!directoryInfo.Parent.Exists)
+            {
+                EnsureDictionary(directoryInfo.Parent);
+            }
+
+            if (!directoryInfo.Exists)
+            {
+                directoryInfo.Create();
+            }
         }
     }
 }

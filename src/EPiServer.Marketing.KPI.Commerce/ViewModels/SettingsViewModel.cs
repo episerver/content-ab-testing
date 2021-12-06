@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EPiServer.Marketing.KPI.Commerce.ViewModels
 {
-    class SettingsViewModel
+    public class SettingsViewModel
     {
         #region Selection options
         public IEnumerable<MarketOption> MarketList { get; set; }

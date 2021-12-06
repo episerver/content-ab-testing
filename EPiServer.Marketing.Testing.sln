@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{00563401
 		Build\nuspec.props = Build\nuspec.props
 		pack.cmd = pack.cmd
 		Build\pack.ps1 = Build\pack.ps1
+		setup.cmd = setup.cmd
 		Build\sign.props = Build\sign.props
 		Build\Sign.ps1 = Build\Sign.ps1
 		Build\test.props = Build\test.props
