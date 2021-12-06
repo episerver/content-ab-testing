@@ -1,17 +1,17 @@
 ﻿using System.Data.Common;
-using System.Data.Entity;
 using EPiServer.Marketing.KPI.Dal;
 using EPiServer.Marketing.KPI.Dal.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.KPI.Test
 {
     internal class KpiTestContext : DatabaseContext
     {
-        public KpiTestContext(DbConnection dbConnection) : base(dbConnection)
+        public KpiTestContext(DbContextOptions options) : base(options)
         {
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             if (modelBuilder != null)
             {

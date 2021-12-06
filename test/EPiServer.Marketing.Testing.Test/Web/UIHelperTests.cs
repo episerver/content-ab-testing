@@ -9,15 +9,15 @@ namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class UIHelperTests
     {
-        private Mock<IServiceLocator> _serviceLocator;
+        private Mock<IServiceProvider> _serviceLocator;
         private Mock<IContentRepository> _contentrepository;
 
         private UIHelper GetUnitUnderTest()
         {
             _contentrepository = new Mock<IContentRepository>();
             _contentrepository.Setup(cr => cr.Get<IContent>(It.IsAny<Guid>())).Throws<NotSupportedException>();
-            _serviceLocator = new Mock<IServiceLocator>();
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentRepository>()).Returns(_contentrepository.Object);
+            _serviceLocator = new Mock<IServiceProvider>();
+            _serviceLocator.Setup(sl => sl.GetService(typeof(IContentRepository))).Returns(_contentrepository.Object);
 
             return new UIHelper(_serviceLocator.Object);
         }
@@ -32,7 +32,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _contentrepository.Setup(cr => cr.Get<IContent>(It.Is<Guid>(guid => guid.Equals(theGuid)))).Returns(tc);
             helper.getContent(theGuid);
 
-            _serviceLocator.Verify(sl => sl.GetInstance<IContentRepository>(), Times.Once, "GetInstance was never called");
+            _serviceLocator.Verify(sl => sl.GetService(typeof(IContentRepository)), Times.Once, "GetInstance was never called");
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _contentrepository.Verify(cr => cr.Get<IContent>(It.Is<Guid>(arg => arg.Equals(theGuid))), Times.Once, "content repository get was never called");
 
             // Now verify the name of the content returned (should be what the api specifies - ContentNotFound)
-            Assert.Equal(content.Name, "ContentNotFound", false);
+            Assert.Equal("ContentNotFound", content.Name, false);
         }
     }
 }

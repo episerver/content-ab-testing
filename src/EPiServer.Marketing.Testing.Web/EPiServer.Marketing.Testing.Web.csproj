@@ -12,7 +12,11 @@
     <NuspecProperties>Configuration=$(Configuration);version=$(PackageVersion);mtVersion=$(MtVersion);mtMessageVersion=$(MtMessageVersion);uiVersion=$(UiVersion);uiNextMajorVersion=$(UiNextMajorVersion);cmsVersion=$(CmsVersion);cmsNextMajorVersion=$(CmsNextMajorVersion)</NuspecProperties>
 	<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
-
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedLangFiles\**\*" />
+    <EmbeddedResource Include="EmbeddedScriptFiles\**\*" />
+    <EmbeddedResource Include="SchemaUpdater\Testing.zip" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="EPiServer.CMS.AspNetCore" Version="$(CmsCoreVersionCommon)" />
     <PackageReference Include="EPiServer.CMS.Core" Version="$(CmsCoreVersionCommon)" />

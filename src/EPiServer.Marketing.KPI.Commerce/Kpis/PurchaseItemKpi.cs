@@ -26,7 +26,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
     public class PurchaseItemKpi : CommerceKpi
     {
         [ExcludeFromCodeCoverage]
-        internal PurchaseItemKpi()
+        public PurchaseItemKpi()
         {
             LocalizationSection = "purchaseitem";
         }

@@ -33,7 +33,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Kpis
         private readonly Injected<IOrderGroupCalculator> _orderGroupCalculator;
 
         [ExcludeFromCodeCoverage]
-        internal AverageOrderKpi()
+        public AverageOrderKpi()
         {
             LocalizationSection = "averageorder";
             _logger = LogManager.GetLogger();

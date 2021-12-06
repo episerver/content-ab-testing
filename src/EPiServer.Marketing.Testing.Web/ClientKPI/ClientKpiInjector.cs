@@ -23,7 +23,7 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
     [ServiceConfiguration(ServiceType = typeof(IClientKpiInjector), Lifecycle = ServiceInstanceScope.Singleton)]
     public class ClientKpiInjector : IClientKpiInjector
     {
-        internal const string ClientCookieName = "ClientKpiList";
+        public const string ClientCookieName = "ClientKpiList";
 
         private static readonly string _clientKpiWrapperScript;
         private static readonly string _clientKpiScriptTemplate;
@@ -66,7 +66,7 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
         /// Constructor
         /// </summary>
         /// <param name="serviceLocator">Dependency container</param>
-        internal ClientKpiInjector(IServiceProvider serviceLocator)
+        public ClientKpiInjector(IServiceProvider serviceLocator)
         {
             _contextHelper = serviceLocator.GetInstance<ITestingContextHelper>();
             _testRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();

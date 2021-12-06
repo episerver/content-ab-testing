@@ -2,7 +2,7 @@
 
 namespace EPiServer.Marketing.Testing.Web.Helpers
 {
-    internal interface IReferenceCounter
+    public interface IReferenceCounter
     {
         void AddReference(object src);
         void RemoveReference(object src);

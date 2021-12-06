@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.Entity.Migrations.History;
 using System.Linq;
 using EPiServer.Marketing.KPI.Common;
 using EPiServer.Marketing.KPI.Manager;
@@ -17,43 +16,43 @@ using EPiServer.ServiceLocation;
 using Moq;
 using EPiServer.Marketing.KPI.Common.Helpers;
 using EPiServer.Core;
+using Microsoft.Extensions.DependencyInjection;
+using EPiServer.Marketing.Testing.Dal;
 
 namespace EPiServer.Marketing.Testing.Test.Dal
 {
     public class MultiVariantDataAccessTests : TestBase
     {
         private TestContext _context;
-        private HistoryContext _historyContext;
-        private DbConnection _dbConnection;
         private TestingDataAccess _dataAccess;
-        private TestingDataAccess _historyDataAccess;
         private TestManager _tm;
-        private Mock<IServiceLocator> _serviceLocator = new Mock<IServiceLocator>();
+        public IServiceCollection Services { get; } = new ServiceCollection();
         private Mock<IKpiManager> _kpiManager;
         private DefaultMarketingTestingEvents _marketingEvents;
         private Mock<IKpiHelper> _kpiHelper = new Mock<IKpiHelper>();
 
         public MultiVariantDataAccessTests()
         {
-            _dbConnection = Effort.DbConnectionFactory.CreateTransient();
-            _context = new TestContext(_dbConnection);
-
-            _dataAccess = new TestingDataAccess(new Core.TestRepository(_context));
-
             _marketingEvents = new DefaultMarketingTestingEvents();
 
             _kpiManager = new Mock<IKpiManager>();
             _kpiManager.Setup(call => call.Save(It.IsAny<List<IKpi>>())).Returns(It.IsAny<List<Guid>>());
 
-             _serviceLocator = new Mock<IServiceLocator>();
-             _serviceLocator.Setup(sl => sl.GetInstance<ITestingDataAccess>()).Returns(_dataAccess);
-             _serviceLocator.Setup(sl => sl.GetInstance<IKpiManager>()).Returns(_kpiManager.Object);
-             _serviceLocator.Setup(sl => sl.GetInstance<DefaultMarketingTestingEvents>()).Returns(_marketingEvents);
+            Services.AddSingleton(_kpiManager.Object);
+            Services.AddSingleton(_marketingEvents);
 
             _kpiHelper.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("teststring");
-            _serviceLocator.Setup(call => call.GetInstance<IKpiHelper>()).Returns(_kpiHelper.Object);          
+            Services.AddSingleton(_kpiHelper.Object);
 
-            _tm = new TestManager(_serviceLocator.Object);
+
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+            _context = new TestContext();
+            _dataAccess = new TestingDataAccess(new Core.TestRepository(_context));
+
+
+            Services.AddSingleton<ITestingDataAccess>(_dataAccess);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+            _tm = new TestManager();
         }
 
         [Fact]
@@ -145,7 +144,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             filter.Value = originalItemId;
             criteria.AddFilter(filter);
             var list = _dataAccess.GetTestList(criteria);
-            Assert.Equal(1, list.Count());
+            Assert.Single(list);
         }
 
         [Fact]
@@ -164,7 +163,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             criteria.AddFilter(filter);
             criteria.AddFilter(filter2);
             var list = _dataAccess.GetTestList(criteria);
-            Assert.Equal(1, list.Count());
+            Assert.Single(list);
         }
 
         [Fact]
@@ -203,7 +202,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             criteria.AddFilter(filter);
             criteria.AddFilter(filter2);
             var list = _dataAccess.GetTestList(criteria);
-            Assert.Equal(0, list.Count());
+            Assert.Empty(list);
         }
 
         [Fact]
@@ -245,11 +244,11 @@ namespace EPiServer.Marketing.Testing.Test.Dal
         public void TestManagerDelete()
         {
             var tests = AddMultivariateTests(_dataAccess, 3);
-
+            
             _dataAccess.Delete(tests[0].Id);
-            _dataAccess._repository.SaveChanges();
+            _dataAccess._repository.Service.SaveChanges();
 
-            Assert.Equal(_dataAccess._repository.GetAll().Count(), 2);
+            Assert.Equal(2, _dataAccess._repository.Service.GetAll().Count());
         }
 
         [Fact]
@@ -259,7 +258,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
 
             _dataAccess.Start(tests[0].Id);
 
-            Assert.Equal(_dataAccess.Get(tests[0].Id).State, DalTestState.Active);
+            Assert.Equal(DalTestState.Active, _dataAccess.Get(tests[0].Id).State);
         }
 
         [Fact]
@@ -271,7 +270,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
 
             _dataAccess.Stop(tests[0].Id);
 
-            Assert.Equal(_dataAccess.Get(tests[0].Id).State, DalTestState.Done);
+            Assert.Equal(DalTestState.Done, _dataAccess.Get(tests[0].Id).State);
         }
 
         [Fact]
@@ -316,7 +315,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
 
             var retTest = _dataAccess.Get(retTestid);
             // check that a variant is set to winner
-            Assert.Equal(retTest.Variants[0].IsWinner,true);
+            Assert.True(retTest.Variants[0].IsWinner);
             
             // check the test is archived
             Assert.True(retTest.State == DalTestState.Archived);
@@ -362,7 +361,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             _dataAccess.Save(test);
 
             // check that a variant exists
-            Assert.Equal(test.Variants.Count(), 1);
+            Assert.Single(test.Variants);
 
             _dataAccess.IncrementCount(testId, itemVersion, DalCountType.View, new Guid());
             _dataAccess.IncrementCount(testId, itemVersion, DalCountType.Conversion, new Guid());
@@ -387,10 +386,10 @@ namespace EPiServer.Marketing.Testing.Test.Dal
                 Owner = "Bert"
             };
 
-            _dataAccess._repository.Add(test);
-            _dataAccess._repository.SaveChanges();
+            _dataAccess._repository.Service.Add(test);
+            _dataAccess._repository.Service.SaveChanges();
 
-            Assert.Equal(1, _dataAccess._repository.GetAll().Count());
+            Assert.Equal(1, _dataAccess._repository.Service.GetAll().Count());
         }
 
         [Fact]
@@ -402,7 +401,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
             _dataAccess.Save(tests[0]);
 
             var list = _dataAccess.GetTestByItemId(originalItemId);
-            Assert.Equal(1, list.Count());
+            Assert.Single(list);
         }
 
         [Fact]
@@ -471,10 +470,9 @@ namespace EPiServer.Marketing.Testing.Test.Dal
 
         [Fact]
         public void TestManagerSaveDone()
-        {
-            //var tm = GetUnitUnderTest();
+        {            
             _kpiHelper.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("teststring");
-            _serviceLocator.Setup(call => call.GetInstance<IKpiHelper>()).Returns(_kpiHelper.Object);
+            Services.AddSingleton(_kpiHelper.Object);
             var id = Guid.NewGuid();
             var itemId = Guid.NewGuid();
 
@@ -490,7 +488,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
                         new Variant() {Id = Guid.NewGuid(), ItemVersion = 1, ItemId = itemId, Views = 5000, Conversions = 100, KeyFinancialResults = new List<KeyFinancialResult>(),
                             KeyValueResults = new List<KeyValueResult>(), KeyConversionResults = new List<KeyConversionResult>()}
                     },
-                KpiInstances = new List<IKpi>() { new ContentComparatorKPI(_serviceLocator.Object, Guid.NewGuid()) },
+                KpiInstances = new List<IKpi>() { new ContentComparatorKPI(Guid.NewGuid()) },
                 Title = "test",
                 Description = "description",
                 CreatedDate = DateTime.UtcNow,

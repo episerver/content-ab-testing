@@ -15,7 +15,7 @@ namespace EPiServer.Marketing.Testing.Test.Model
             testCriteria.AddFilter(addedFilter);
             var retFilters = testCriteria.GetFilters();
 
-            Assert.Equal(1, retFilters.Count);
+            Assert.Single(retFilters);
             Assert.Equal(addedFilter, retFilters.FirstOrDefault());
         }
 
@@ -28,7 +28,7 @@ namespace EPiServer.Marketing.Testing.Test.Model
             testCriteria.AddFilter(dupeFilter);
             testCriteria.AddFilter(dupeFilter);
             var retFilters = testCriteria.GetFilters();
-            Assert.Equal(1, retFilters.Count);
+            Assert.Single(retFilters);
             Assert.Equal(dupeFilter, retFilters.FirstOrDefault());
         }
     }

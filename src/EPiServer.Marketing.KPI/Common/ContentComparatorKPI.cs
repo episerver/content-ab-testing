@@ -43,6 +43,11 @@ namespace EPiServer.Marketing.KPI.Common
         private readonly Injected<IContentRepository> _contentRepository;
         private readonly Injected<IContentVersionRepository> _contentVersionRepository;
         private readonly Injected<IContentEvents> _contentEvents;
+
+        public ContentComparatorKPI()
+        {
+        }
+
         public ContentComparatorKPI(Guid contentGuid)
         {
             ContentGuid = contentGuid;

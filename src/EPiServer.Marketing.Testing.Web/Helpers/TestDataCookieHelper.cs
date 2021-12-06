@@ -21,7 +21,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         private IEpiserverHelper _episerverHelper;
         private IAdminConfigTestSettingsHelper _adminConfigTestSettingsHelper;
 
-        internal readonly string COOKIE_PREFIX = "EPI-MAR-";
+        public readonly string COOKIE_PREFIX = "EPI-MAR-";
 
         [ExcludeFromCodeCoverage]
         public TestDataCookieHelper()
@@ -35,7 +35,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         /// <summary>
         /// unit tests should use this contructor and add needed services to the service locator as needed
         /// </summary>
-        internal TestDataCookieHelper(IAdminConfigTestSettingsHelper adminConfigTestSettingsHelper, IMarketingTestingWebRepository testRepo, IHttpContextHelper contextHelper, IEpiserverHelper epiHelper)
+        public TestDataCookieHelper(IAdminConfigTestSettingsHelper adminConfigTestSettingsHelper, IMarketingTestingWebRepository testRepo, IHttpContextHelper contextHelper, IEpiserverHelper epiHelper)
         {
             _adminConfigTestSettingsHelper = adminConfigTestSettingsHelper;
             _testRepo = testRepo;
@@ -123,8 +123,8 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             var currentCulturename = cultureName != null ? cultureName : _episerverHelper.GetContentCultureinfo().Name;
             var cookieKey = COOKIE_PREFIX + testContentId + cookieDelimeter + currentCulturename;
             var cookie = _httpContextHelper.HasCookie(cookieKey)
-                ? _httpContextHelper.GetRequestCookie(cookieKey)
-                : string.Empty;
+                ? _httpContextHelper.GetResponseCookie(cookieKey)
+                : _httpContextHelper.GetRequestCookie(cookieKey);
 
             if (!string.IsNullOrEmpty(cookie))
             {

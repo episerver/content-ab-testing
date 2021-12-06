@@ -33,7 +33,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         }
 
         // For unit test support.
-        internal ABTestStore(IServiceProvider serviceLocator)
+        public ABTestStore(IServiceProvider serviceLocator)
         {
             _webRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
             _episerverHelper = serviceLocator.GetInstance<IEpiserverHelper>();

@@ -59,12 +59,12 @@ namespace EPiServer.Marketing.KPI.Dal
             return DatabaseContext.SaveChanges();
         }
 
-        public IDalKpi GetById(object id)
+        public DalKpi GetById(object id)
         {
             return DatabaseContext.Set<DalKpi>().Find(id);
         }
 
-        public IQueryable<IDalKpi> GetAll()
+        public IQueryable<DalKpi> GetAll()
         {
             return DatabaseContext.Set<DalKpi>().AsQueryable();
         } 
@@ -215,7 +215,7 @@ namespace EPiServer.Marketing.KPI.Dal
         #endregion
 
         #region Internal Members
-        public readonly DatabaseContext DatabaseContext;
+        public DatabaseContext DatabaseContext { set; get; }
 
         public readonly IHistoryRepository HistoryRepository;
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web.Mvc;
 using EPiServer.Framework.Localization;
 using EPiServer.Logging;
 using EPiServer.Marketing.KPI.Common;
@@ -17,25 +16,34 @@ using Moq;
 using Newtonsoft.Json;
 using Xunit;
 using System.Collections;
+using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class KpiStoreTests
     {
-        Mock<IServiceLocator> _locator = new Mock<IServiceLocator>();
+        Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<ILogger> _logger = new Mock<ILogger>();
         private Mock<IKpiWebRepository> _kpiWebRepoMock;
-
+        MemoryLocalizationService _mockLocalizationService = new MemoryLocalizationService();
+        public IServiceCollection Services { get; } = new ServiceCollection();
         private KpiStore GetUnitUnderTest()
         {
-            _locator.Setup(sl => sl.GetInstance<ILogger>()).Returns(_logger.Object);
-            _locator.Setup(sl => sl.GetInstance<LocalizationService>()).Returns(new FakeLocalizationService("testing"));
+            _mockLocalizationService.AddString(CultureInfo.CurrentUICulture, "/abtesting/addtestview/error_conversiongoal", "testing");
+            _mockLocalizationService.AddString(CultureInfo.CurrentUICulture, "/abtesting/addtestview/error_duplicate_kpi_values", "testing");
 
+            _locator.Setup(sl => sl.GetService(typeof(ILogger))).Returns(_logger.Object);
+            _locator.Setup(sl => sl.GetService(typeof(LocalizationService))).Returns(_mockLocalizationService);
+            
             _kpiWebRepoMock = new Mock<IKpiWebRepository>();
             _kpiWebRepoMock.Setup(call => call.GetKpiTypes()).Returns(new List<KpiTypeModel>() { new KpiTypeModel()});
             
-            _locator.Setup(s1 => s1.GetInstance<IKpiWebRepository>()).Returns(_kpiWebRepoMock.Object);
-            
+            _locator.Setup(s1 => s1.GetService(typeof(IKpiWebRepository))).Returns(_kpiWebRepoMock.Object);
+
+            Services.AddTransient<LocalizationService>(s => _mockLocalizationService);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
             var testStore = new KpiStore(_locator.Object);
             return testStore;
         }
@@ -144,9 +152,9 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var responseDataErrors = JsonConvert.DeserializeObject<Dictionary<string,string>>(retResult.Data.GetType().GetProperty("errors").GetValue(retResult.Data, null).ToString());
 
             Assert.Equal(2, responseDataErrors.Count);
-            Assert.True(responseDataErrors.Keys.Contains("KpiWidget_0"));
+            Assert.Contains("KpiWidget_0", responseDataErrors.Keys);
             Assert.True(responseDataErrors["KpiWidget_0"] == "testing");
-            Assert.True(responseDataErrors.Keys.Contains("KpiWidget_1"));
+            Assert.Contains("KpiWidget_1", responseDataErrors.Keys);
             Assert.True(responseDataErrors["KpiWidget_1"] == "testing");
         }
     }   

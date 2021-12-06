@@ -44,9 +44,9 @@ namespace EPiServer.Marketing.Testing.Web.Config
         public string PreviewStyleOverride { get; set; }
         
 
-        internal static AdminConfigTestSettings _currentSettings;
-        internal static DynamicDataStoreFactory _factory;
-        internal IServiceProvider _serviceLocator;
+        public static AdminConfigTestSettings _currentSettings;
+        public static DynamicDataStoreFactory _factory;
+        public IServiceProvider _serviceLocator;
 
         /// <summary>
         /// Resets the config and forces a re-read of the settings from the db.

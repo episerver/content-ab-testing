@@ -13,9 +13,9 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         private Stream responseFilterStream;
         private Encoding encoding;
         private bool leaveOpen;
-        internal string clientScript;
+        public string clientScript;
 
-        internal string HtmlResponseStream;
+        public string HtmlResponseStream;
 
         /// <summary>
         /// constructor for the response filter

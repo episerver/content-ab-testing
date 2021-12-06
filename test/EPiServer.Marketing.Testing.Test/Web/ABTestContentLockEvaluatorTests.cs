@@ -10,6 +10,7 @@ using System.Globalization;
 using EPiServer.Cms.Shell;
 using EPiServer.Marketing.Testing.Test.Fakes;
 using EPiServer.SpecializedProperties;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.Testing.Test.Web
 {
@@ -18,7 +19,6 @@ namespace EPiServer.Marketing.Testing.Test.Web
         private Mock<IMarketingTestingWebRepository> _mockWebRepo;
         private Mock<IContentRepository> _mockContentRepo;
         private Mock<IEpiserverHelper> _mockEpiHelper;
-        
         private ABTestLockEvaluator GetUnitUnderTest()
         {
             _mockWebRepo = new Mock<IMarketingTestingWebRepository>();

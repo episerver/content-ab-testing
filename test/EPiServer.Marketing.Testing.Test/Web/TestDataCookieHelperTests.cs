@@ -1,8 +1,10 @@
-﻿using EPiServer.Marketing.KPI.Manager.DataClass;
+﻿using EPiServer.Marketing.KPI;
+using EPiServer.Marketing.KPI.Manager.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass.Enums;
 using EPiServer.Marketing.Testing.Web.Helpers;
 using EPiServer.Marketing.Testing.Web.Repositories;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -112,15 +114,14 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 Id = Guid.Parse("a19221d7-b977-4f90-b256-2e6b3cfd8216"),
             };
 
-            var testCookie = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + testContentId.ToString() + _cookieDelimeter + "en-US")
+            var testCookie = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                ["vId"] = "0",
-                ["viewed"] = "false",
-                ["converted"] = "false",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", startDate.ToString()},
+                {"vId", "0"},
+                {"viewed", "false"},
+                {"converted", "false"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
             var test = new ABTest()
             {
@@ -168,15 +169,14 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 Id = Guid.Parse("a19221d7-b977-4f90-b256-2e6b3cfd8216"),
             };
 
-            var testCookie = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + testContentId.ToString() + _cookieDelimeter + "da-DK")
+            var testCookie = new Dictionary<string, string>()
             {
-                ["start"] = DateTime.Parse("28-09-2018 07:04:41", CultureInfo.GetCultureInfo("da-DK")).ToString(CultureInfo.InvariantCulture),
-                ["vId"] = "0",
-                ["viewed"] = "false",
-                ["converted"] = "false",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", DateTime.Parse("28-09-2018 07:04:41", CultureInfo.GetCultureInfo("da-DK")).ToString(CultureInfo.InvariantCulture)},
+                {"vId", "0"},
+                {"viewed", "false"},
+                {"converted", "false"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
             var test = new ABTest()
             {
@@ -223,15 +223,14 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 Id = Guid.Parse("a19221d7-b977-4f90-b256-2e6b3cfd8216"),
             };
 
-            var testCookie = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + testContentId.ToString() + _cookieDelimeter + "en-US")
+            var testCookie = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                ["vId"] = "1",
-                ["viewed"] = "false",
-                ["converted"] = "false",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", startDate.ToString()},
+                {"vId", "1"},
+                {"viewed", "false"},
+                {"converted", "false"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
             var test = new ABTest()
             {
@@ -273,12 +272,14 @@ namespace EPiServer.Marketing.Testing.Test.Web
             {
                 Id = Guid.NewGuid()
             };
-            var testCookie = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + testContentId.ToString() + _cookieDelimeter + "en-us")
+            var testCookie = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", startDate.ToString()},
+                {"vId", "-1"},
+                {"viewed", "false"},
+                {"converted", "false"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
             var aTest = new ABTest()
             {
@@ -318,38 +319,38 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 Id = Guid.NewGuid()
             };
 
-            var responseCookie1 = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + responseContentCookie1.ToString()
-                + _cookieDelimeter + "en-US")
+            var responseCookie1Name = mockTestDataCookiehelper.COOKIE_PREFIX + responseContentCookie1.ToString()
+                + _cookieDelimeter + "en-US";
+            var responseCookie1 = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                ["vId"] = "0",
-                ["viewed"] = "True",
-                ["converted"] = "True",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", startDate.ToString()},
+                {"vId", "0"},
+                {"viewed", "True"},
+                {"converted", "True"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
-            var requestCookie1 = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + requestContentCookie1.ToString()
-                + _cookieDelimeter + "en-US")
+            var requestCookie1Name = mockTestDataCookiehelper.COOKIE_PREFIX + requestContentCookie1.ToString()
+                + _cookieDelimeter + "en-US";
+            var requestCookie1 = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                ["vId"] = "1",
-                ["viewed"] = "True",
-                ["converted"] = "False",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", startDate.ToString()},
+                {"vId", "1"},
+                {"viewed", "True"},
+                {"converted", "False"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
-            var requestCookie2 = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + requestContentCookie2.ToString()
-                + _cookieDelimeter + "en-US")
+            var requestCookie2Name = mockTestDataCookiehelper.COOKIE_PREFIX + requestContentCookie2.ToString()
+                + _cookieDelimeter + "en-US";
+            var requestCookie2 = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                ["vId"] = "1",
-                ["viewed"] = "True",
-                ["converted"] = "False",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", startDate.ToString()},
+                {"vId", "1"},
+                {"viewed", "True"},
+                {"converted", "False"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
             var aTest = new ABTest()
             {
@@ -364,14 +365,13 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 }
             };
 
-            _httpContextHelper.Setup(hch => hch.GetResponseCookieKeys()).Returns(new string[1] { responseCookie1.Name });
-            _httpContextHelper.Setup(hch => hch.GetRequestCookieKeys()).Returns(new string[2] { requestCookie1.Name, requestCookie2.Name });
+            _httpContextHelper.Setup(hch => hch.GetRequestCookieKeys()).Returns(new string[2] { requestCookie1Name, requestCookie2Name });
 
-            _httpContextHelper.Setup(hch => hch.HasCookie(It.Is<string>(c => c == responseCookie1.Name))).Returns(true);
-            _httpContextHelper.Setup(hch => hch.HasCookie(It.Is<string>(c => c == requestCookie2.Name))).Returns(false);
-            _httpContextHelper.Setup(hch => hch.GetResponseCookie(It.Is<string>(c => c == responseCookie1.Name))).Returns(responseCookie1);
-            _httpContextHelper.Setup(hch => hch.GetRequestCookie(It.Is<string>(c => c == responseCookie1.Name))).Returns(responseCookie1);
-            _httpContextHelper.Setup(hch => hch.GetRequestCookie(It.Is<string>(c => c == requestCookie2.Name))).Returns(requestCookie2);
+            _httpContextHelper.Setup(hch => hch.HasCookie(It.Is<string>(c => c == responseCookie1Name))).Returns(true);
+            _httpContextHelper.Setup(hch => hch.HasCookie(It.Is<string>(c => c == requestCookie2Name))).Returns(false);
+            _httpContextHelper.Setup(hch => hch.GetResponseCookie(It.Is<string>(c => c == responseCookie1Name))).Returns(responseCookie1);
+            _httpContextHelper.Setup(hch => hch.GetRequestCookie(It.Is<string>(c => c == responseCookie1Name))).Returns(responseCookie1);
+            _httpContextHelper.Setup(hch => hch.GetRequestCookie(It.Is<string>(c => c == requestCookie2Name))).Returns(requestCookie2);
             _testRepo.Setup(tr => tr.GetActiveTestsByOriginalItemId(It.IsAny<Guid>(), It.IsAny<CultureInfo>())).Returns(new List<IMarketingTest>());
             _epiHelper.Setup(call => call.GetContentCultureinfo()).Returns(CultureInfo.GetCultureInfo("en-US"));
             _testRepo.Setup(tr => tr.GetActiveTestsByOriginalItemId(It.IsAny<Guid>(), It.IsAny<CultureInfo>())).Returns(new List<IMarketingTest>() { aTest });
@@ -433,11 +433,11 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
             mockTestDataCookiehelper.SaveTestDataToCookie(tdCookie);
 
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => c.Name == mockTestDataCookiehelper.COOKIE_PREFIX + tdCookie.TestContentId + _cookieDelimeter + "en-GB")));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => c["start"] == startDate.ToString(CultureInfo.InvariantCulture))));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => int.Parse(c["vId"]) == 0)));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => bool.Parse(c["viewed"]) == tdCookie.Viewed)));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => bool.Parse(c["converted"]) == tdCookie.Converted)));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<string>(c => c == mockTestDataCookiehelper.COOKIE_PREFIX + tdCookie.TestContentId + _cookieDelimeter + "en-GB"),It.IsAny<string>(),It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => c.FromLegacyCookieString()["start"] == startDate.ToString(CultureInfo.InvariantCulture)), It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => int.Parse(c.FromLegacyCookieString()["vId"]) == 0), It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => bool.Parse(c.FromLegacyCookieString()["viewed"]) == tdCookie.Viewed), It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => bool.Parse(c.FromLegacyCookieString()["converted"]) == tdCookie.Converted), It.IsAny<CookieOptions>()));
         }
 
         [Fact]
@@ -463,9 +463,9 @@ namespace EPiServer.Marketing.Testing.Test.Web
             tdCookie.KpiConversionDictionary.Add(kpiId, true);
             cookieHelper.SaveTestDataToCookie(tdCookie);
 
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => !string.IsNullOrEmpty(c[cookieKey]))),
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => !string.IsNullOrEmpty(c.FromLegacyCookieString()[cookieKey])), It.IsAny<CookieOptions>()),
                 Times.Once(), "expected kpi conversion info to be added to the cookie");
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => bool.Parse(c[cookieKey]))),
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => bool.Parse(c.FromLegacyCookieString()[cookieKey])), It.IsAny<CookieOptions>()),
                 "not the expected kpi conversion value");
         }
 
@@ -510,11 +510,11 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var cookieKey = mockTestDataCookiehelper.COOKIE_PREFIX + originalCookie.TestContentId.ToString() + _cookieDelimeter + "en-GB";
             //Removed the old cookie
             _httpContextHelper.Verify(hch => hch.RemoveCookie(It.Is<string>(cid => cid == cookieKey)));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => c.Name == cookieKey)));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => c["start"] == startDate.ToString(CultureInfo.InvariantCulture))));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => int.Parse(c["vId"]) == 1)));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => bool.Parse(c["viewed"]) == updatedCookie.Viewed)));
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => bool.Parse(c["converted"]) == updatedCookie.Converted)));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<string>(c => c == cookieKey), It.IsAny<string>(), It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => c.FromLegacyCookieString()["start"] == startDate.ToString(CultureInfo.InvariantCulture)), It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => int.Parse(c.FromLegacyCookieString()["vId"]) == 1), It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => bool.Parse(c.FromLegacyCookieString()["viewed"]) == updatedCookie.Viewed), It.IsAny<CookieOptions>()));
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.Is<string>(c => bool.Parse(c.FromLegacyCookieString()["converted"]) == updatedCookie.Converted), It.IsAny<CookieOptions>()));
         }
 
         [Fact]
@@ -532,7 +532,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             testDataCookieHelper.ExpireTestDataCookie(tdCookie);
             var cookieKey = testDataCookieHelper.COOKIE_PREFIX + tdCookie.TestContentId.ToString() + _cookieDelimeter + "en-GB";
             _httpContextHelper.Verify(hch => hch.RemoveCookie(It.Is<string>(ck => ck == cookieKey)), Times.Once, "passed in cookie was not removed");
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => c.Expires <= DateTime.Now)), Times.Once, "cookie was not added with a expiry less than now");
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.IsAny<string>(), It.IsAny<string>(), It.Is<CookieOptions>(c => c.Expires <= DateTime.Now)), Times.Once, "cookie was not added with a expiry less than now");
         }
 
         [Fact]
@@ -545,12 +545,14 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
             var testVariantId = Guid.NewGuid();
 
-            var testCookie = new HttpCookie(cookieHelper.COOKIE_PREFIX + testContentId.ToString() + _cookieDelimeter + "en-GB")
-            { // purposely empty properties...
-                ["start"] = startDate.ToString(),
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+            var testCookie = new Dictionary<string, string>()
+            {// purposely empty properties...
+                {"start", startDate.ToString()},
+                {"vId", "-1"},
+                {"viewed", "false"},
+                {"converted", "false"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
             _httpContextHelper.Setup(hch => hch.HasCookie(It.IsAny<string>())).Returns(true);
             _httpContextHelper.Setup(hch => hch.GetResponseCookie(It.IsAny<string>())).Returns(testCookie);
@@ -582,7 +584,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var result = cookieHelper.ResetTestDataCookie(aCookieData);
 
             _httpContextHelper.Verify(hch => hch.RemoveCookie(It.Is<string>(c => c == aCookieName)), Times.Once(), "did not remove the old cookie");
-            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<HttpCookie>(c => c.Name == aCookieName)), Times.Once(), "did not add the reset cookie");
+            _httpContextHelper.Verify(hch => hch.AddCookie(It.Is<string>(c => c == aCookieName),It.IsAny<string>(), It.IsAny<CookieOptions>()), Times.Once(), "did not add the reset cookie");
             Assert.True(result.TestId == Guid.Empty);
         }
 
@@ -604,15 +606,14 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 Id = Guid.Parse("a19221d7-b977-4f90-b256-2e6b3cfd8216"),
             };
 
-            var testCookie = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + testContentId.ToString() + _cookieDelimeter + "en-GB")
+            var testCookie = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                ["vId"] = "0",
-                ["viewed"] = "false",
-                ["converted"] = "false",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
+                {"start", startDate.ToString()},
+                {"vId", "0"},
+                {"viewed", "false"},
+                {"converted", "false"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
 
             _httpContextHelper.Setup(hch => hch.HasCookie(It.IsAny<string>())).Returns(true);
             _httpContextHelper.Setup(hch => hch.GetResponseCookie(It.IsAny<string>())).Returns(testCookie);
@@ -648,16 +649,15 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 Id = Guid.Parse("a19221d7-b977-4f90-b256-2e6b3cfd8216"),
             };
 
-            var testCookie = new HttpCookie(mockTestDataCookiehelper.COOKIE_PREFIX + testContentId.ToString() + _cookieDelimeter + "en-US")
+            var testCookie = new Dictionary<string, string>()
             {
-                ["start"] = startDate.ToString(),
-                ["vId"] = "-1",
-                ["viewed"] = "false",
-                ["converted"] = "false",
-                Expires = expireDate,
-                ["k0"] = true.ToString()
-            };
-
+                {"start", startDate.ToString()},
+                {"vId", "-1"},
+                {"viewed", "false"},
+                {"converted", "false"},
+                {"k0", true.ToString()}
+            }.ToLegacyCookieString();
+            
             var test = new ABTest()
             {
                 Id = _activeTestId,

@@ -33,7 +33,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         /// unit tests should use this contructor and add needed services to the service locator as needed
         /// </summary>
         /// <param name="locator"></param>
-        internal UIHelper(IServiceProvider locator)
+        public UIHelper(IServiceProvider locator)
         {
             _serviceLocator = locator;
         }

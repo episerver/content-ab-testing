@@ -14,7 +14,7 @@ namespace EPiServer.Marketing.Messaging.Tests.InMemory
             BlockingCollection<object> queue = queueStore.Get("Get_ReturnsANewQueueOnFirstAccess");
 
             Assert.NotNull(queue);
-            Assert.Equal(0, queue.Count);
+            Assert.Empty(queue);
         }
 
         [Fact]

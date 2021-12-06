@@ -13,12 +13,12 @@ namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class JobReschedulerTests
     {
-        Mock<IServiceLocator> _locator = new Mock<IServiceLocator>();
+        Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<IScheduledJobRepository> _jobRepo = new Mock<IScheduledJobRepository>();
 
         private JobRescheduler GetUnitUnderTest()
         {
-            _locator.Setup(sl => sl.GetInstance<IScheduledJobRepository>()).Returns(_jobRepo.Object);
+            _locator.Setup(sl => sl.GetService(typeof(IScheduledJobRepository))).Returns(_jobRepo.Object);
             _jobRepo.Setup(g => g.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new ScheduledJob(
                             Guid.Empty, "TestSchedulingJob", true,

@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Data.Common;
 using System.Data.SqlClient;
+using EPiServer.Marketing.KPI.Dal;
 using EPiServer.Marketing.KPI.Dal.Model;
 using EPiServer.Marketing.KPI.DataAccess;
+using EPiServer.ServiceLocation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace EPiServer.Marketing.KPI.Test
@@ -11,12 +17,19 @@ namespace EPiServer.Marketing.KPI.Test
     {
         private KpiTestContext _context;
         private DbConnection _dbConnection;
-        private KpiDataAccess _mtm;
+        private IKpiDataAccess _mtm;
+        private IRepository _repository;
         public KpiDataAccessTests()
         {
-            _dbConnection = Effort.DbConnectionFactory.CreateTransient();
-            _context = new KpiTestContext(_dbConnection);
-            _mtm = new KpiDataAccess(new KpiTestRepository(_context));
+            var optionsBuilder = new DbContextOptionsBuilder<KpiTestContext>().UseInMemoryDatabase(databaseName: "episerver.testing").EnableServiceProviderCaching(false);
+            _context = new KpiTestContext(optionsBuilder.Options);
+            _repository = new KpiTestRepository(_context);
+
+            Services.AddTransient(x => _repository);
+
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+
+            _mtm = new KpiDataAccess(_repository);
         }
 
         [Fact]

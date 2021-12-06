@@ -45,7 +45,7 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
             _config = AdminConfigTestSettings.Current;
         }
 
-        internal TestSchedulingJob(IServiceProvider locator)
+        public TestSchedulingJob(IServiceProvider locator)
         {
             _locator = locator;
             _config = _locator.GetInstance<AdminConfigTestSettings>();

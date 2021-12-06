@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using EPiServer.Marketing.KPI.Dal.Model;
 using EPiServer.Marketing.KPI.Dal.Model.Enums;
 using EPiServer.Marketing.KPI.DataAccess;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.KPI.Test
 {
     public class KpiTestBase
     {
+        public IServiceCollection Services { get; } = new ServiceCollection();
+
         internal void AddObjectsToContext<T>(KpiTestContext context, IList<T> data) where T : class
         {
             context.Set<T>().AddRange(data);
@@ -33,9 +36,9 @@ namespace EPiServer.Marketing.KPI.Test
             return kpis;
         }
 
-        internal IList<IDalKpi> AddKpis(KpiDataAccess dataAccess, int numberOfTests)
+        internal IList<DalKpi> AddKpis(KpiDataAccess dataAccess, int numberOfTests)
         {
-            var kpis = new List<IDalKpi>();
+            var kpis = new List<DalKpi>();
 
             for (var i = 0; i < numberOfTests; i++)
             {

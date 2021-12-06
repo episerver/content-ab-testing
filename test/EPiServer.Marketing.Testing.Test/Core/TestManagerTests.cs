@@ -15,6 +15,7 @@ using EPiServer.Marketing.Testing.Dal.EntityModel.Enums;
 using EPiServer.Marketing.Testing.Messaging;
 using EPiServer.Marketing.Testing.Web.Statistics;
 using EPiServer.ServiceLocation;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
 {
     public class TestManagerTests
     {
-        private Mock<IServiceLocator> _serviceLocator;
+        public IServiceCollection Services { get; } = new ServiceCollection();
         private Mock<ITestingDataAccess> _dataAccessLayer;
         private Mock<IContentLoader> _contentLoader;
         private Guid testId = Guid.NewGuid();
@@ -34,6 +35,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
         private Mock<IKpiDataAccess> _kpiDataAccess;
         private DefaultMarketingTestingEvents _marketingEvents;
         private Mock<ISynchronizedObjectInstanceCache> _syncronizedCache;
+        private Mock<IMessagingManager> _mockIMessagingManager;
         private static Object TestLock = new object();
 
         private TestManager GetUnitUnderTest()
@@ -76,15 +78,15 @@ namespace EPiServer.Marketing.Testing.Test.Core
             _kpiManager.Setup(call => call.Get(It.IsAny<Guid>())).Returns(kpi);
 
             var startTest = new DalABTest() {Id = testId, State = DalTestState.Active, Variants = new List<DalVariant>(), KeyPerformanceIndicators = new List<DalKeyPerformanceIndicator>() };
-            _serviceLocator = new Mock<IServiceLocator>();
+            
             _dataAccessLayer = new Mock<ITestingDataAccess>();
             _dataAccessLayer.Setup(dal => dal.Get(It.IsAny<Guid>())).Returns(GetDalTest());
             _dataAccessLayer.Setup(dal => dal.Start(It.IsAny<Guid>())).Returns(startTest);
             _dataAccessLayer.Setup(dal => dal.GetTestList(It.IsAny<DalTestCriteria>())).Returns(dalList);
-            _dataAccessLayer.Setup(dal => dal.GetDatabaseVersion(It.IsAny<DbConnection>(), It.IsAny<string>(), It.IsAny<string>())).Returns(1);            
-            _serviceLocator.Setup(sl => sl.GetInstance<ITestingDataAccess>()).Returns(_dataAccessLayer.Object);
-            _serviceLocator.Setup(sl => sl.GetInstance<IKpiDataAccess>()).Returns(_kpiDataAccess.Object);
-            _serviceLocator.Setup(sl => sl.GetInstance<IKpiManager>()).Returns(_kpiManager.Object);
+            _dataAccessLayer.Setup(dal => dal.GetDatabaseVersion(It.IsAny<string>(), It.IsAny<string>())).Returns(1);
+            Services.AddSingleton(_dataAccessLayer.Object);
+            Services.AddSingleton(_kpiDataAccess.Object);
+            Services.AddSingleton(_kpiManager.Object);
 
             var pageRef2 = new PageReference() { ID = 2, WorkID = 0 };
             var contentData = new PageData(pageRef2);
@@ -95,15 +97,19 @@ namespace EPiServer.Marketing.Testing.Test.Core
             _contentLoader = new Mock<IContentLoader>();
             _contentLoader.Setup(call => call.Get<IContent>(It.IsAny<Guid>())).Returns(new PageData());
             _contentLoader.Setup(call => call.Get<ContentData>(It.IsAny<ContentReference>())).Returns(contentData);
-            _serviceLocator.Setup(sl => sl.GetInstance<IContentLoader>()).Returns(_contentLoader.Object);
+            Services.AddSingleton(_contentLoader.Object);
 
             _marketingEvents = new DefaultMarketingTestingEvents();
-            _serviceLocator.Setup(sl => sl.GetInstance<DefaultMarketingTestingEvents>()).Returns(_marketingEvents);
+            Services.AddSingleton(_marketingEvents);
 
             _syncronizedCache = new Mock<ISynchronizedObjectInstanceCache>();
-            _serviceLocator.Setup(sl => sl.GetInstance<ISynchronizedObjectInstanceCache>()).Returns(_syncronizedCache.Object);
+            Services.AddSingleton(_syncronizedCache.Object);
 
-            return new TestManager(_serviceLocator.Object);
+            _mockIMessagingManager = new Mock<IMessagingManager>();
+            Services.AddSingleton(_mockIMessagingManager.Object);
+
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
+            return new TestManager();
         }
 
         private DalABTest GetDalTest()
@@ -489,15 +495,11 @@ namespace EPiServer.Marketing.Testing.Test.Core
         {
             var testManager = GetUnitUnderTest();
 
-            // Mock up the message manager
-            Mock<IMessagingManager> messageManager = new Mock<IMessagingManager>();
-            _serviceLocator.Setup(sl => sl.GetInstance<IMessagingManager>()).Returns(messageManager.Object);
-
             Guid original = Guid.NewGuid();
             Guid testItemId = Guid.NewGuid();
             testManager.IncrementCount(original, 1, CountType.Conversion);
 
-            messageManager.Verify(mm => mm.EmitUpdateConversion(
+            _mockIMessagingManager.Verify(mm => mm.EmitUpdateConversion(
                 It.Is<Guid>(arg => arg.Equals(original)),
                 It.Is<int>(arg => arg.Equals(1)), It.IsAny<Guid>(), It.IsAny<string>()),
                 "Guids are not correct or update conversion message not emmited");
@@ -508,15 +510,11 @@ namespace EPiServer.Marketing.Testing.Test.Core
         {
             var testManager = GetUnitUnderTest();
 
-            // Mock up the message manager
-            Mock<IMessagingManager> messageManager = new Mock<IMessagingManager>();
-            _serviceLocator.Setup(sl => sl.GetInstance<IMessagingManager>()).Returns(messageManager.Object);
-
             Guid original = Guid.NewGuid();
             Guid testItemId = Guid.NewGuid();
             testManager.IncrementCount(original, 1, CountType.View);
 
-            messageManager.Verify(mm => mm.EmitUpdateViews(
+            _mockIMessagingManager.Verify(mm => mm.EmitUpdateViews(
                 It.Is<Guid>(arg => arg.Equals(original)),
                 It.Is<int>(arg => arg.Equals(1))),
                 "Guids are not correct or update View message not emmited");
@@ -526,10 +524,6 @@ namespace EPiServer.Marketing.Testing.Test.Core
         public void TestManager_EmitKpiResultData()
         {
             var testManager = GetUnitUnderTest();
-
-            // Mock up the message manager
-            Mock<IMessagingManager> messageManager = new Mock<IMessagingManager>();
-            _serviceLocator.Setup(sl => sl.GetInstance<IMessagingManager>()).Returns(messageManager.Object);
 
             var original = Guid.NewGuid();
             var testItemId = Guid.NewGuid();
@@ -544,7 +538,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
 
             testManager.SaveKpiResultData(original, 1, result, 0);
 
-            messageManager.Verify(mm => mm.EmitKpiResultData(
+            _mockIMessagingManager.Verify(mm => mm.EmitKpiResultData(
                 It.Is<Guid>(arg => arg.Equals(original)),
                 It.Is<int>(arg => arg.Equals(1)),
                 It.Is<IKeyResult>(arg => arg.Equals(result)),

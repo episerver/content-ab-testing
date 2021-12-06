@@ -1,5 +1,9 @@
 ﻿using EPiServer.Marketing.Testing.Test.Fakes;
 using EPiServer.Marketing.Testing.Web.Helpers;
+using EPiServer.ServiceLocation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using System.Collections.Generic;
 using System.Web;
 using Xunit;
@@ -9,6 +13,8 @@ namespace EPiServer.Marketing.Testing.Test.Web
     public class HttpContextHelperTests
     {
         private const string GoodData = "testing";
+        public IServiceCollection Services { get; } = new ServiceCollection();
+        Mock<IHttpContextAccessor> _mockIHttpContextAccessor = new Mock<IHttpContextAccessor>();
 
         public static IEnumerable<object[]> GetBadData()
         {
@@ -23,8 +29,11 @@ namespace EPiServer.Marketing.Testing.Test.Web
         [MemberData(nameof(GetBadData))]
         public void GetCookieValueSplitsOff_BadData(string badData)
         {
-            HttpContext.Current = FakeHttpContext.FakeContext("http://localhost:48594/alloy-plan/");
-            HttpContext.Current.Response.Cookies["key"].Value = GoodData + badData;
+            var httpContextMock = new FakeHttpContext("http://localhost:48594/alloy-plan/");
+            httpContextMock.AddCookie("key", GoodData + badData);
+            _mockIHttpContextAccessor.Setup(x => x.HttpContext).Returns(httpContextMock.Current);
+            Services.AddSingleton<IHttpContextAccessor>(_mockIHttpContextAccessor.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
 
             var helper = new HttpContextHelper();
             var value = helper.GetCookieValue("key");
@@ -35,8 +44,11 @@ namespace EPiServer.Marketing.Testing.Test.Web
         [Fact]
         public void GetCookieValue_WithNoBadData()
         {
-            HttpContext.Current = FakeHttpContext.FakeContext("http://localhost:48594/alloy-plan/");
-            HttpContext.Current.Response.Cookies["key"].Value = GoodData;
+            var httpContextMock = new FakeHttpContext("http://localhost:48594/alloy-plan/");
+            httpContextMock.AddCookie("key", GoodData);
+            _mockIHttpContextAccessor.Setup(x => x.HttpContext).Returns(httpContextMock.Current);
+            Services.AddSingleton<IHttpContextAccessor>(_mockIHttpContextAccessor.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
 
             var helper = new HttpContextHelper();
             var value = helper.GetCookieValue("key");

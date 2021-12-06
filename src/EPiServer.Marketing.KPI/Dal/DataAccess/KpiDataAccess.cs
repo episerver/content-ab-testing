@@ -16,7 +16,7 @@ using EPiServer.ServiceLocation;
 namespace EPiServer.Marketing.KPI.DataAccess
 {
     [ServiceConfiguration(ServiceType = typeof(IKpiDataAccess), Lifecycle = ServiceInstanceScope.Singleton)]
-    internal class KpiDataAccess : IKpiDataAccess
+    public class KpiDataAccess : IKpiDataAccess
     {
         public readonly Injected<IRepository> _repository;
         internal bool _UseEntityFramework;
@@ -25,6 +25,11 @@ namespace EPiServer.Marketing.KPI.DataAccess
         [ExcludeFromCodeCoverage]
         public KpiDataAccess()
         {
+        }
+
+        public KpiDataAccess(IRepository repository)
+        {
+            _repository.Service = repository;
         }
 
         /// <summary>
@@ -51,7 +56,7 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// </summary>
         /// <param name="kpiId">ID of the KPI to retrieve.</param>
         /// <returns>KPI object.</returns>
-        public IDalKpi Get(Guid kpiId)
+        public DalKpi Get(Guid kpiId)
         {
             if (!IsDatabaseConfigured)
             {
@@ -60,7 +65,7 @@ namespace EPiServer.Marketing.KPI.DataAccess
             return GetHelper(_repository.Service, kpiId);
         }
 
-        private IDalKpi GetHelper(IRepository repo, Guid kpiId)
+        private DalKpi GetHelper(IRepository repo, Guid kpiId)
         {
             return repo.GetById(kpiId);
         }
@@ -69,7 +74,7 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// Gets the whole list of KPI objects.
         /// </summary>
         /// <returns>List of KPI objects.</returns>
-        public List<IDalKpi> GetKpiList()
+        public List<DalKpi> GetKpiList()
         {
             if (!IsDatabaseConfigured)
             {
@@ -78,7 +83,7 @@ namespace EPiServer.Marketing.KPI.DataAccess
             return GetKpiListHelper(_repository.Service);
         }
 
-        private List<IDalKpi> GetKpiListHelper(IRepository repo)
+        private List<DalKpi> GetKpiListHelper(IRepository repo)
         {
             return repo.GetAll().ToList();
         }
@@ -88,9 +93,9 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// </summary>
         /// <param name="kpiObject">ID of the KPI to add/update.</param>
         /// <returns>The ID of the KPI object that was added/updated.</returns>
-        public Guid Save(IDalKpi kpiObject)
+        public Guid Save(DalKpi kpiObject)
         {
-            return Save(new List<IDalKpi>() { kpiObject }).First();
+            return Save(new List<DalKpi>() { kpiObject }).First();
         }
 
         /// <summary>
@@ -98,7 +103,7 @@ namespace EPiServer.Marketing.KPI.DataAccess
         /// </summary>
         /// <param name="kpiObjects">List of KPIs to add/update.</param>
         /// <returns>The IDs of the KPI objects that were added/updated.</returns>
-        public IList<Guid> Save(IList<IDalKpi> kpiObjects)
+        public IList<Guid> Save(IList<DalKpi> kpiObjects)
         {
             if (!IsDatabaseConfigured)
             {
@@ -107,7 +112,7 @@ namespace EPiServer.Marketing.KPI.DataAccess
             return SaveHelper(_repository.Service, kpiObjects);
         }
 
-        private IList<Guid> SaveHelper(IRepository repo, IList<IDalKpi> kpiObjects)
+        private IList<Guid> SaveHelper(IRepository repo, IList<DalKpi> kpiObjects)
         {
             var ids = new List<Guid>();
 
