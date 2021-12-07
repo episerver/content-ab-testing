@@ -21,17 +21,22 @@ namespace EPiServer.Marketing.KPI
         public void ConfigureContainer(ServiceConfigurationContext context)
         {
             context.Services.AddDbContext<DatabaseContext>(
-                options => options.UseSqlServer(ServiceLocator.Current.GetInstance<IConfiguration>().GetConnectionString("EPiServerDB")));
+                options =>
+                {
+                    options.UseSqlServer(
+                        ServiceLocator.Current.GetInstance<IConfiguration>().GetConnectionString("EPiServerDB"),
+                        x => x.MigrationsHistoryTable("__MigrationHistory", "dbo"));
+                });
         }
 
         public void Initialize(InitializationEngine context)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
 
         public void Uninitialize(InitializationEngine context)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
     }
 }

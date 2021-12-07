@@ -1,0 +1,15 @@
+2021-11-17 01:57:25.878 +07:00 [ERR] Initialize action failed for 'Initialize on class EPiServer.Data.DataInitialization, EPiServer.Data, Version=12.1.0.0, Culture=neutral, PublicKeyToken=8fe83dea738b45b7'
+EPiServer.Core.EPiServerException: The connection string 'EcfSqlConnection' was not found.
+   at EPiServer.Commerce.Internal.SchemaUpdaterBase.GetConnection(IEnumerable`1 connectionStringOptions, String connectionName)
+   at EPiServer.Commerce.Internal.SchemaUpdaterBase.GetCommerceConnection(IEnumerable`1 connectionStringOptions)
+   at EPiServer.Commerce.Internal.CommerceDatabaseSchemaUpdater.GetStatus(IEnumerable`1 connectionStringOptions)
+   at EPiServer.Data.SchemaUpdates.Internal.DatabaseSchemaManagerImplementation.<>c__DisplayClass6_0.<EnsureDatabaseSchema>b__0(ISchemaUpdater u)
+   at System.Linq.Enumerable.SelectIPartitionIterator`2.ToList()
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at EPiServer.Data.SchemaUpdates.Internal.DatabaseSchemaManagerImplementation.EnsureDatabaseSchema(DataAccessOptions dataAccessOptions)
+   at EPiServer.Data.DataInitialization.ValidateDatabaseSchema(InitializationEngine context)
+   at EPiServer.Data.DataInitialization.Initialize(InitializationEngine context)
+   at EPiServer.Framework.Initialization.Internal.ModuleNode.<>c__DisplayClass4_0.<Initialize>b__0()
+   at EPiServer.Framework.Initialization.Internal.ModuleNode.Execute(Action a, String key)
+   at EPiServer.Framework.Initialization.Internal.ModuleNode.Initialize(InitializationEngine context)
+   at EPiServer.Framework.Initialization.InitializationEngine.InitializeModules()

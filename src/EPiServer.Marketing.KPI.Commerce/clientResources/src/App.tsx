@@ -2,14 +2,14 @@ import React from "react";
 import { ContentArea, Workspace } from "@episerver/ui-framework";
 import "@episerver/ui-framework/dist/main.css";
 import "./App.scss";
-import KpiCommerceSettings from "./KpiCommerceSettings";
+import KpiCommerceSettingsView from "./KpiCommerceSettingsView";
 
 
 function App() {
     return (
         <ContentArea>            
             <Workspace>                
-                <KpiCommerceSettings/>
+                <KpiCommerceSettingsView/>
             </Workspace>
         </ContentArea>
     );

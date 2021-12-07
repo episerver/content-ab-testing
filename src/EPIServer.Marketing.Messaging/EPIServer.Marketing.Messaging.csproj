@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="version.props" />
+  <Import Project="..\..\build\nuspec.props" />
   <PropertyGroup>
     <Product>EPIServer.Marketing.Messaging</Product>
     <TargetFramework>net5.0</TargetFramework>
     <OutputType>Library</OutputType>    
-    <NuspecFile>Package.nuspec</NuspecFile>
+    <NuspecFile>EPIServer.Marketing.Messaging.nuspec</NuspecFile>
     <IsPackable>true</IsPackable>
     <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
+	  <NuspecProperties>Configuration=$(Configuration);version=$(MtMessageVersion);</NuspecProperties>
   </PropertyGroup>
 
 </Project>
