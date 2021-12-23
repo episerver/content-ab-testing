@@ -172,25 +172,6 @@ namespace EPiServer.Marketing.Testing.Test.Web
         }
 
         [Fact]
-        public void VerifyExceptionHandler()
-        {
-            var th = GetUnitUnderTest();
-
-            var content = new BasicContent();
-            content.ContentGuid = _noAssociatedTestGuid;
-            content.ContentLink = new ContentReference();
-            ContentEventArgs args = new ContentEventArgs(content);
-            th.LoadedContent(new object(), args);
-
-            // For this test we dont actually care what the exception is just that it is catching and
-            // logging one.
-            Assert.True(_logger.DebugCalled, "Exception was not logged.");
-            _logger.ErrorCalled = false;
-            _logger.WarningCalled = false;
-            _logger.DebugCalled = false;
-        }
-
-        [Fact]
         public void Page_Not_In_A_Test_Load_As_Normal()
         {
             var content = new BasicContent();
@@ -259,16 +240,6 @@ namespace EPiServer.Marketing.Testing.Test.Web
         }
 
         [Fact]
-        public void EnableABTesting_LogsInformationMessage()
-        {
-            var testHandler = GetUnitUnderTest();
-            testHandler.EnableABTesting();
-
-            Assert.True(_logger.InformationCalled);
-            Assert.Contains("enabled", _logger.Message);
-        }
-
-        [Fact]
         public void EnableABTesting_AddsLoadedContentListeners()
         {
             var testHandler = GetUnitUnderTest();
@@ -331,16 +302,6 @@ namespace EPiServer.Marketing.Testing.Test.Web
             testHandler.DisableABTesting();
             Assert.Equal(0, contentEvents.LoadedContentCounter);
             Assert.Equal(0, contentEvents.LoadedChildrenCounter);
-        }
-
-        [Fact]
-        public void DisableABTesting_LogsInformationMessage()
-        {
-            var testHandler = GetUnitUnderTest();
-            testHandler.DisableABTesting();
-
-            Assert.True(_logger.InformationCalled);
-            Assert.Contains("disabled", _logger.Message);
         }
 
         [Fact]

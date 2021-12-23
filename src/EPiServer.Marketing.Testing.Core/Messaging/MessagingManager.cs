@@ -22,7 +22,7 @@ namespace EPiServer.Marketing.Testing.Messaging
         private MessageHandlerRegistry registry;
         private MessagingApplicationBuilder appBuilder;
         private InMemoryQueueStore _queueStore;
-        private readonly Injected<ITestingMessageHandler> _handler;
+        private ITestingMessageHandler _handler;
         private BlockingCollection<object> _queue;
 
         [ExcludeFromCodeCoverage]
@@ -41,9 +41,13 @@ namespace EPiServer.Marketing.Testing.Messaging
             registry = new MessageHandlerRegistry();
             appBuilder = new MessagingApplicationBuilder();
 
-            registry.Register<UpdateViewsMessage>(_handler.Service);
-            registry.Register<UpdateConversionsMessage>(_handler.Service);
-            registry.Register<AddKeyResultMessage>(_handler.Service);
+            // register the handler for each message
+            if (_handler == null)
+                _handler = new TestingMessageHandler();
+
+            registry.Register<UpdateViewsMessage>(_handler);
+            registry.Register<UpdateConversionsMessage>(_handler);
+            registry.Register<AddKeyResultMessage>(_handler);
 
             // Create the dispatcher, queue store, and the memory reciever
             var messageDispatcher = new FanOutMessageDispatcher(registry);

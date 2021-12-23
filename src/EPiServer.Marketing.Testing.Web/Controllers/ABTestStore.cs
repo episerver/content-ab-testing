@@ -17,7 +17,6 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
     /// This is the main RestStore the UI components use to manage IMarketingTestObjects.
     /// </summary>
     [RestStore("ABTestStore")]
-    [ApiController]
     public class ABTestStore : RestControllerBase
     {
         private IMarketingTestingWebRepository _webRepo;
@@ -30,14 +29,6 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
             _webRepo = ServiceLocator.Current.GetInstance<IMarketingTestingWebRepository>();
             _episerverHelper = ServiceLocator.Current.GetInstance<IEpiserverHelper>();
             _logger = LogManager.GetLogger();
-        }
-
-        // For unit test support.
-        public ABTestStore(IServiceProvider serviceLocator)
-        {
-            _webRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
-            _episerverHelper = serviceLocator.GetInstance<IEpiserverHelper>();
-            _logger = serviceLocator.GetInstance<ILogger>();
         }
 
         /// <summary>
@@ -99,7 +90,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         /// <returns>HttpStatusCode.Created or HttpStatusCode.InternalServerError</returns>
         [HttpPost]
         [AppSettingsAuthorize(Roles="CmsAdmins, CmsEditors")]
-        public ActionResult Post(TestingStoreModel testData)
+        public ActionResult Post([FromBody]TestingStoreModel testData)
         {
             ActionResult result = new RestStatusCodeResult((int)HttpStatusCode.InternalServerError);
 
@@ -132,7 +123,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         /// <returns>publishedVersionContentLink or InternalServerError</returns>
         [HttpPut]
         [AppSettingsAuthorize(Roles="CmsAdmins, CmsEditors")]
-        public ActionResult Put(TestResultStoreModel testResult)
+        public ActionResult Put([FromBody]TestResultStoreModel testResult)
         {
             ActionResult result = new RestStatusCodeResult((int)HttpStatusCode.InternalServerError);
 

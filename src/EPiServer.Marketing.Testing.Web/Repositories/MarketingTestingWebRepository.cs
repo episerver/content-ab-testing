@@ -20,6 +20,8 @@ using EPiServer.Framework.Cache;
 using EPiServer.Marketing.Testing.Web.Config;
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
+using EPiServer.Marketing.Testing.Core;
+using Microsoft.Extensions.Options;
 
 namespace EPiServer.Marketing.Testing.Web.Repositories
 {
@@ -40,7 +42,7 @@ namespace EPiServer.Marketing.Testing.Web.Repositories
         [ExcludeFromCodeCoverage]
         public MarketingTestingWebRepository()
         {
-            int.TryParse(ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:TestMonitorSeconds"]?.ToString(), out int testMonitorValue);
+            int.TryParse(ServiceLocator.Current.GetInstance<IOptions<TestingOption>>().Value.TestMonitorSeconds, out int testMonitorValue);
 
             _serviceLocator = ServiceLocator.Current;
             _testResultHelper = _serviceLocator.GetInstance<ITestResultHelper>();

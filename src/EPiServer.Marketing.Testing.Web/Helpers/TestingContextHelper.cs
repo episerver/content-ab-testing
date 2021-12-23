@@ -255,7 +255,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
 
         public bool IsHtmlContentType()
         {
-            return _contextHelper.HasCurrentContext() && _contextHelper.GetCurrentContext().Response.ContentType.Contains("text/html");
+            return _contextHelper.HasCurrentContext() && _contextHelper.GetCurrentContext().Response.ContentType != null && _contextHelper.GetCurrentContext().Response.ContentType.Contains("text/html");
         }
 
         /// <summary>

@@ -21,4 +21,9 @@
     <ProjectReference Include="..\EPiServer.Marketing.KPI\EPiServer.Marketing.KPI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Markup\**\*"  />
+    <EmbeddedResource Include="EmbeddedLangFiles\**\*"  />
+  </ItemGroup>
+  
 </Project>

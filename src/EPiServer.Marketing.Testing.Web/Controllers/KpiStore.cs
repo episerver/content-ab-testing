@@ -30,14 +30,6 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
             _kpiRepo = _serviceLocator.GetInstance<IKpiWebRepository>();
         }
 
-        public KpiStore(IServiceProvider sl)
-        {
-            _serviceLocator = sl;
-            _logger = _serviceLocator.GetInstance<ILogger>();
-            _localizationService = _serviceLocator.GetInstance<LocalizationService>();
-            _kpiRepo = sl.GetInstance<IKpiWebRepository>();
-        }
-
         /// <summary>
         /// Gets KPI types currently available to the system
         /// </summary>
@@ -58,7 +50,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         /// <param name="entity"></param>
         /// <returns></returns>
         [HttpPut]
-        public ActionResult Put(string id, string entity)
+        public ActionResult Put([FromBody]KpiPutRequest request)
         {
             List<IKpi> validKpiInstances = new List<IKpi>();
             Dictionary<string, string> kpiErrors = new Dictionary<string, string>();
@@ -66,7 +58,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
 
             try
             {
-                var kpiData = _kpiRepo.DeserializeJsonKpiFormCollection(entity);
+                var kpiData = _kpiRepo.DeserializeJsonKpiFormCollection(request.entity);
 
                 if (kpiData.Count > 0)
                 {
@@ -165,4 +157,9 @@ public class Response
     public object obj { get; set; }
     public object message { get; set; }
 }
+    public class KpiPutRequest
+    {
+        public string id { get; set; }
+        public string entity { get; set; }
+    }
 }

@@ -12,12 +12,13 @@ using EPiServer.Marketing.Testing.Core.DataClass;
 using Xunit;
 using EPiServer.Marketing.Testing.Web.Helpers;
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class ABTestStoreTests
     {
-        readonly Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
+        public IServiceCollection Services { get; } = new ServiceCollection();
         Mock<IMarketingTestingWebRepository> _webRepo = new Mock<IMarketingTestingWebRepository>();
         Mock<IEpiserverHelper> _episerverHelper = new Mock<IEpiserverHelper>();
 
@@ -25,11 +26,11 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private ABTestStore GetUnitUnderTest()
         {
-            _locator.Setup(sl => sl.GetService(typeof(ILogger))).Returns(_logger.Object);
-            _locator.Setup(sl => sl.GetService(typeof(IMarketingTestingWebRepository))).Returns(_webRepo.Object);
-            _locator.Setup(sl => sl.GetService(typeof(IEpiserverHelper))).Returns(_episerverHelper.Object);
+            Services.AddSingleton(_webRepo.Object);
+            Services.AddSingleton(_episerverHelper.Object);
+            ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
 
-            ABTestStore testStore = new ABTestStore(_locator.Object);
+            ABTestStore testStore = new ABTestStore();
             return testStore;
         }
 

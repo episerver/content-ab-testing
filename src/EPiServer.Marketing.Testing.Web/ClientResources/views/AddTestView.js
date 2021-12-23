@@ -207,7 +207,7 @@
                 this.durationText.set("Value", viewTestDuration);
             },
 
-            _setViewConfidenceLevelAttr: function (viewConfidenceLevel) {
+            _setViewConfidenceLevelAttr: function () {
                 var rbs = [
                     { val: 99, label: "99%" },
                     { val: 98, label: "98%" },
@@ -218,15 +218,13 @@
                 dijit.byId('confidence').removeOption(dijit.byId('confidence').getOptions());
                 if (confidenceSelectWidget) {
                     for (var i = 0; i < rbs.length; i++) {
-                        if (viewConfidenceLevel) {
-                            if (rbs[i].val === viewConfidenceLevel) {
-                                selectOption = { value: rbs[i].val, label: rbs[i].label + " (Default)" };
-                                confidenceSelectWidget.addOption(selectOption);
-                                defaultOption = rbs[i].val;
-                            } else {
-                                selectOption = { value: rbs[i].val, label: rbs[i].label };
-                                confidenceSelectWidget.addOption(selectOption);
-                            }
+                        if (rbs[i].val === this.model.confidenceLevel) {
+                            selectOption = { value: rbs[i].val, label: rbs[i].label + " (Default)" };
+                            confidenceSelectWidget.addOption(selectOption);
+                            defaultOption = rbs[i].val;
+                        } else {
+                            selectOption = { value: rbs[i].val, label: rbs[i].label };
+                            confidenceSelectWidget.addOption(selectOption);
                         }
                         confidenceSelectWidget.setValue(defaultOption);
                     }

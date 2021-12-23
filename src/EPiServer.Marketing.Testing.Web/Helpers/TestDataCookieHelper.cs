@@ -98,6 +98,10 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             }
 
             _httpContextHelper.AddCookie(cookieName, cookieData.ToLegacyCookieString(), option);
+
+            // Cookie added to Response.Cookies is not immediately available in the Request.Cookies
+            // Add it to HttpContext.Items so it's available for the first visit.
+            _httpContextHelper.SetItemValue(cookieName, cookieData.ToLegacyCookieString());
         }
 
         /// <summary>

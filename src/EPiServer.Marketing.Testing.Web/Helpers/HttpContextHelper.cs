@@ -33,9 +33,6 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             if (_httpContextAccessor.Service.HttpContext.Request.Query[itemId].Count > 0)
                 return _httpContextAccessor.Service.HttpContext.Request.Query[itemId].ToString();
 
-            if (_httpContextAccessor.Service.HttpContext.Request.Form[itemId].Count > 0)
-                return _httpContextAccessor.Service.HttpContext.Request.Form[itemId].ToString();
-
             if (_httpContextAccessor.Service.HttpContext.Request.Cookies[itemId] != null)
                 return _httpContextAccessor.Service.HttpContext.Request.Cookies[itemId];
             
@@ -54,12 +51,18 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
 
         public bool HasCookie(string cookieKey)
         {
-            return _httpContextAccessor.Service.HttpContext.Request.Cookies.ContainsKey(cookieKey);
+            foreach (var headers in _httpContextAccessor.Service.HttpContext.Response.Headers.Values)
+                foreach (var header in headers)
+                    if (header.StartsWith($"{cookieKey}="))
+                    {
+                        return true;
+                    }
+            return HasItem(cookieKey);
         }
 
         public string GetCookieValue(string cookieKey)
         {
-            var value = _httpContextAccessor.Service.HttpContext.Request.Cookies[cookieKey];
+            var value = GetResponseCookie(cookieKey);
 
             var pattern = "\\r|\\n|%0d|%0a";
             var substrings = Regex.Split(value, pattern, RegexOptions.None, TimeSpan.FromSeconds(2));
@@ -69,15 +72,23 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
 
         public string GetResponseCookie(string cookieName)
         {
+            string cookieValue = string.Empty;
             foreach (var headers in _httpContextAccessor.Service.HttpContext.Response.Headers.Values)
                 foreach (var header in headers)
                     if (header.StartsWith($"{cookieName}="))
                     {
                         var p1 = header.IndexOf('=');
                         var p2 = header.IndexOf(';');
-                        return header.Substring(p1 + 1, p2 - p1 - 1);
+                        cookieValue = header.Substring(p1 + 1, p2 - p1 - 1);
+                        break;
                     }
-            return null;
+
+            // Cookie added to Response.Cookies is not immediately available in the Request.Cookies
+            // Add it to HttpContext.Items so it's available for the first visit.
+            if (string.IsNullOrEmpty(cookieValue) && HasItem(cookieName))
+                return _httpContextAccessor.Service.HttpContext.Items[cookieName]?.ToString();
+
+            return cookieValue;
         }
 
         public string GetRequestCookie(string cookieKey)
@@ -93,6 +104,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         public void RemoveCookie(string cookieKey)
         {
             _httpContextAccessor.Service.HttpContext.Response.Cookies.Delete(cookieKey);
+            _httpContextAccessor.Service.HttpContext.Items.Remove(cookieKey);
         }
 
         public void AddCookie(string key, string value, CookieOptions options)

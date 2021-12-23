@@ -25,7 +25,7 @@ namespace EPiServer.Marketing.KPI.Dal
         /// (recommended to be injected via Spring.NET)
         /// </summary>
         /// <param name="dbContext">EF Db Context to make queries from</param>
-        public BaseRepository(DatabaseContext dbContext)
+        public BaseRepository(KpiDatabaseContext dbContext)
         {
             DatabaseContext = dbContext;
             HistoryRepository = dbContext.GetService<IHistoryRepository>();
@@ -215,7 +215,7 @@ namespace EPiServer.Marketing.KPI.Dal
         #endregion
 
         #region Internal Members
-        public DatabaseContext DatabaseContext { set; get; }
+        public KpiDatabaseContext DatabaseContext { set; get; }
 
         public readonly IHistoryRepository HistoryRepository;
 

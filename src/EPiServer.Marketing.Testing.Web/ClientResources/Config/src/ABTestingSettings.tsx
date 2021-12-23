@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "@rmwc/select/styles";
-import { GridCell, GridRow, TextButton, ExposedDropdownMenu, TextField, Typography, Checkbox } from "@episerver/ui-framework";
+import { Card, CardContentArea, TextButton, ExposedDropdownMenu, TextField, Typography, Checkbox } from "@episerver/ui-framework";
 import { ABTestingSettingsModel } from "./models/ABTestingSettingsModel";
 import axios from "axios";
 import { Snackbar, SnackbarAction } from "@rmwc/snackbar/dist/snackbar";
@@ -70,7 +70,7 @@ const ABTestingSettings = () => {
     return (   
         <div className="abtesting-config-container">
             <div className="header">
-                <Typography tag="h1" use="headline3">{aBTestingSettingsModel.aBTestingConfigTitle}</Typography>
+                <Typography tag="h1" use="headline3">{aBTestingSettingsModel.abTestingConfigTitle}</Typography>
             </div>
             <Snackbar
                 open={snackBarMessage.isOpen}
@@ -83,92 +83,59 @@ const ABTestingSettings = () => {
                     />
                 }
             />
-
-            <Typography use="subtitle2">{aBTestingSettingsModel.aBTestingConfigDescription}</Typography>
-            <GridRow>
-                <GridCell span={6}>
-                    <GridRow>
-                        <GridCell span={12}>
-                            <div className="control">
-                                <TextField
-                                    className="textfield-wide"
-                                    outlined={true}
-                                    label={aBTestingSettingsModel.testDurationLabel}
-                                    value={aBTestingSettingsModel.testDuration.toString()}
-                                    onChange={handleChange}
-                                    type="number"
-                                    name="testDuration"
-                                />
-                            </div>
-                        </GridCell>
-                    </GridRow>
-                    <GridRow>
-                        <GridCell span={12}>
-                            <div className="control">
-                                <TextField
-                                    className="textfield-wide"
-                                    outlined={true}
-                                    label={aBTestingSettingsModel.participationPercentLabel}
-                                    value={aBTestingSettingsModel.participationPercent.toString()}
-                                    onChange={handleChange}
-                                    type="number"
-                                    name="participationPercent"
-                                />
-                            </div>
-                        </GridCell>
-                    </GridRow>
-                    <GridRow>
-                        <GridCell span={12}>
-                            <div className="control">
-                                <ExposedDropdownMenu
-                                    label={aBTestingSettingsModel.autoPublishWinnerLabel}
-                                    value={aBTestingSettingsModel.autoPublishWinner.toString()}
-                                    options={aBTestingSettingsModel.autoPublishWinners}
-                                    onValueChange={value => changeAutoPublishWinner(value)}
-                                />
-                            </div>
-                        </GridCell>
-                    </GridRow>
-                    <GridRow>
-                        <GridCell span={12}>
-                            <div className="control">
-                                <ExposedDropdownMenu
-                                    label={aBTestingSettingsModel.confidenceLevelLabel}
-                                    value={aBTestingSettingsModel.confidenceLevel.toString()}
-                                    options={aBTestingSettingsModel.confidenceLevels}
-                                    onValueChange={value => changeConfidenceLevel(value)}
-                                />
-                            </div>
-                        </GridCell>
-                    </GridRow>
-                    <GridRow>
-                        <GridCell span={12}>
-                            <div className="control">
-                                <Checkbox
-                                    checked={aBTestingSettingsModel.isEnabled}
-                                    onChange={handleChange}
-                                >
-                                    {aBTestingSettingsModel.isEnabledLabel}
-                                </Checkbox>
-                            </div>
-                        </GridCell>
-                    </GridRow>
-                </GridCell>
-            </GridRow>
-            <GridRow>
-                <GridCell>
-                    <div className="form-bottom">
-                        <TextButton onClick={cancel} style={{ marginRight: "10px" }}>{aBTestingSettingsModel.cancelButton}</TextButton>
-                        <TextButton
-                            contained
-                            onClick={save}
-                            disabled={!isValidForm()}
-                        >
-                            {aBTestingSettingsModel.saveButton}
-                        </TextButton>
-                    </div>
-                </GridCell>
-            </GridRow>
+            <Typography use="subtitle2">{aBTestingSettingsModel.abTestingConfigDescription}</Typography>
+            <Card>
+                <CardContentArea>
+                    <TextField
+                        label={aBTestingSettingsModel.testDurationLabel}
+                        value={aBTestingSettingsModel.testDuration?.toString()}
+                        onChange={handleChange}
+                        type="number"
+                        name="testDuration"
+                    />
+                </CardContentArea>
+                <CardContentArea>
+                    <TextField
+                        label={aBTestingSettingsModel.participationPercentLabel}
+                        value={aBTestingSettingsModel.participationPercent?.toString()}
+                        onChange={handleChange}
+                        type="number"
+                        name="participationPercent"
+                    />
+                </CardContentArea>
+                <CardContentArea>
+                    <ExposedDropdownMenu
+                        label={aBTestingSettingsModel.autoPublishWinnerLabel}
+                        value={aBTestingSettingsModel.autoPublishWinner?.toString()}
+                        options={aBTestingSettingsModel.autoPublishWinners}
+                        onValueChange={value => changeAutoPublishWinner(value)}
+                    />
+                </CardContentArea>
+                <CardContentArea>
+                    <ExposedDropdownMenu
+                        label={aBTestingSettingsModel.confidenceLevelLabel}
+                        value={aBTestingSettingsModel.confidenceLevel?.toString()}
+                        options={aBTestingSettingsModel.confidenceLevels}
+                        onValueChange={value => changeConfidenceLevel(value)}
+                    />
+                </CardContentArea>
+                <CardContentArea>
+                    <Checkbox
+                        checked={aBTestingSettingsModel.isEnabled}
+                        onChange={handleChange}
+                    >
+                        {aBTestingSettingsModel.isEnabledLabel}
+                    </Checkbox>
+                </CardContentArea>
+            </Card>
+            <TextButton onClick={cancel} style={{ marginRight: "10px" }}>{aBTestingSettingsModel.cancelButton}</TextButton>
+            <TextButton
+                contained
+                onClick={save}
+                disabled={!isValidForm()}
+            >
+                {aBTestingSettingsModel.saveButton}
+            </TextButton>
         </div>     
         
     );

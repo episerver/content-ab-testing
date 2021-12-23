@@ -15,27 +15,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.Testing.Dal.DataAccess
 {
+    [ServiceConfiguration(ServiceType = typeof(ITestingDataAccess), Lifecycle = ServiceInstanceScope.Transient)]
     public class TestingDataAccess : ITestingDataAccess
     {
         public readonly Injected<IRepository> _repository;
         internal bool _UseEntityFramework;
+        public bool IsDatabaseConfigured;
 
         public TestingDataAccess()
         {
             _UseEntityFramework = true;
 
-            if (!HasTableNamed((BaseRepository)_repository.Service , DatabaseVersion.TableToCheckFor))
-            {
-                // the sql scripts need to be run!
-                throw new DatabaseDoesNotExistException();
-            }
-
-            var version = GetDatabaseVersion("dbo", DatabaseVersion.ContextKey);
-
-            if (version < DatabaseVersion.RequiredDbVersion)
-            {
-                throw new DatabaseNeedsUpdating();
-            }
+            
         }
 
         public TestingDataAccess(IRepository repository)
@@ -103,7 +94,13 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
 
         public long GetDatabaseVersion(string schema, string contextKey)
         {
-            return GetDatabaseVersionHelper(_repository.Service, contextKey); ;
+            if (HasTableNamed((BaseRepository)_repository.Service, DatabaseVersion.TableToCheckFor))
+            {
+                // the sql scripts need to be run!
+                IsDatabaseConfigured = true;
+            }
+
+            return IsDatabaseConfigured ? GetDatabaseVersionHelper(_repository.Service, contextKey) : 0;
         }
 
         #region Private Helpers

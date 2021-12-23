@@ -1,6 +1,5 @@
 ﻿using EPiServer.Framework;
 using EPiServer.Framework.Initialization;
-using EPiServer.Marketing.KPI.Dal;
 using EPiServer.ServiceLocation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,22 +10,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EPiServer.Marketing.KPI
+namespace EPiServer.Marketing.Testing.Core
 {
     [InitializableModule]
     [ModuleDependency(typeof(Shell.UI.InitializationModule))]
     [ModuleDependency(typeof(Web.InitializationModule))]
-    public partial class InitializationModule : IConfigurableModule //netcore , IInitializableHttpModule
+    public partial class InitializationModule : IConfigurableModule
     {
         public void ConfigureContainer(ServiceConfigurationContext context)
         {
-            context.Services.AddDbContext<KpiDatabaseContext>(
-                options =>
-                {
-                    options.UseSqlServer(
-                        ServiceLocator.Current.GetInstance<IConfiguration>().GetConnectionString("EPiServerDB"),
-                        x => x.MigrationsHistoryTable("__MigrationHistory", "dbo"));
-                });
+            var serviceProvider = context.Services.BuildServiceProvider();
+            var configuration = serviceProvider.GetService<IConfiguration>();
+
+            context.Services.Configure<TestingOption>(configuration.GetSection(TestingOption.Section));
         }
 
         public void Initialize(InitializationEngine context)

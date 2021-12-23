@@ -47,7 +47,7 @@ namespace EPiServer.Marketing.Testing.Web
             _serviceLocator = ServiceLocator.Current;
             _testDataCookieHelper = new TestDataCookieHelper();
             _contextHelper = _serviceLocator.GetInstance<ITestingContextHelper>();
-            _logger = LogManager.GetLogger();
+            _logger = LogManager.GetLogger(typeof(TestHandler));
             _httpContextHelper = new HttpContextHelper();
             _testRepo = _serviceLocator.GetInstance<IMarketingTestingWebRepository>();
             _marketingTestingEvents = _serviceLocator.GetInstance<DefaultMarketingTestingEvents>();
@@ -65,7 +65,7 @@ namespace EPiServer.Marketing.Testing.Web
             _serviceLocator = serviceLocator;
             _testDataCookieHelper = serviceLocator.GetInstance<ITestDataCookieHelper>();
             _contextHelper = serviceLocator.GetInstance<ITestingContextHelper>();
-            _logger = serviceLocator.GetInstance<ILogger>();
+            _logger = LogManager.GetLogger(typeof(TestHandler));
             _testRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
             _episerverHelper = serviceLocator.GetInstance<IEpiserverHelper>();
             _databaseMode = serviceLocator.GetInstance<IDatabaseMode>();

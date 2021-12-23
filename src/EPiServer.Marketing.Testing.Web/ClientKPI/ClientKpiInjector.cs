@@ -1,4 +1,5 @@
-﻿using EPiServer.Logging;
+﻿using EPiServer.Framework.Web.Resources;
+using EPiServer.Logging;
 using EPiServer.Marketing.KPI.Manager;
 using EPiServer.Marketing.KPI.Manager.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass;
@@ -41,11 +42,11 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
         static ClientKpiInjector()
         {
             _clientKpiWrapperScript = ReadScriptFromAssembly(
-                "EPiServer.Marketing.Testing.Web.EmbeddedScriptFiles.ClientKpiWrapper.html"
+                "EPiServer.Marketing.Testing.Web.EmbeddedScriptFiles.ClientKpiWrapper.js"
             );
 
             _clientKpiScriptTemplate = ReadScriptFromAssembly(
-                "EPiServer.Marketing.Testing.Web.EmbeddedScriptFiles.ClientKpiSuccessEvent.html"
+                "EPiServer.Marketing.Testing.Web.EmbeddedScriptFiles.ClientKpiSuccessEvent.js"
             );
         }
 
@@ -70,7 +71,7 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
         {
             _contextHelper = serviceLocator.GetInstance<ITestingContextHelper>();
             _testRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
-            _logger = serviceLocator.GetInstance<ILogger>();
+            _logger = LogManager.GetLogger();
             _httpContextHelper = serviceLocator.GetInstance<IHttpContextHelper>();
             _kpiManager = serviceLocator.GetInstance<IKpiManager>();
         }
@@ -91,14 +92,7 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
                 {
                     kpisToActivate.ForEach(kpi => _httpContextHelper.SetItemValue(kpi.Id.ToString(), true));
 
-                    _httpContextHelper.RemoveCookie(ClientCookieName);
-                    _httpContextHelper.AddCookie(ClientCookieName,
-                        JsonConvert.SerializeObject(kpisToActivate.ToDictionary(kpi => kpi.Id, kpi => cookieData)),
-                        new CookieOptions
-                        {
-                            Expires = DateTime.Now.AddMinutes(60),
-                            HttpOnly = true
-                        });
+                    AppendClientKpiScript(kpisToActivate.ToDictionary(kpi => kpi.Id, kpi => cookieData));
                 }
             }
         }
@@ -106,53 +100,41 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
         /// <summary>
         /// Gets the associated script for a client KPI and appends it.
         /// </summary>
-        public string AppendClientKpiScript()
+        public void AppendClientKpiScript(Dictionary<Guid, TestDataCookie> clientKpis)
         {
-            //Check if the current response has client kpis.  This lets us know we are in the correct response
-            //so we don't inject scripts into an unrelated response stream.
-            if (_httpContextHelper.HasCookie(ClientCookieName))
+            //Check to make sure we have client kpis to inject
+            if (ShouldInjectKpiScript(clientKpis))
             {
-                var clientKpis = JsonConvert.DeserializeObject<Dictionary<Guid, TestDataCookie>>(_httpContextHelper.GetCookieValue(ClientCookieName));
+                var clientKpiScript = new StringBuilder()
+                    .Append("//<!-- ABT Script -->")
+                    .Append(_clientKpiWrapperScript);
 
-                //Check to make sure we have client kpis to inject
-                if (ShouldInjectKpiScript(clientKpis))
+                //Add clients custom evaluation scripts
+                foreach (var kpiToTestCookie in clientKpis)
                 {
-                    var clientKpiScript = new StringBuilder()
-                        .Append("<!-- ABT Script -->")
-                        .Append(_clientKpiWrapperScript);
+                    var kpiId = kpiToTestCookie.Key;
+                    var testCookie = kpiToTestCookie.Value;
+                    var test = _testRepo.GetTestById(testCookie.TestId, true);
+                    var variant = test?.Variants.FirstOrDefault(v => v.Id.ToString() == testCookie.TestVariantId.ToString());
 
-                    //Add clients custom evaluation scripts
-                    foreach (var kpiToTestCookie in clientKpis)
+                    if (variant == null)
                     {
-                        var kpiId = kpiToTestCookie.Key;
-                        var testCookie = kpiToTestCookie.Value;
-                        var test = _testRepo.GetTestById(testCookie.TestId, true);
-                        var variant = test?.Variants.FirstOrDefault(v => v.Id.ToString() == testCookie.TestVariantId.ToString());
-
-                        if (variant == null)
-                        {
-                            _logger.Debug($"Could not find test {testCookie.TestId} or variant {testCookie.TestVariantId} when preparing client script for KPI {kpiId}.");
-                        }
-                        else
-                        {
-                            var kpi = _kpiManager.Get(kpiId);
-                            var clientKpi = kpi as IClientKpi;
-                            var individualKpiScript = BuildClientScript(kpi.Id, test.Id, variant.ItemVersion, clientKpi.ClientEvaluationScript);
-
-                            individualKpiScript = individualKpiScript.StartsWith(_byteOrderMarkUtf8, StringComparison.Ordinal) ? individualKpiScript.Remove(0, _byteOrderMarkUtf8.Length) : individualKpiScript;                            
-                            clientKpiScript.Append(individualKpiScript);
-                        }
+                        _logger.Debug($"Could not find test {testCookie.TestId} or variant {testCookie.TestVariantId} when preparing client script for KPI {kpiId}.");
                     }
+                    else
+                    {
+                        var kpi = _kpiManager.Get(kpiId);
+                        var clientKpi = kpi as IClientKpi;
+                        var individualKpiScript = BuildClientScript(kpi.Id, test.Id, variant.ItemVersion, clientKpi.ClientEvaluationScript);
 
-                    //Remove the temporary cookie.
-                    _httpContextHelper.RemoveCookie(ClientCookieName);
-
-                    return clientKpiScript.ToString();
+                        individualKpiScript = individualKpiScript.StartsWith(_byteOrderMarkUtf8, StringComparison.Ordinal) ? individualKpiScript.Remove(0, _byteOrderMarkUtf8.Length) : individualKpiScript;
+                        clientKpiScript.Append(individualKpiScript);
+                    }
                 }
-            }
-            return string.Empty;
-        }
 
+                Inject(clientKpiScript.ToString());
+            }
+        }
         /// <summary>
         /// Determines whether or not client-side KPI scripts need to be injected into the response.
         /// </summary>
@@ -175,7 +157,17 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
             return _contextHelper.IsHtmlContentType() &&
                      !_contextHelper.IsInSystemFolder() && (!cookieData.Converted || cookieData.AlwaysEval);
         }
-        
+
+        /// <summary>
+        /// Injects the specified script into the response stream.
+        /// </summary>
+        /// <param name="script">Script to inject</param>
+        private void Inject(string script)
+        {
+            var requiredResources = ServiceLocator.Current.GetInstance<IRequiredClientResourceList>();
+            requiredResources.RequireScriptInline(script).AtFooter();
+        }
+
         /// <summary>
         /// Renders the template script for an individual client KPI with the given parameters.
         /// </summary>

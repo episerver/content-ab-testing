@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>EPiServer.Marketing.Testing</id>
+    <id>EPiServer.Marketing.Testing.Web</id>
     <title>EPiServer Marketing Testing Tools</title>
     <version>$version$</version>
     <authors>EPiServer</authors>
@@ -20,8 +20,11 @@
   </metadata>
 	<files>
 		<file src="src\EPiServer.Marketing.Testing.Web\license.txt" target="" />
-		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.dll" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.pdb" target="lib\net5.0\" />
+    <file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.dll" target="lib\net5.0\" />
+    <file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.pdb" target="lib\net5.0\" />
+    <file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.Views.dll" target="lib\net5.0\" />
+    <file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.Views.pdb" target="lib\net5.0\" />
+    <file src="EPiServer.Marketing.Testing.Web.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Marketing.Testing.Web" />
 		<file src="build\CopyZipFiles.targets" target="build\net5.0\EPiServer.Marketing.Testing.Web.targets" />
 	</files>
 </package>

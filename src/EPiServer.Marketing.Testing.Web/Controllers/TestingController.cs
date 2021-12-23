@@ -22,19 +22,13 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
     /// updating views and conversions. Note this is provided as a rest end point
     /// for customers to use via jscript on thier site.
     /// </summary>
-    public class TestingController : ControllerBase
+    [Route("api/episerver/[controller]/[action]/")]
+    public class TestingController : Controller
     {
         private IServiceProvider _serviceLocator;
         private IHttpContextHelper _httpContextHelper;
         private IMarketingTestingWebRepository _webRepo;
         private IKpiWebRepository _kpiWebRepo;
-
-        [ExcludeFromCodeCoverage]
-        public TestingController()
-        {
-            _serviceLocator = ServiceLocator.Current;
-            _httpContextHelper = new HttpContextHelper();
-        }
 
         [ExcludeFromCodeCoverage]
         public TestingController(IHttpContextHelper contexthelper, IServiceProvider locator)

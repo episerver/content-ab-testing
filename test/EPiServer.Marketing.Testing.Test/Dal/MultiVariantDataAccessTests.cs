@@ -47,7 +47,7 @@ namespace EPiServer.Marketing.Testing.Test.Dal
 
             ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
             _context = new TestContext();
-            _dataAccess = new TestingDataAccess(new Core.TestRepository(_context));
+            _dataAccess = new TestingDataAccess(new Core.TestRepository(_context)) { IsDatabaseConfigured = true };
 
 
             Services.AddSingleton<ITestingDataAccess>(_dataAccess);

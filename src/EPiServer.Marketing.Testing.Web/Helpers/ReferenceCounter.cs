@@ -1,8 +1,10 @@
-﻿using System.Collections.Concurrent;
+﻿using EPiServer.ServiceLocation;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace EPiServer.Marketing.Testing.Web.Helpers
 {
+    [ServiceConfiguration(ServiceType = typeof(IReferenceCounter), Lifecycle = ServiceInstanceScope.Singleton)]
     public class ReferenceCounter : IReferenceCounter
     {
         IDictionary<object,int> dictionary = new ConcurrentDictionary<object, int>();

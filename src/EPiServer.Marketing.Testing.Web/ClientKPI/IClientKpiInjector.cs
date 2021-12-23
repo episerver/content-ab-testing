@@ -10,6 +10,6 @@ namespace EPiServer.Marketing.Testing.Web.ClientKPI
     public interface IClientKpiInjector
     {
         void ActivateClientKpis(List<IKpi> kpiInstances, TestDataCookie cookieData);
-        string AppendClientKpiScript();
+        void AppendClientKpiScript(Dictionary<Guid, TestDataCookie> clientKpis);
     }
 }
