@@ -24,6 +24,8 @@
 	
   <ItemGroup>
     <EmbeddedResource Include="SchemaUpdater\**\*"  />
+    <EmbeddedResource Include="Markup\**\*"  />
+    <EmbeddedResource Include="EmbeddedLangFiles\**\*"  />
   </ItemGroup>
 
 </Project>

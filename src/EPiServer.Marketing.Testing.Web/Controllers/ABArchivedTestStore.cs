@@ -18,7 +18,6 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
     /// This is the main RestSTore the UI compontents use to manage IMarketingTestObjects 
     /// </summary>
     [RestStore("ABArchivedTestStore")]
-    [ApiController]
     public class ABArchivedTestStore : RestControllerBase
     {
         private IMarketingTestingWebRepository _webRepo;
@@ -33,15 +32,6 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
             _episerverHelper = ServiceLocator.Current.GetInstance<IEpiserverHelper>();
             _contentRepo = ServiceLocator.Current.GetInstance<IContentRepository>();
             _logger = LogManager.GetLogger();
-        }
-
-        // For unit test support.
-        internal ABArchivedTestStore(IServiceProvider serviceLocator)
-        {
-            _webRepo = serviceLocator.GetInstance<IMarketingTestingWebRepository>();
-            _episerverHelper = serviceLocator.GetInstance<IEpiserverHelper>();
-            _contentRepo = serviceLocator.GetInstance<IContentRepository>();
-            _logger = serviceLocator.GetInstance<ILogger>();
         }
 
         /// <summary>

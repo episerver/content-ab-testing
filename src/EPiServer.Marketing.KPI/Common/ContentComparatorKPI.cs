@@ -39,7 +39,7 @@ namespace EPiServer.Marketing.KPI.Common
         public List<string>  _startpagepaths = new List<string>();
         private ObjectCache _cache;
         private readonly Injected<IKpiHelper> _kpiHelper;
-        private readonly Injected<UrlHelper> _urlHelper;
+        private readonly Injected<IUrlResolver> _IUrlResolver;
         private readonly Injected<IContentRepository> _contentRepository;
         private readonly Injected<IContentVersionRepository> _contentVersionRepository;
         private readonly Injected<IContentEvents> _contentEvents;
@@ -78,7 +78,7 @@ namespace EPiServer.Marketing.KPI.Common
                      var conversionDescription = LocalizationService.Current.GetString("/kpi/content_comparator_kpi/readonly_markup/conversion_selector_description");
 
                     var conversionContent = _contentRepository.Service.Get<IContent>(ContentGuid);
-                    var conversionLink = _urlHelper.Service.ContentUrl(conversionContent.ContentLink);
+                    var conversionLink = _IUrlResolver.Service.GetUrl(conversionContent.ContentLink);
                     markup = string.Format(markup, conversionDescription, conversionLink,
                         conversionContent.Name);
                 }

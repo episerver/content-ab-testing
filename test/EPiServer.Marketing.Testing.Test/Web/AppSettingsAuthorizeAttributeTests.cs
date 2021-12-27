@@ -1,4 +1,5 @@
-﻿using EPiServer.Marketing.Testing.Web.Controllers;
+﻿using EPiServer.Marketing.Testing.Core;
+using EPiServer.Marketing.Testing.Web.Controllers;
 using EPiServer.ServiceLocation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,9 +23,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private static void SetRoleConfiguration(string role)
         {
-            var config = new Mock<IConfiguration>();
-            config.Setup(c => c["EPiServer:Marketing:Testing:Roles"]).Returns(role);
-            Services.AddSingleton(config.Object);
+            Services.Configure<TestingOption>(o=>o.Roles=role);
             ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
         }
 

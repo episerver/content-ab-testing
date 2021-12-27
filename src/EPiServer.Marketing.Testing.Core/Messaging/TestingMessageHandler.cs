@@ -9,7 +9,6 @@ using System.Runtime.Caching;
 namespace EPiServer.Marketing.Testing.Messaging
 {
     /// <inheritdoc />
-    [ServiceConfiguration(ServiceType = typeof(ITestingMessageHandler), Lifecycle = ServiceInstanceScope.Singleton)]
     public class TestingMessageHandler : ITestingMessageHandler
     {
         private ObjectCache _sessionCache = MemoryCache.Default;

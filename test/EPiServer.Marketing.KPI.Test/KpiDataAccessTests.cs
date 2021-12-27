@@ -21,7 +21,7 @@ namespace EPiServer.Marketing.KPI.Test
         private IRepository _repository;
         public KpiDataAccessTests()
         {
-            var optionsBuilder = new DbContextOptionsBuilder<KpiTestContext>().UseInMemoryDatabase(databaseName: "episerver.testing").EnableServiceProviderCaching(false);
+            var optionsBuilder = new DbContextOptionsBuilder<KpiDatabaseContext>().UseInMemoryDatabase(databaseName: "episerver.testing").EnableServiceProviderCaching(false);
             _context = new KpiTestContext(optionsBuilder.Options);
             _repository = new KpiTestRepository(_context);
 
@@ -29,7 +29,7 @@ namespace EPiServer.Marketing.KPI.Test
 
             ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
 
-            _mtm = new KpiDataAccess(_repository);
+            _mtm = new KpiDataAccess(_repository) { IsDatabaseConfigured = true };
         }
 
         [Fact]

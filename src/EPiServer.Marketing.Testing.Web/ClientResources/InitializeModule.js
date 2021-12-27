@@ -24,11 +24,11 @@
 
             //define our stores
             var commandRegistry = dependency.resolve("epi.globalcommandregistry"),
-            abTestingStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing", storeName: "ABTestStore" });
-            abArchivesPath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing", storeName: "ABArchivedTestStore" });
-            kpiStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing", storeName: "KpiStore" });
-            thumbnailStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing", storeName: "ThumbnailStore" });
-            abTestingConfigStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing", storeName: "ABTestConfigStore" });
+                abTestingStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing.Web", storeName: "ABTestStore" });
+            abArchivesPath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing.Web", storeName: "ABArchivedTestStore" });
+            kpiStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing.Web", storeName: "KpiStore" });
+            thumbnailStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing.Web", storeName: "ThumbnailStore" });
+            abTestingConfigStorePath = routes.getRestPath({ moduleArea: "EPiServer.Marketing.Testing.Web", storeName: "ABTestConfigStore" });
 
             //create our store
             //preventCache:true required to get around IE's tendency to cache 'Get' calls.

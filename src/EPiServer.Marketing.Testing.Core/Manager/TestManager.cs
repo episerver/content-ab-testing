@@ -21,7 +21,6 @@ namespace EPiServer.Marketing.Testing.Core.Manager
     /// <summary>
     /// Central point of access for test data and test manipulation.
     /// </summary>
-    [ServiceConfiguration(ServiceType = typeof(ITestManager), Lifecycle = ServiceInstanceScope.Singleton)]
     public class TestManager : ITestManager
     {        
         private readonly Injected<ITestingDataAccess> _dataAccess;

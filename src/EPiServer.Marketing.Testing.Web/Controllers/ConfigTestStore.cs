@@ -12,7 +12,6 @@ using EPiServer.Shell.Services.Rest;
 namespace EPiServer.Marketing.Testing.Web.Controllers
 {
     [RestStore("ABTestConfigStore")]
-    [ApiController]
     public class ABTestConfigStore : RestControllerBase
     {
         private ILogger _logger;
@@ -23,13 +22,6 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         {
             _logger = LogManager.GetLogger();
             _settings = AdminConfigTestSettings.Current;
-        }
-
-        // For unit test support.
-        internal ABTestConfigStore(IServiceProvider serviceLocator)
-        {
-            _logger = serviceLocator.GetInstance<ILogger>();
-            _settings = serviceLocator.GetInstance<AdminConfigTestSettings>();
         }
 
         [HttpGet]

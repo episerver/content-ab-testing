@@ -3,6 +3,7 @@ using EPiServer.Framework.Cache;
 using EPiServer.Logging;
 using EPiServer.Marketing.KPI.Manager.DataClass;
 using EPiServer.Marketing.KPI.Results;
+using EPiServer.Marketing.Testing.Core;
 using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass.Enums;
 using EPiServer.Marketing.Testing.Core.Manager;
@@ -30,7 +31,6 @@ namespace EPiServer.Marketing.Testing.Test.Core
         private List<IMarketingTest> _expectedTests;
         private Mock<ISynchronizedObjectInstanceCache> _mockSynchronizedObjectInstanceCache;
         private Mock<ILogger> _logger;
-        private Mock<IConfiguration> _mockIConfiguration;
         public IServiceCollection Services { get; } = new ServiceCollection();
         [ExcludeFromCodeCoverage]
         public CachingTestManagerTests()
@@ -74,9 +74,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
                 new ABTest { Id = Guid.NewGuid(), OriginalItemId = Guid.NewGuid(), ContentLanguage = "es-ES", State = TestState.Active, Variants = new List<Variant> { new Variant { Id = Guid.NewGuid() }  } }
             };            
 
-            _mockIConfiguration = new Mock<IConfiguration>();
-            _mockIConfiguration.Setup(x => x["EPiServer:Marketing:Testing:CacheTimeoutInMinutes"]).Returns("1");
-            Services.AddSingleton(_mockIConfiguration.Object);
+            Services.Configure<TestingOption>(o=>o.CacheTimeoutInMinutes="1");
             ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
         }
 
@@ -867,6 +865,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
         {
             var expectedVariant = Mock.Of<IContent>();
 
+            _mockSynchronizedObjectInstanceCache.Setup(call => call.Get(CachingTestManager.AllTestsKey)).Returns(_expectedTests);
             _mockTestManager.Setup(tm => tm.GetTestList(It.IsAny<TestCriteria>())).Returns(_expectedTests);
             _mockTestManager.Setup(tm => tm.GetVariantContent(It.IsAny<Guid>(), It.IsAny<CultureInfo>())).Returns(expectedVariant);
 
@@ -968,6 +967,7 @@ namespace EPiServer.Marketing.Testing.Test.Core
         {
             var expectedVariant = Mock.Of<IContent>();
 
+            _mockSynchronizedObjectInstanceCache.Setup(call => call.Get(CachingTestManager.AllTestsKey)).Returns(_expectedTests);
             _mockTestManager.Setup(tm => tm.GetTestList(It.IsAny<TestCriteria>())).Returns(_expectedTests);
             _mockTestManager.Setup(tm => tm.GetVariantContent(It.IsAny<Guid>(), It.IsAny<CultureInfo>())).Returns(expectedVariant);
 

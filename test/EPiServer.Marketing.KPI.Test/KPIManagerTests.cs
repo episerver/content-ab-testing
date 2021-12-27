@@ -153,9 +153,6 @@ namespace EPiServer.Marketing.KPI.Test
             var manager = GetUnitUnderTest();
 
             Assert.Equal(1, manager.GetDatabaseVersion("", ""));
-
-            manager.DatabaseNeedsConfiguring = true;
-            Assert.Equal(0, manager.GetDatabaseVersion("", ""));
         }
 
 

@@ -1,8 +1,8 @@
 export interface ABTestingSettingsModel {
     autoPublishWinners: Array<{ label: string; value: string }>;
     confidenceLevels: Array<{ label: string; value: string }>;
-    aBTestingConfigTitle: string;
-    aBTestingConfigDescription: string;
+    abTestingConfigTitle: string;
+    abTestingConfigDescription: string;
     testDurationLabel: string;
     participationPercentLabel: string;        
     autoPublishWinnerLabel: string;

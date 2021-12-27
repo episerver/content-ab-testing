@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using System.Linq;
 using Xunit;
+using EPiServer.Marketing.KPI.Dal;
 
 namespace EPiServer.Marketing.KPI.Test
 {
@@ -12,7 +13,7 @@ namespace EPiServer.Marketing.KPI.Test
         private KpiTestContext _context;
         public KpiDalTests()
         {
-            var optionsBuilder = new DbContextOptionsBuilder<KpiTestContext>().UseInMemoryDatabase(databaseName: "episerver.testing").EnableServiceProviderCaching(false);
+            var optionsBuilder = new DbContextOptionsBuilder<KpiDatabaseContext>().UseInMemoryDatabase(databaseName: "episerver.testing").EnableServiceProviderCaching(false);
             _context = new KpiTestContext(optionsBuilder.Options);
         }
 

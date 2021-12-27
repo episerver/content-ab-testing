@@ -23,7 +23,6 @@ namespace EPiServer.Marketing.Testing.Test.Web
 {
     public class KpiStoreTests
     {
-        Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<ILogger> _logger = new Mock<ILogger>();
         private Mock<IKpiWebRepository> _kpiWebRepoMock;
         MemoryLocalizationService _mockLocalizationService = new MemoryLocalizationService();
@@ -33,18 +32,17 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _mockLocalizationService.AddString(CultureInfo.CurrentUICulture, "/abtesting/addtestview/error_conversiongoal", "testing");
             _mockLocalizationService.AddString(CultureInfo.CurrentUICulture, "/abtesting/addtestview/error_duplicate_kpi_values", "testing");
 
-            _locator.Setup(sl => sl.GetService(typeof(ILogger))).Returns(_logger.Object);
-            _locator.Setup(sl => sl.GetService(typeof(LocalizationService))).Returns(_mockLocalizationService);
+            Services.AddSingleton(_mockLocalizationService);
             
             _kpiWebRepoMock = new Mock<IKpiWebRepository>();
             _kpiWebRepoMock.Setup(call => call.GetKpiTypes()).Returns(new List<KpiTypeModel>() { new KpiTypeModel()});
-            
-            _locator.Setup(s1 => s1.GetService(typeof(IKpiWebRepository))).Returns(_kpiWebRepoMock.Object);
+
+            Services.AddSingleton(_kpiWebRepoMock.Object);
 
             Services.AddTransient<LocalizationService>(s => _mockLocalizationService);
             ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
 
-            var testStore = new KpiStore(_locator.Object);
+            var testStore = new KpiStore();
             return testStore;
         }
 
@@ -63,8 +61,8 @@ namespace EPiServer.Marketing.Testing.Test.Web
         public void Put_With_Null_Entity()
         {
             var testClass = GetUnitUnderTest();
-
-            var retResult = testClass.Put("", "") as RestResult;
+            var request = new KpiPutRequest { entity = "", id = "" };
+            var retResult = testClass.Put(request) as RestResult;
 
             var responseDataStatus = (bool)retResult.Data.GetType().GetProperty("status").GetValue(retResult.Data, null);
 
@@ -76,9 +74,11 @@ namespace EPiServer.Marketing.Testing.Test.Web
         {
             var testClass = GetUnitUnderTest();
 
-            var entity =
-                "{\"kpiType\": \"EPiServer.Marketing.KPI.Common.ContentComparatorKPI, EPiServer.Marketing.KPI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8fe83dea738b45b7\",\"ConversionPage\": \"16\",\"CurrentContent\": \"6_197\"}";
-            var retResult = testClass.Put("", entity) as RestResult;
+            var request = new KpiPutRequest { 
+                entity = "{\"kpiType\": \"EPiServer.Marketing.KPI.Common.ContentComparatorKPI, EPiServer.Marketing.KPI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8fe83dea738b45b7\",\"ConversionPage\": \"16\",\"CurrentContent\": \"6_197\"}", 
+                id = "" 
+            };
+            var retResult = testClass.Put(request) as RestResult;
 
             var responseDataStatus = (bool)retResult.Data.GetType().GetProperty("status").GetValue(retResult.Data, null);
 
@@ -112,7 +112,8 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var sticky = new Mock<StickySiteKpi>();
             _kpiWebRepoMock.Setup(call => call.ActivateKpiInstance(It.IsAny<Dictionary<string, string>>())).Returns(sticky.Object);
 
-            var retResult = testClass.Put("KpiFormData", "") as RestResult;
+            var request = new KpiPutRequest { entity = "", id = "KpiFormData" };
+            var retResult = testClass.Put(request) as RestResult;
             
             var responseDataObj= (Dictionary<Guid,string>)retResult.Data.GetType().GetProperty("obj").GetValue(retResult.Data, null);
 
@@ -147,7 +148,8 @@ namespace EPiServer.Marketing.Testing.Test.Web
             var sticky = new Mock<StickySiteKpi>();
             _kpiWebRepoMock.Setup(call => call.ActivateKpiInstance(It.IsAny<Dictionary<string, string>>())).Returns(sticky.Object);
 
-            var retResult = testClass.Put("KpiFormData", "") as RestResult;
+            var request = new KpiPutRequest { entity = "", id = "KpiFormData" };
+            var retResult = testClass.Put(request) as RestResult;
 
             var responseDataErrors = JsonConvert.DeserializeObject<Dictionary<string,string>>(retResult.Data.GetType().GetProperty("errors").GetValue(retResult.Data, null).ToString());
 

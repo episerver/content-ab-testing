@@ -118,6 +118,7 @@ namespace EPiServer.Templates.Alloy.Mvc
             {
                 c.BasePathFileProviders.Add(new MappingPhysicalFileProvider("/EPiServer/EPiServer.Marketing.KPI.Commerce", string.Empty, Path.Combine(uiSolutionFolder, @"src\EPiServer.Marketing.KPI.Commerce")));
                 c.BasePathFileProviders.Add(new MappingPhysicalFileProvider("/EPiServer/EPiServer.Marketing.KPI", string.Empty, Path.Combine(uiSolutionFolder, @"src\EPiServer.Marketing.KPI")));
+                c.BasePathFileProviders.Add(new MappingPhysicalFileProvider("/EPiServer/EPiServer.Marketing.Testing.Web", string.Empty, Path.Combine(uiSolutionFolder, @"src\EPiServer.Marketing.Testing.Web")));
             });
             return services;
         }

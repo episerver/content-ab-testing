@@ -7,6 +7,7 @@ using EPiServer.Marketing.Testing.Core.DataClass;
 using EPiServer.Marketing.Testing.Core.DataClass.Enums;
 using EPiServer.ServiceLocation;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -19,7 +20,6 @@ namespace EPiServer.Marketing.Testing.Core.Manager
     /// The CachingTestManager class delivers marketing tests from a cache ,
     /// if possible, prior to deferring to another test manager.
     /// </summary>
-    [ServiceConfiguration(ServiceType = typeof(ITestManager), Lifecycle = ServiceInstanceScope.Singleton)]
     public class CachingTestManager : ITestManager
     {
         public const string MasterCacheKey = "epi/marketing/testing/masterkey";
@@ -49,7 +49,7 @@ namespace EPiServer.Marketing.Testing.Core.Manager
         /// <param name="cacheTimeout">Cache timeout in seconds.</param>
         public CachingTestManager(ISynchronizedObjectInstanceCache cache, DefaultMarketingTestingEvents events, ITestManager inner, int? time=null)
         {
-            var configuredTimeout = ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:CacheTimeoutInMinutes"];
+            var configuredTimeout = ServiceLocator.Current.GetInstance<IOptions<TestingOption>>().Value.CacheTimeoutInMinutes;
             int.TryParse(configuredTimeout, out int timeout);
 
             _inner = inner;

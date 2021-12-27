@@ -15,7 +15,7 @@ namespace EPiServer.Marketing.KPI.Test
     internal class KpiTestRepository : IRepository
     {
         public KpiTestContext TestContext { get; set; }
-        public DatabaseContext DatabaseContext { get; set; }
+        public KpiDatabaseContext DatabaseContext { get; set; }
 
         public readonly IHistoryRepository HistoryRepository;
 
@@ -24,7 +24,7 @@ namespace EPiServer.Marketing.KPI.Test
             TestContext = testContext;
         }
 
-        public KpiTestRepository(DatabaseContext dbContext)
+        public KpiTestRepository(KpiDatabaseContext dbContext)
         {
             HistoryRepository = dbContext.GetService<IHistoryRepository>();
         }

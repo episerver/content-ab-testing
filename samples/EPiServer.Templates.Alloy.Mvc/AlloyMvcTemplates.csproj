@@ -25,5 +25,10 @@
   </ItemGroup>-->
   <ItemGroup>
     <ProjectReference Include="..\..\src\EPiServer.Marketing.KPI.Commerce\EPiServer.Marketing.KPI.Commerce.csproj" />
+    <ProjectReference Include="..\..\src\EPiServer.Marketing.KPI\EPiServer.Marketing.KPI.csproj" />
+    <ProjectReference Include="..\..\src\EPIServer.Marketing.Messaging\EPIServer.Marketing.Messaging.csproj" />
+    <ProjectReference Include="..\..\src\EPiServer.Marketing.Testing.Core\EPiServer.Marketing.Testing.Core.csproj" />
+    <ProjectReference Include="..\..\src\EPiServer.Marketing.Testing.Dal\EPiServer.Marketing.Testing.Dal.csproj" />
+    <ProjectReference Include="..\..\src\EPiServer.Marketing.Testing.Web\EPiServer.Marketing.Testing.Web.csproj" />
   </ItemGroup>
 </Project>

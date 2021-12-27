@@ -9,10 +9,10 @@ namespace EPiServer.Marketing.KPI.Dal
     using System.Linq;
     using Microsoft.EntityFrameworkCore;
 
-    public class DatabaseContext : DbContext
+    public class KpiDatabaseContext : DbContext
     {
         [ExcludeFromCodeCoverage]
-        public DatabaseContext(DbContextOptions options) : base(options)
+        public KpiDatabaseContext(DbContextOptions<KpiDatabaseContext> options) : base(options)
         {
         }
 

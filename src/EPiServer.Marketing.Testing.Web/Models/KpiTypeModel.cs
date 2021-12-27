@@ -9,6 +9,6 @@ namespace EPiServer.Marketing.Testing.Web.Models
     public class KpiTypeModel
     {
         public IKpi kpi { get; set; }
-        public Type kpiType { get; set; }
+        public string kpiType { get; set; }
     }
 }

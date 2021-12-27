@@ -1,6 +1,7 @@
 ﻿using HttpContextMoq;
 using HttpContextMoq.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,12 @@ namespace EPiServer.Marketing.Testing.Test.Fakes
         {
             var uri = new Uri(url);
 
+            var _headers = new Mock<IHeaderDictionary>();
+            _headers.Setup(x => x.Values).Returns(new List<StringValues>());
+
             var _httpRequest = new Mock<HttpRequest>();
             _httpRequest.Setup(x=>x.Path).Returns(uri.AbsolutePath);
+
             var requestCookieMock = new Mock<IRequestCookieCollection>();
             _httpRequest.Setup(x => x.Cookies).Returns(requestCookieMock.Object);
 
@@ -41,6 +46,7 @@ namespace EPiServer.Marketing.Testing.Test.Fakes
             var _httpResponse = new Mock<HttpResponse>();
             var responseCookieMock = new Mock<IResponseCookies>();
             _httpResponse.Setup(x => x.Cookies).Returns(responseCookieMock.Object);
+            _httpResponse.Setup(x => x.Headers).Returns(_headers.Object);
             _httpContextMock.Setup(x => x.Response).Returns(_httpResponse.Object);
 
             _httpContextMock.Setup(x => x.Items).Returns(new Dictionary<object, object>());
@@ -54,6 +60,9 @@ namespace EPiServer.Marketing.Testing.Test.Fakes
             });
 
             _httpContextMock.Setup(x => x.Request.Cookies).Returns(contextMock.Request.Cookies);
+            var items = new Dictionary<object, object>();
+            items.Add(name, value);
+            _httpContextMock.Setup(x => x.Items).Returns(items);
         }
     }
 }

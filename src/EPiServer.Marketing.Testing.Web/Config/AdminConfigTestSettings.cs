@@ -1,8 +1,10 @@
 ﻿using EPiServer.Data;
 using EPiServer.Data.Dynamic;
+using EPiServer.Marketing.Testing.Core;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.ServiceLocation;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
@@ -78,7 +80,7 @@ namespace EPiServer.Marketing.Testing.Web.Config
                     }
                 }
 
-                _currentSettings.PreviewStyleOverride = ServiceLocator.Current.GetInstance<IConfiguration>()["EPiServer:Marketing:Testing:PreviewStyleOverride"]?.ToString();
+                _currentSettings.PreviewStyleOverride = ServiceLocator.Current.GetInstance<IOptions<TestingOption>>().Value.PreviewStyleOverride;
                 return _currentSettings;
             }
         }

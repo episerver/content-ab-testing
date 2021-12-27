@@ -222,3 +222,8 @@ ModelManifest.xml
 
 # Alloy sample Module path
 /samples/EPiServe.Templates.Alloy.Mvc/modules/
+
+## Ignore files generated or required by Episerver sample site
+/samples/EPiServer.Templates.Alloy.Mvc/App_Data/**
+/samples/EPiServer.Templates.Alloy.Mvc/App_Code/**
+/nupkgs

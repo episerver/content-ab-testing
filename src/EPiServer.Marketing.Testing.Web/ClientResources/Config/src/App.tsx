@@ -6,11 +6,13 @@ import ABTestingSettings from "./ABTestingSettings";
 
 function App() {
     return (
-        <ContentArea>            
-            <Workspace>                
-                <ABTestingSettings/>
-            </Workspace>
-        </ContentArea>
+        <div className="content-area-container">
+            <ContentArea>            
+                <Workspace>                
+                    <ABTestingSettings/>
+                </Workspace>
+            </ContentArea>
+        </div>
     );
 }
 

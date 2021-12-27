@@ -1,5 +1,6 @@
 ﻿using EPiServer.Data.Dynamic;
 using EPiServer.Logging;
+using EPiServer.Marketing.Testing.Core;
 using EPiServer.Marketing.Testing.Web;
 using EPiServer.Marketing.Testing.Web.Config;
 using EPiServer.Marketing.Testing.Web.Controllers;
@@ -31,9 +32,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         public ABTestConfigStoreTests()
         {
-            var _mockIConfiguration = new Mock<IConfiguration>();
-            _mockIConfiguration.Setup(x => x["EPiServer:Marketing:Testing:PreviewStyleOverride"]).Returns("testing");
-            Services.AddSingleton(_mockIConfiguration.Object);
+            Services.Configure<TestingOption>(o=>o.PreviewStyleOverride="testing");
             ServiceLocator.SetScopedServiceProvider(Services.BuildServiceProvider());
         }
 

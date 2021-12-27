@@ -8,7 +8,7 @@ namespace EPiServer.Marketing.Testing.Dal
     public class DatabaseContext : DbContext
     {
         [ExcludeFromCodeCoverage]
-        public DatabaseContext(DbContextOptions options) : base(options)
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
         }
 

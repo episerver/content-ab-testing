@@ -1,16 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <Import Project="version.props" />
   <Import Project="..\..\build\nuspec.props" />
   <Import Project="..\..\build\DependencyVersions.props" />
   <PropertyGroup>
     <Product>EPiServer.Marketing.Testing.Web</Product>
     <TargetFramework>net5.0</TargetFramework>
-    <OutputType>Library</OutputType>    
-    <NuspecFile>EPiServer.Marketing.Testing.nuspec</NuspecFile>
+    <OutputType>Library</OutputType>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <IsPackable>true</IsPackable>
+    <NuspecFile>EPiServer.Marketing.Testing.Web.nuspec</NuspecFile>
     <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
     <NuspecProperties>Configuration=$(Configuration);version=$(PackageVersion);mtVersion=$(MtVersion);mtMessageVersion=$(MtMessageVersion);uiVersion=$(UiVersion);uiNextMajorVersion=$(UiNextMajorVersion);cmsVersion=$(CmsVersion);cmsNextMajorVersion=$(CmsNextMajorVersion)</NuspecProperties>
-	<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedLangFiles\**\*" />
@@ -24,7 +24,6 @@
     <PackageReference Include="EPiServer.CMS.UI.Core" Version="$(CmsUiVersionCommon)" />
     <PackageReference Include="EPiServer.Framework" Version="$(CmsCoreVersionCommon)" />
     <PackageReference Include="EPiServer.Framework.AspNetCore" Version="$(CmsCoreVersionCommon)" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="System.Runtime.Caching" Version="5.0.0" />
   </ItemGroup>
 

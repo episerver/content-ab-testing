@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EPiServer.Marketing.KPI.Test
 {
-    internal class KpiTestContext : DatabaseContext
+    internal class KpiTestContext : KpiDatabaseContext
     {
-        public KpiTestContext(DbContextOptions options) : base(options)
+        public KpiTestContext(DbContextOptions<KpiDatabaseContext> options) : base(options)
         {
         }
 

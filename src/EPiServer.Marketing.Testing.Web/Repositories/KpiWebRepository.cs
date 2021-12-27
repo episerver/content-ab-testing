@@ -39,7 +39,7 @@ namespace EPiServer.Marketing.Testing.Web.Repositories
             var KpiTypes = kpiManager.GetKpiTypes();
             foreach (Type t in KpiTypes)
             {
-                kpiData.Add(new KpiTypeModel() {kpi = Activator.CreateInstance(t) as IKpi, kpiType = t});
+                kpiData.Add(new KpiTypeModel() {kpi = Activator.CreateInstance(t) as IKpi, kpiType = t.AssemblyQualifiedName});
             }
             return kpiData;
         }
