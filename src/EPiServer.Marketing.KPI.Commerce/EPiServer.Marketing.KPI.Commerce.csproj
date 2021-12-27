@@ -12,6 +12,9 @@
 	<NuspecProperties>Configuration=$(Configuration);version=$(MtCommerceVersion);mtVersion=$(MtVersion);commerceVersion=$(CommerceVersion);commerceNextMajorVersion=$(CommerceNextMajorVersion)</NuspecProperties>
 	<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="clientResources\scss\main.scss" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EPiServer.Commerce.Core" Version="$(CmsCommerceVersionCommon)" />

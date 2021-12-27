@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace EPiServer.Marketing.KPI.Commerce.Internal
 {
-    class SettingsController : Controller
+    public class SettingsController : Controller
     {
         private readonly Injected<IMarketService> _marketService;
         private readonly Injected<LocalizationService> _localizationService;
@@ -22,7 +22,19 @@ namespace EPiServer.Marketing.KPI.Commerce.Internal
         {
         }
 
-        public ActionResult Index() => View();
+        public ActionResult Index()
+        {
+            if (!User.IsInRole(Roles.CmsAdmins))
+            {
+                throw new AccessDeniedException();
+            }
+
+            return View(new SettingsViewModel
+            {
+                MarketList = GetMarketOptions(),
+                PreferredMarket = _marketService.Service.GetMarket(_commerceKpiConfig.Service.PreferredMarket).MarketName,
+            });
+        }
 
         [HttpGet]
         public ActionResult Get()
@@ -36,11 +48,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Internal
             var model = new SettingsViewModel
             {
                 MarketList = GetMarketOptions(),
-                PreferredMarket = _commerceKpiConfig.Service.PreferredMarket,
-                KpiCommerceConfigTitle = _localizationService.Service.GetString("/commercekpi/admin/displayname"),
-                PreferredMarketDescription = _localizationService.Service.GetString("/commercekpi/admin/description"),
-                PreferredMarketLabel = _localizationService.Service.GetString("/commercekpi/admin/financialculturepreference"),
-                KpiCommerceSaveButton = _localizationService.Service.GetString("/commercekpi/admin/save"),
+                PreferredMarket = _marketService.Service.GetMarket(_commerceKpiConfig.Service.PreferredMarket).MarketName,
             };
             return this.JsonData(model);
         }
@@ -54,7 +62,7 @@ namespace EPiServer.Marketing.KPI.Commerce.Internal
 
                 CommerceKpiSettings.Current.Save();
 
-                return Ok(_localizationService.Service.GetString("/abtesting/admin/success"));
+                return Ok(_localizationService.Service.GetString("/abtesting/admin/success","Saved Successfully"));
             }
             catch (Exception ex)
             {

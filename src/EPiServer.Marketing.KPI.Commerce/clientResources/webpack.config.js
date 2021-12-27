@@ -17,14 +17,14 @@ module.exports = (envVars) => {
 
     return {
         ...webpack_config,
-        entry: path.resolve(__dirname, "src/index.tsx"),
+        entry: [path.resolve(__dirname, "src/index.ts"), path.resolve(__dirname, "scss/main.scss")],
         output: {
             path: path.resolve(__dirname, "dist"),
             filename: "kpicommerce.bundle.js",
             publicPath: "/",
         },
         resolve: {
-            extensions: [".tsx", ".ts", ".js", ".jsx"],
+            extensions: [".scss", ".ts", ".js", ".jsx"],
         },
         devServer: {
             historyApiFallback: true,
