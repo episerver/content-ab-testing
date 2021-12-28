@@ -21,6 +21,7 @@
         <displayname>Commerce Conversion Goals Configuration</displayname>
         <financialculturepreference>Select which culture to use when saving and viewing financial results</financialculturepreference>
         <save>Save</save>
+        <success>Update successfully</success>
       </admin>
       <averageorder>
         <config_markup>

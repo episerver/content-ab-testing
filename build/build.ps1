@@ -14,17 +14,10 @@ Import-Module .\build\exechelper.ps1
 exec .\build\dotnet-cli-install.ps1
 
 # Build dotnet projects
-exec "dotnet" "build EPiServer.MarketingAutomationIntegration.sln -c $configuration"
+exec "dotnet" "build EPiServer.Marketing.Testing.sln -c $configuration"
 
 # Run XUnit test projects
-#exec "dotnet"  "test EPiServer.MarketingAutomationIntegration.sln -l $logger -v $verbosity -c $configuration --no-build --no-restore"
+#exec "dotnet"  "test EPiServer.Marketing.Testing.sln -l $logger -v $verbosity -c $configuration --no-build --no-restore"
 
-# Generate Sandcastle Documentation, By default only happens on build machine.
-if([System.Convert]::ToBoolean($generateDoc) -eq $true) {
-	&"$msbuild" /p:Configuration=Release ..\Documentation\KPI\Kpi.shfbproj
-	&"$msbuild" /p:Configuration=Release ..\Documentation\\KPI.Commerce\Kpicommerce.shfbproj
-	#&"$msbuild" /p:Configuration=Release ..\Documentation\Messaging\Messaging.shfbproj
-	&"$msbuild" /p:Configuration=Release ..\Documentation\Testing\Testing.shfbproj
-}
 
 Pop-Location

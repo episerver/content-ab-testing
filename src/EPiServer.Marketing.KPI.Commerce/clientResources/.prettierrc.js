@@ -1,9 +1,0 @@
-module.exports = {
-    tabWidth: 4,
-    semi: true,
-    trailingComma: "es5",
-    singleQuote: false,
-    jsxSingleQuote: false,
-    printWidth: 120,
-    endOfLine: "auto",
-};

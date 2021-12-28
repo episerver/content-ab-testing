@@ -1,34 +1,29 @@
-@using EPiServer.Framework.Web.Resources
-@using EPiServer.Shell.Navigation
+@using EPiServer.Marketing.KPI.Commerce.ViewModels
 @model EPiServer.Marketing.KPI.Commerce.ViewModels.SettingsViewModel
-<!DOCTYPE html>
 
-<html lang="en">
-<head>
-    <title>EPiServer Marketing AB Testing</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/EPiServer/EPiServer.Cms.UI.Admin/clientResources/favicon.ico" rel="icon" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Barlow:300,400,500" />
 
-    @ClientResources.RenderResources("kpi-commerce", new[] { ClientResourceType.Style })
-
-    <style>
-        body {
-            margin: 0;
-        }
-
-        input[type='text'] {
-            border: 0 !important;
-            background: none !important;
-        }
-    </style>
-</head>
-<body class="epi-workspace">
-    @Html.Raw(Html.CreatePlatformNavigationMenu())
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" @Html.Raw(Html.ApplyPlatformNavigation()) style="z-index:auto;" data-module-shell-path="@EPiServer.Shell.Paths.ToResource("EPiServer.Marketing.KPI.Commerce", "")"></div>
-    @ClientResources.RenderResources("kpi-commerce", new[] { ClientResourceType.Script })
-</body>
-</html>
+<div class="kpi-commerce-container">
+    <div>
+        <form action="Settings/Save" method="post">
+            <h3 class="epsilon">@Html.TranslateFallback("/commercekpi/admin/displayname", "Commerce Conversion Goals Configuration")</h3>
+            <hr>
+            <p>@Html.TranslateFallback("/commercekpi/admin/description", "These settings are the default values used for Commerce conversion goals when added to a test.")</p>
+            <div>
+                <div class="flex">
+                    <label asp-for="PreferredMarket" class="flush--bottom push--left weight--normal cursor--pointer">
+                        @Html.TranslateFallback("/commercekpi/admin/financialculturepreference", "Select which culture to use when saving and viewing financial results")
+                    </label>
+                    <select asp-for="PreferredMarket"
+                            asp-items="@(new SelectList(Model.MarketList, nameof(MarketOption.IdValue), nameof(MarketOption.Name), Model.PreferredMarket))"
+                            class="flex--none push--left">
+                    </select>
+                </div>
+            </div>
+            <hr>
+            <button class="oui-button oui-button--highlight oui-button--default mt-commerce-settings-submit" type="button" aria-live="polite">
+                @Html.TranslateFallback("/commercekpi/admin/save", "Save")
+            </button>
+            <div id="mt-commerce-settings-status" style="display: none"></div>
+        </form>
+    </div>
+</div>

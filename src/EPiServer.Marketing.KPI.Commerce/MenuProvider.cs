@@ -33,22 +33,15 @@ namespace EPiServer.Marketing.KPI.Commerce
         {
             return new List<MenuItem>()
             {
-                new SectionMenuItem(_localizationService.GetString("", "Addons"),
-                    MarketingToolSettingsPath)
+                new UrlMenuItem(_localizationService.GetString("", "AB Testing Commerce Settings"),
+                    MarketingToolSettingsPath + "/marketingtools/commercesettings",
+                    Paths.ToResource(GetType(), "Settings"))
                 {
-                    SortIndex = 10,
-                    Alignment = MenuItemAlignment.Left,
-                    IsAvailable = (context) => true
-                },
-                new UrlMenuItem(_localizationService.GetString("/marketingtool/admin/displayname", "Marketing Tools"),
-                    MarketingToolSettingsPath + "/marketingtools",
-                    Paths.ToResource(GetType(), "Setting"))
-                {
-                    SortIndex = 10,
+                    SortIndex = 100,
                     Alignment = MenuItemAlignment.Left,
                     IsAvailable = (context) => true,
                     AuthorizationPolicy = CmsPolicyNames.CmsAdmin
-                },
+                }
             };
         }
     }

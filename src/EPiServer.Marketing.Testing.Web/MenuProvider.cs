@@ -15,7 +15,7 @@ namespace EPiServer.Marketing.Testing.Web
         private readonly ModuleTable _moduleTable;
         private readonly LocalizationService _localizationService;
 
-        private const string ABTestingMenuPath = MenuPaths.Global + "/cms/admin/abtestingconfig";
+        private const string MarketingToolSettingsPath = MenuPaths.Global + "/addons";
 
         public MenuProvider(LocalizationService localizationService, ModuleTable moduleTable)
         {
@@ -33,8 +33,24 @@ namespace EPiServer.Marketing.Testing.Web
             }
             return new List<MenuItem>
             {
+                new SectionMenuItem(_localizationService.GetString("", "Addons"),
+                    MarketingToolSettingsPath)
+                {
+                    SortIndex = 10,
+                    Alignment = MenuItemAlignment.Left,
+                    IsAvailable = (context) => true
+                },
+                new UrlMenuItem(_localizationService.GetString("", "Marketing Tools"),
+                    MarketingToolSettingsPath + "/marketingtools",
+                    Paths.ToResource(GetType(), "Setting"))
+                {
+                    SortIndex = 10,
+                    Alignment = MenuItemAlignment.Left,
+                    IsAvailable = (context) => true,
+                    AuthorizationPolicy = CmsPolicyNames.CmsAdmin
+                },
                  new UrlMenuItem(_localizationService.GetString("/abtesting/admin/displayname", "AB Testing Configuration"),
-                    ABTestingMenuPath,
+                    MarketingToolSettingsPath + "/marketingtools/setting",
                     Paths.ToResource(GetType(), "Setting"))
                 {
                     SortIndex = SortIndex.Early + 110,
