@@ -10,10 +10,10 @@
             <p>@Html.TranslateFallback("/commercekpi/admin/description", "These settings are the default values used for Commerce conversion goals when added to a test.")</p>
             <div>
                 <div class="flex">
-                    <label asp-for="PreferredMarket" class="flush--bottom push--left weight--normal cursor--pointer">
+                    <label for="PreferredMarket" class="flush--bottom push--left weight--normal cursor--pointer">
                         @Html.TranslateFallback("/commercekpi/admin/financialculturepreference", "Select which culture to use when saving and viewing financial results")
                     </label>
-                    <select asp-for="PreferredMarket"
+                    <select for="PreferredMarket"
                             asp-items="@(new SelectList(Model.MarketList, nameof(MarketOption.IdValue), nameof(MarketOption.Name), Model.PreferredMarket))"
                             class="flex--none push--left">
                     </select>

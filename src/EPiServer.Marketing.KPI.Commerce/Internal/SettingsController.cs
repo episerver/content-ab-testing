@@ -32,25 +32,8 @@ namespace EPiServer.Marketing.KPI.Commerce.Internal
             return View(new SettingsViewModel
             {
                 MarketList = GetMarketOptions(),
-                PreferredMarket = _marketService.Service.GetMarket(_commerceKpiConfig.Service.PreferredMarket).MarketName,
+                PreferredMarket = _marketService.Service.GetMarket(_commerceKpiConfig.Service.PreferredMarket).MarketId.Value,
             });
-        }
-
-        [HttpGet]
-        public ActionResult Get()
-        {
-            // Security validation: user should have Edit access to view this page
-            if (!User.IsInRole(Roles.CmsAdmins))
-            {
-                throw new AccessDeniedException();
-            }
-
-            var model = new SettingsViewModel
-            {
-                MarketList = GetMarketOptions(),
-                PreferredMarket = _marketService.Service.GetMarket(_commerceKpiConfig.Service.PreferredMarket).MarketName,
-            };
-            return this.JsonData(model);
         }
 
         [HttpPost]
