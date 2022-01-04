@@ -111,7 +111,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
             catch (Exception ex)
             {
                 _logger.Debug("Error creating Kpi" + ex);
-                result = Rest(new Response() { status = false, obj = ex, message = ex.Message });                
+                result = Rest(new Response() { status = false, message = ex.Message });                
             }           
             return result;
         }
