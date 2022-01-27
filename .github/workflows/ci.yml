@@ -43,7 +43,7 @@ jobs:
         run: yarn build 
         working-directory: src/EPiServer.Marketing.Testing.Web/clientResources/config
       - name: Restore
-        run: dotnet restore --packages ../packages
+        run: dotnet restore 
       - name: Build (Release version)
         if:  ${{ github.ref == 'refs/heads/main' }}
         run: dotnet build --no-restore --configuration $env:buildConfiguration 
