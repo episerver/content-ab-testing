@@ -19,4 +19,4 @@ IF %errorlevel% NEQ 0 exit /B %errorlevel%
 CALL yarn --cwd src\EPiServer.Marketing.Testing.Web\ClientResources\Config run build
 IF %errorlevel% NEQ 0 exit /B %errorlevel%
 
-powershell -File "build\build.ps1" -configuration %Configuration%
+dotnet build EPiServer.Marketing.Testing.sln -c %Configuration%

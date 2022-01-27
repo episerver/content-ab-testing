@@ -1,0 +1,65 @@
+﻿name: Nuget client Continuous integration
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+      - 'netcore'
+  pull_request:
+    branches:
+      - '*'
+      - '!main'
+jobs:
+  build_test_pack:
+    name: Build, test & pack
+    runs-on: windows-latest
+    env:
+      buildConfiguration: release
+      versionSuffix: ${{ github.ref == 'refs/heads/develop' && 'pre-' ||  'ci-' }}${{github.RUN_NUMBER }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+      - name: Set up Node.js ⚙️
+        uses: actions/setup-node@v2
+        with:
+            node-version: '16'
+      - name: Setup .NET Core @ Latest
+        uses: actions/setup-dotnet@v1
+        with:
+          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Install commerce dependencies 📦
+        run: yarn install --frozen-lockfile
+        working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
+      - name: Build Connector TS
+        run: yarn build:release 
+        working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
+      - name: Install cms dependencies 📦
+        run: yarn install --frozen-lockfile
+        working-directory: src/EPiServer.Marketing.Testing.Web/clientResources/config
+      - name: Build Connector TS
+        run: yarn build 
+        working-directory: src/EPiServer.Marketing.Testing.Web/clientResources/config
+      - name: Restore
+        run: dotnet restore --packages ../packages
+      - name: Build (Release version)
+        if:  ${{ github.ref == 'refs/heads/main' }}
+        run: dotnet build --no-restore --configuration $env:buildConfiguration 
+      - name: Build (Pre-Release version)
+        if:  ${{ github.ref != 'refs/heads/main' }}
+        run: dotnet build --no-restore --configuration $env:buildConfiguration --version-suffix $env:versionSuffix
+      - name: Test
+        run: dotnet test --no-build --configuration $env:buildConfiguration
+      - name: Pack  (Release version)
+        if:  ${{ github.ref == 'refs/heads/main' }}  
+        run: |
+          ./build/pack.ps1 -versionSuffix $env:versionSuffix
+      - name: Pack  (Pre-Release version)
+        if:  ${{ github.ref != 'refs/heads/main' }}  
+        run: |
+          ./build/pack.ps1 
+      - name: Publish packages
+        run: dotnet nuget push **/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
+

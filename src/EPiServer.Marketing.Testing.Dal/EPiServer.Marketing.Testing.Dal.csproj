@@ -4,8 +4,6 @@
     <Product>EPiServer.Marketing.Testing.Dal</Product>
     <TargetFramework>net5.0</TargetFramework>
     <OutputType>Library</OutputType>    
-    <IsPackable>true</IsPackable>
-    <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

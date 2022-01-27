@@ -1,30 +1,31 @@
 <?xml version="1.0"?>
 <package>
-    <metadata>
-        <id>EPiServer.Marketing.KPI.Commerce</id>
-        <version>$version$</version>
-        <title>EPiServer KPI for Commerce</title>
-        <authors>EPiServer</authors>
-        <owners>EPiServer</owners>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Integrate EPiServer site with KPI Commerce package</description>
-        <copyright>Copyright EPiServer $Year</copyright>
-        <releaseNotes>
-        </releaseNotes>
-        <tags>EPiServerModulePackage EPiServer KPI EPiServerBetaAddon</tags>
-            <dependencies>
-				<group targetFramework="net5.0">
-                  <dependency id="EPiServer.Marketing.KPI" version="($mtVersion$)" />
-                  <dependency id="EPiServer.Commerce.Core" version="[$commerceVersion$,$commerceNextMajorVersion$)" />
-				</group>
-        </dependencies>
-    </metadata>
+	<metadata>
+		<id>EPiServer.Marketing.KPI.Commerce</id>
+		<version>$version$</version>
+		<title>EPiServer KPI for Commerce</title>
+		<authors>EPiServer</authors>
+		<owners>EPiServer</owners>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Integrate EPiServer site with KPI Commerce package</description>
+		<copyright>Copyright EPiServer $Year</copyright>
+		<releaseNotes>
+		</releaseNotes>
+		<tags>EPiServerModulePackage EPiServer KPI EPiServerBetaAddon</tags>
+		<dependencies>
+			<group targetFramework="net5.0">
+				<dependency id="EPiServer.Marketing.KPI" version="$mtVersion$" />
+				<dependency id="EPiServer.Commerce.Core" version="[$commerceVersion$,$commerceNextMajorVersion$)" />
+			</group>
+		</dependencies>
+	</metadata>
 	<files>
 		<file src="src\EPiServer.Marketing.KPI.Commerce\license.txt" target="" />
 		<file src="src\EPiServer.Marketing.KPI.Commerce\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.Commerce.dll" target="lib\net5.0\" />
 		<file src="src\EPiServer.Marketing.KPI.Commerce\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.Commerce.pdb" target="lib\net5.0\" />
 		<file src="src\EPiServer.Marketing.KPI.Commerce\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.Commerce.Views.dll" target="lib\net5.0\" />
 		<file src="src\EPiServer.Marketing.KPI.Commerce\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.Commerce.Views.pdb" target="lib\net5.0\" />
+		<file src="zipoutput\EPiServer.Marketing.Testing.Web.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Marketing.KPI.Commerce" />
 		<file src="build\CopyZipFiles.targets" target="build\net5.0\EPiServer.Marketing.KPI.Commerce.targets" />
 	</files>
 </package>

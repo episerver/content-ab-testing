@@ -227,3 +227,5 @@ ModelManifest.xml
 /samples/EPiServer.Templates.Alloy.Mvc/App_Data/**
 /samples/EPiServer.Templates.Alloy.Mvc/App_Code/**
 /nupkgs
+modules
+zipoutput

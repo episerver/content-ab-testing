@@ -7,9 +7,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <OutputType>Library</OutputType>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <IsPackable>true</IsPackable>
     <NuspecFile>EPiServer.Marketing.Testing.Web.nuspec</NuspecFile>
-    <PackageOutputPath>$(SolutionDir)artifacts\packages\</PackageOutputPath>
     <NuspecProperties>Configuration=$(Configuration);version=$(PackageVersion);mtVersion=$(MtVersion);mtMessageVersion=$(MtMessageVersion);uiVersion=$(UiVersion);uiNextMajorVersion=$(UiNextMajorVersion);cmsVersion=$(CmsVersion);cmsNextMajorVersion=$(CmsNextMajorVersion)</NuspecProperties>
   </PropertyGroup>
   <ItemGroup>
