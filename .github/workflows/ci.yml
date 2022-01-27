@@ -55,11 +55,11 @@ jobs:
       - name: Pack  (Release version)
         if:  ${{ github.ref == 'refs/heads/main' }}  
         run: |
-          ./build/pack.ps1 -versionSuffix $env:versionSuffix
+          ./build/pack.ps1 
       - name: Pack  (Pre-Release version)
         if:  ${{ github.ref != 'refs/heads/main' }}  
         run: |
-          ./build/pack.ps1 
+          ./build/pack.ps1 -versionSuffix $env:versionSuffix
       - name: Publish packages
-        run: dotnet nuget push **/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
+        run: dotnet nuget push artifacts/**/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
 
