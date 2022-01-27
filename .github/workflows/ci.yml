@@ -34,7 +34,7 @@ jobs:
         run: yarn install --frozen-lockfile
         working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
       - name: Build Connector TS
-        run: yarn build:release 
+        run: yarn build 
         working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
       - name: Install cms dependencies 📦
         run: yarn install --frozen-lockfile
