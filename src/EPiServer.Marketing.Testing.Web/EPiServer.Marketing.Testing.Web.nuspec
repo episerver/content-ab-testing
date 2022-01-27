@@ -11,6 +11,7 @@
 		<releaseNotes></releaseNotes>
 		<copyright>Copyright $Year$</copyright>
 		<tags>EPiServerModulePackage EPiServerAddon EPiServer Marketing Testing</tags>
+		<repository type="git" url="https://github.com/episerver/content-ab-testing.git"></repository>
 		<dependencies>
 			<group targetFramework="net5.0">
 				<dependency id="EPiServer.Marketing.KPI" version="$mtVersion$" />

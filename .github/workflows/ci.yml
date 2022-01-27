@@ -30,16 +30,16 @@ jobs:
           source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - name: Install commerce dependencies 📦
+      - name: Install commerce dependencies
         run: yarn install --frozen-lockfile
         working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
       - name: Build KPI Commerce
         run: yarn build 
         working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
-      - name: Install cms dependencies 📦
+      - name: Install cms dependencies
         run: yarn install --frozen-lockfile
         working-directory: src/EPiServer.Marketing.Testing.Web/clientResources/config
-      - name: Build Testing Automation
+      - name: Build Testing 
         run: yarn build 
         working-directory: src/EPiServer.Marketing.Testing.Web/clientResources/config
       - name: Restore

@@ -12,6 +12,7 @@
 		<releaseNotes>
 		</releaseNotes>
 		<tags>EPiServerModulePackage EPiServer KPI EPiServerBetaAddon</tags>
+		<repository type="git" url="https://github.com/episerver/content-ab-testing.git"></repository>
 		<dependencies>
 			<group targetFramework="net5.0">
 				<dependency id="EPiServer.CMS.AspNetCore.HtmlHelpers"  version="[$cmsVersion$,$cmsNextMajorVersion$)" />

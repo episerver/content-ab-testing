@@ -12,6 +12,7 @@
         <releaseNotes>
         </releaseNotes>
         <tags>EPiServerModulePackage EPiServer Messaging</tags>
+		  	<repository type="git" url="https://github.com/episerver/content-ab-testing.git"></repository>
         <dependencies>
         </dependencies>
     </metadata>
