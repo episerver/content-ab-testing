@@ -33,13 +33,13 @@ jobs:
       - name: Install commerce dependencies 📦
         run: yarn install --frozen-lockfile
         working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
-      - name: Build Connector TS
+      - name: Build KPI Commerce
         run: yarn build 
         working-directory: src/EPiServer.Marketing.KPI.Commerce/clientResources
       - name: Install cms dependencies 📦
         run: yarn install --frozen-lockfile
         working-directory: src/EPiServer.Marketing.Testing.Web/clientResources/config
-      - name: Build Connector TS
+      - name: Build Testing Automation
         run: yarn build 
         working-directory: src/EPiServer.Marketing.Testing.Web/clientResources/config
       - name: Restore
