@@ -20,6 +20,9 @@
 				<dependency id="EPiServer.CMS.AspNetCore" version="[$cmsVersion$,$cmsNextMajorVersion$)" />
 			</group>
 		</dependencies>
+		<contentFiles>
+			<files include="any/any/modules/_protected/EPiServer.Marketing.Testing.Web/EPiServer.Marketing.Testing.Web.zip" buildAction="None" copyToOutput="true"  />
+		</contentFiles>
 	</metadata>
 	<files>
 		<file src="src\EPiServer.Marketing.Testing.Web\license.txt" target="" />
