@@ -68,7 +68,7 @@ $module = $moduleFile.SelectSingleNode("module")
 $module.Attributes["clientResourceRelativePath"].Value = $version
 $moduleFile.Save("./zipoutput/EPiServer.Marketing.Testing.Web/module.config")
 Move-Item -Path "./zipoutput/Episerver.Marketing.Testing.Web/clientResources" -Destination "./zipoutput/Episerver.Marketing.Testing.Web/$version/clientresources"
-
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/Images" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/$version/Images" -Recurse
 
 $compress = @{
   Path = "./zipoutput/Episerver.Marketing.KPI.Commerce/*"
