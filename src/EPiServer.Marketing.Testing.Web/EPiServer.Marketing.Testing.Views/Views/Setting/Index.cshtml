@@ -28,7 +28,7 @@
 <body>
     @Html.Raw(Html.CreatePlatformNavigationMenu())
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" @Html.Raw(Html.ApplyPlatformNavigation()) style="z-index:auto;" data-module-shell-path="@EPiServer.Shell.Paths.ToResource("EPiServer.Marketing.Testing.Web", "")"></div>
+    <div id="root" @Html.Raw(Html.ApplyPlatformNavigation()) style="z-index:auto;" data-module-shell-path="@EPiServer.Shell.Paths.ToResource("EPiServer.Marketing.Testing", "")"></div>
     @ClientResources.RenderResources("ABTestingConfig", new[] { ClientResourceType.Script })
 </body>
 </html>
