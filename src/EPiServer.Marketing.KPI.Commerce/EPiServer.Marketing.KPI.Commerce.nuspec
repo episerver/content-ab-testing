@@ -19,6 +19,10 @@
 				<dependency id="EPiServer.Commerce.Core" version="[$commerceVersion$,$commerceNextMajorVersion$)" />
 			</group>
 		</dependencies>
+		<contentFiles>
+			<files include="any/any/modules/_protected/EPiServer.Marketing.KPI.Commerce/EPiServer.Marketing.KPI.Commerce.zip" buildAction="None" copyToOutput="true"  />
+		</contentFiles>
+	
 	</metadata>
 	<files>
 		<file src="src\EPiServer.Marketing.KPI.Commerce\license.txt" target="" />
@@ -26,7 +30,7 @@
 		<file src="src\EPiServer.Marketing.KPI.Commerce\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.Commerce.pdb" target="lib\net5.0\" />
 		<file src="src\EPiServer.Marketing.KPI.Commerce\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.Commerce.Views.dll" target="lib\net5.0\" />
 		<file src="src\EPiServer.Marketing.KPI.Commerce\bin\$configuration$\net5.0\EPiServer.Marketing.KPI.Commerce.Views.pdb" target="lib\net5.0\" />
-		<file src="zipoutput\EPiServer.Marketing.Testing.Web.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Marketing.KPI.Commerce" />
+		<file src="zipoutput\EPiServer.Marketing.KPI.Commerce.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Marketing.KPI.Commerce" />
 		<file src="build\CopyZipFiles.targets" target="build\net5.0\EPiServer.Marketing.KPI.Commerce.targets" />
 	</files>
 </package>

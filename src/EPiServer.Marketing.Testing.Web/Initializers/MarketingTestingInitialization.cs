@@ -55,9 +55,9 @@ namespace EPiServer.Marketing.Testing.Web.Initializers
                 });
             context.Services.Configure<ProtectedModuleOptions>(o =>
             {
-                if (!o.Items.Any(x => x.Name.Equals("EPiServer.Marketing.Testing.Web")))
+                if (!o.Items.Any(x => x.Name.Equals("EPiServer.Marketing.Testing")))
                 {
-                    o.Items.Add(new ModuleDetails() { Name = "EPiServer.Marketing.Testing.Web" });
+                    o.Items.Add(new ModuleDetails() { Name = "EPiServer.Marketing.Testing" });
                 }
             });
         }

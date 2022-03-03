@@ -50,25 +50,25 @@ $module.Attributes["clientResourceRelativePath"].Value = $mtCommerceVersion
 $moduleFile.Save("./zipoutput/EPiServer.Marketing.KPI.Commerce/module.config")
 Move-Item -Path "./zipoutput/Episerver.Marketing.KPI.Commerce/clientResources" -Destination "./zipoutput/Episerver.Marketing.KPI.Commerce/$mtCommerceVersion/clientresources"
 
-New-Item -Path "./zipoutput/EPiServer.Marketing.Testing.Web" -Name "clientResources" -ItemType "directory"
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/InitializeModule.js" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/TestNotification.js" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/cmsuicomponents" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/cmsuicomponents" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/command" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/command" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/css" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/css" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/nls" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/nls" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/scripts" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/scripts" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/viewmodels" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/viewmodels" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/views" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/views" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/widgets" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/widgets" -Recurse
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/config/dist" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/clientResources/config/dist" -Recurse
-New-Item -Path "./zipoutput/EPiServer.Marketing.Testing.Web" -Name "$version" -ItemType "directory"
+New-Item -Path "./zipoutput/EPiServer.Marketing.Testing" -Name "clientResources" -ItemType "directory"
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/InitializeModule.js" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/TestNotification.js" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/cmsuicomponents" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/cmsuicomponents" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/command" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/command" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/css" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/css" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/nls" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/nls" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/scripts" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/scripts" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/viewmodels" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/viewmodels" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/views" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/views" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/widgets" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/widgets" -Recurse
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/clientResources/config/dist" -Destination "./zipoutput/EPiServer.Marketing.Testing/clientResources/config/dist" -Recurse
+New-Item -Path "./zipoutput/EPiServer.Marketing.Testing" -Name "$version" -ItemType "directory"
 [xml] $moduleFile = Get-Content "./src/EPiServer.Marketing.Testing.Web/module.config"
 $module = $moduleFile.SelectSingleNode("module")
 $module.Attributes["clientResourceRelativePath"].Value = $version
-$moduleFile.Save("./zipoutput/EPiServer.Marketing.Testing.Web/module.config")
-Move-Item -Path "./zipoutput/Episerver.Marketing.Testing.Web/clientResources" -Destination "./zipoutput/Episerver.Marketing.Testing.Web/$version/clientresources"
-Copy-Item "./src/EPiServer.Marketing.Testing.Web/Images" -Destination "./zipoutput/EPiServer.Marketing.Testing.Web/$version/Images" -Recurse
+$moduleFile.Save("./zipoutput/EPiServer.Marketing.Testing/module.config")
+Move-Item -Path "./zipoutput/Episerver.Marketing.Testing/clientResources" -Destination "./zipoutput/Episerver.Marketing.Testing/$version/clientresources"
+Copy-Item "./src/EPiServer.Marketing.Testing.Web/Images" -Destination "./zipoutput/EPiServer.Marketing.Testing/$version/Images" -Recurse
 
 $compress = @{
   Path = "./zipoutput/Episerver.Marketing.KPI.Commerce/*"
@@ -78,9 +78,9 @@ $compress = @{
 Compress-Archive @compress
 
 $compress = @{
-  Path = "./zipoutput/Episerver.Marketing.Testing.Web/*"
+  Path = "./zipoutput/Episerver.Marketing.Testing/*"
   CompressionLevel = "Optimal"
-  DestinationPath = "./zipoutput/Episerver.Marketing.Testing.Web.zip"
+  DestinationPath = "./zipoutput/Episerver.Marketing.Testing.zip"
 }
 Compress-Archive @compress
 

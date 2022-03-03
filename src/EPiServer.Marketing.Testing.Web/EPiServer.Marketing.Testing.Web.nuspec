@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
 	<metadata>
-		<id>EPiServer.Marketing.Testing.Web</id>
+		<id>EPiServer.Marketing.Testing</id>
 		<title>EPiServer Marketing Testing Tools</title>
 		<version>$version$</version>
 		<authors>EPiServer</authors>
@@ -21,7 +21,7 @@
 			</group>
 		</dependencies>
 		<contentFiles>
-			<files include="any/any/modules/_protected/EPiServer.Marketing.Testing.Web/EPiServer.Marketing.Testing.Web.zip" buildAction="None" copyToOutput="true"  />
+			<files include="any/any/modules/_protected/EPiServer.Marketing.Testing/EPiServer.Marketing.Testing.zip" buildAction="None" copyToOutput="true"  />
 		</contentFiles>
 	</metadata>
 	<files>
@@ -34,7 +34,7 @@
 		<file src="src\EPiServer.Marketing.Testing.Core\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Core.pdb" target="lib\net5.0\" />
 		<file src="src\EPiServer.Marketing.Testing.Dal\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Dal.dll" target="lib\net5.0\" />
 		<file src="src\EPiServer.Marketing.Testing.Dal\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Dal.pdb" target="lib\net5.0\" />
-		<file src="zipoutput\EPiServer.Marketing.Testing.Web.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Marketing.Testing.Web" />
-		<file src="build\CopyZipFiles.targets" target="build\net5.0\EPiServer.Marketing.Testing.Web.targets" />
+		<file src="zipoutput\EPiServer.Marketing.Testing.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Marketing.Testing" />
+		<file src="build\CopyZipFiles.targets" target="build\net5.0\EPiServer.Marketing.Testing.targets" />
 	</files>
 </package>
