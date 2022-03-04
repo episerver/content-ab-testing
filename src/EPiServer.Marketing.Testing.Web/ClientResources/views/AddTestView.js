@@ -120,8 +120,8 @@
                 this.kpiEntries = 0;
                 this._adjustKpiSelectorCombo();
                 if (document.getElementById("publishThumbnaildetail-spinner")) {
-                    thumbnails._setPreviewState("publishThumbnaildetail", block, none);
-                    thumbnails._setPreviewState("draftThumbnaildetail", block, none);
+                    thumbnails._setPreviewState("publishThumbnaildetail", "block", "none");
+                    thumbnails._setPreviewState("draftThumbnaildetail", "block", "none");
                 }
                 this.reset();
             },
@@ -149,8 +149,8 @@
                 this.reset();
                 this._setViewCurrentVersionAttr();
                 if (document.getElementById("draftThumbnaildetail")) {
-                    thumbnails._setPreviewState("publishThumbnaildetail", block, none);
-                    thumbnails._setPreviewState("draftThumbnaildetail", block, none);
+                    thumbnails._setPreviewState("publishThumbnaildetail", "block", "none");
+                    thumbnails._setPreviewState("draftThumbnaildetail", "block", "none");
                 }
                 if (this.breadcrumbWidget) {
                     this.breadcrumbWidget.set("contentLink", this.contentData.contentLink);

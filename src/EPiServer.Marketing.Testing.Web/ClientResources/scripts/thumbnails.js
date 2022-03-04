@@ -79,9 +79,11 @@ function (dependency, html2canvas) {
         },
 
         _setPreviewState: function (canvasForPreviewImage, spinnerDisplayState, previewDisplayState, errorDisplayState) {
-            document.getElementById(canvasForPreviewImage.id + "-spinner").style.display = spinnerDisplayState;
-            canvasForPreviewImage.style.display = previewDisplayState;
-            document.getElementById(canvasForPreviewImage.id + "-error").style.display = errorDisplayState;
+            var spinnerElement = document.getElementById(canvasForPreviewImage.id + "-spinner");
+            spinnerElement && (spinnerElement.style.display = spinnerDisplayState);
+            canvasForPreviewImage && canvasForPreviewImage.style && (canvasForPreviewImage.style.display = previewDisplayState);
+            var errElement = document.getElementById(canvasForPreviewImage.id + "-error");
+            errElement && (errElement.style.display = errorDisplayState);
         }
     };
 });
