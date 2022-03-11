@@ -123,6 +123,7 @@ const ABTestingSettings = () => {
                     <Checkbox
                         checked={aBTestingSettingsModel.isEnabled}
                         onChange={handleChange}
+                        name="isEnabled"
                     >
                         {aBTestingSettingsModel.isEnabledLabel}
                     </Checkbox>
