@@ -132,7 +132,7 @@
                 me.contextParameters = {
                     uri: "epi.marketing.testing:///testid=" + this.context.data.test.id + "/pickwinner"
                 };
-                topic.publish("/epi/shell/context/request", me.contextParameters);
+                topic.publish("/epi/shell/context/request", me.contextParameters, { sender: this });
             },
 
             _onAbortOptionClicked: function () {

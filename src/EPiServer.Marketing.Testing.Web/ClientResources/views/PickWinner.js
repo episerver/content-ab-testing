@@ -226,7 +226,7 @@
                     .then(function (testId) {
                         this.kpiSummaryWidgets = new Array();
                         var contextParameters = { uri: "epi.marketing.testing:///testid=" + testId + "/Archive" };
-                        topic.publish("/epi/shell/context/request", contextParameters);
+                        topic.publish("/epi/shell/context/request", contextParameters, { sender: this });
                     }).otherwise(function () {
                         alert("Error Processing Winner: Unable to process and save selected version");
                         console.log("Error occurred while processing winning content");
@@ -248,7 +248,7 @@
                 .then(function (testId) {
                     this.kpiSummaryWidgets = new Array();
                     var contextParameters = { uri: "epi.marketing.testing:///testid=" + testId + "/Archive" };
-                    topic.publish("/epi/shell/context/request", contextParameters);
+                    topic.publish("/epi/shell/context/request", contextParameters, { sender: this });
                 }).otherwise(function () {
                     alert("Error Processing Winner: Unable to process and save selected version");
                     console.log("Error occurred while processing winning content");
