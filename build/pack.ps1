@@ -73,14 +73,14 @@ Copy-Item "./src/EPiServer.Marketing.Testing.Web/Images" -Destination "./zipoutp
 $compress = @{
   Path = "./zipoutput/Episerver.Marketing.KPI.Commerce/*"
   CompressionLevel = "Optimal"
-  DestinationPath = "./zipoutput/Episerver.Marketing.KPI.Commerce.zip"
+  DestinationPath = "./zipoutput/EPiServer.Marketing.KPI.Commerce.zip"
 }
 Compress-Archive @compress
 
 $compress = @{
   Path = "./zipoutput/Episerver.Marketing.Testing/*"
   CompressionLevel = "Optimal"
-  DestinationPath = "./zipoutput/Episerver.Marketing.Testing.zip"
+  DestinationPath = "./zipoutput/EPiServer.Marketing.Testing.zip"
 }
 Compress-Archive @compress
 
