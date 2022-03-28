@@ -15,13 +15,7 @@ namespace EPiServer.Marketing.KPI
     {
         public void ConfigureContainer(ServiceConfigurationContext context)
         {
-            context.Services.AddDbContext<KpiDatabaseContext>(
-                options =>
-                {
-                    options.UseSqlServer(
-                        ServiceLocator.Current.GetInstance<IConfiguration>().GetConnectionString("EPiServerDB"),
-                        x => x.MigrationsHistoryTable("__MigrationHistory", "dbo"));
-                });
+            
         }
 
         public void Initialize(InitializationEngine context)

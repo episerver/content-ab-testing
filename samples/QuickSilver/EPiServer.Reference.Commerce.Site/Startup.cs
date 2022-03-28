@@ -3,6 +3,7 @@ using EPiServer.Data;
 using EPiServer.DependencyInjection;
 using EPiServer.Framework.Hosting;
 using EPiServer.Framework.Web.Resources;
+using EPiServer.Marketing.Testing.Web.Initializers;
 using EPiServer.Personalization.Commerce.Tracking;
 using EPiServer.Reference.Commerce.Site.Features.Market.Services;
 using EPiServer.Reference.Commerce.Site.Features.Recommendations.Services;
@@ -105,6 +106,8 @@ namespace EPiServer.Reference.Commerce.Site
             {
                 o.DisableOrderDataLocalization = true;
             });
+
+            services.AddABTesting(_configuration.GetConnectionString("EPiServerDB"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

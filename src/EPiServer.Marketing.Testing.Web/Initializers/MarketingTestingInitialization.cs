@@ -46,13 +46,6 @@ namespace EPiServer.Marketing.Testing.Web.Initializers
                         timeout < 10 ? 60 : timeout
                     ));
             context.Services.AddSingleton<ITestHandler, TestHandler>();
-            context.Services.AddDbContext<DatabaseContext>(
-                options =>
-                {
-                    options.UseSqlServer(
-                        ServiceLocator.Current.GetInstance<IConfiguration>().GetConnectionString("EPiServerDB"),
-                        x => x.MigrationsHistoryTable("__MigrationHistory", "dbo"));
-                });
             context.Services.Configure<ProtectedModuleOptions>(o =>
             {
                 if (!o.Items.Any(x => x.Name.Equals("EPiServer.Marketing.Testing")))
