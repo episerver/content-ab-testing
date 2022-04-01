@@ -32,6 +32,10 @@ const ABTestingSettings = () => {
     const changeConfidenceLevel = (value: string) => setABTestingSettingsModel({ ...aBTestingSettingsModel, confidenceLevel: parseInt(value) });
 
     const isValidForm=()=>{
+        if(isNaN(aBTestingSettingsModel.participationPercent) || isNaN(aBTestingSettingsModel.testDuration)){
+            setSnackBarMessage({ message: aBTestingSettingsModel.inValid, isOpen: true });
+            return false;
+        }
         if(aBTestingSettingsModel.participationPercent < 1 || aBTestingSettingsModel.participationPercent > 100){
             setSnackBarMessage({ message: aBTestingSettingsModel.participationError, isOpen: true });
             return false;
