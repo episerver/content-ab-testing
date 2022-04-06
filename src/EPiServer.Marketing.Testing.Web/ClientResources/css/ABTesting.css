@@ -581,3 +581,5 @@
     cursor: pointer; /* Add a pointer on hover */
 }
 /* end Throbber classes*/
+
+span.dijit.dijitReset.dijitInline.dijitButton.epi-button--bold { margin:0; }
