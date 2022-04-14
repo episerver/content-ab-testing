@@ -137,7 +137,6 @@ const ABTestingSettings = () => {
             <TextButton
                 contained
                 onClick={save}
-                disabled={!isValidForm()}
             >
                 {aBTestingSettingsModel.saveButton}
             </TextButton>
