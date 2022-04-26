@@ -32,7 +32,7 @@ const ABTestingSettings = () => {
     const changeConfidenceLevel = (value: string) => setABTestingSettingsModel({ ...aBTestingSettingsModel, confidenceLevel: parseInt(value) });
 
     const isValidForm=()=>{
-        if(isNaN(aBTestingSettingsModel.participationPercent) || isNaN(aBTestingSettingsModel.testDuration)){
+        if(!isNumber(aBTestingSettingsModel.participationPercent.toString()) || !isNumber(aBTestingSettingsModel.testDuration.toString())){
             setSnackBarMessage({ message: aBTestingSettingsModel.inValid, isOpen: true });
             return false;
         }
@@ -46,6 +46,11 @@ const ABTestingSettings = () => {
             return false;
         }
         return true;
+    }
+
+    const isNumber = (value : string) => {
+        var reg = /^\d+$/;
+        return reg.test(value);
     }
 
     const save = () => {
