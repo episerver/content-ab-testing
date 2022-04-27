@@ -58,7 +58,8 @@ const ABTestingSettings = () => {
                 IsEnabled: aBTestingSettingsModel.isEnabled
             }).then(response => {
                 if (response.status === 200) {
-                    setSnackBarMessage({ message: response.data, isOpen: true });                 
+                    setSnackBarMessage({ message: response.data, isOpen: true });  
+                    setABTestingSettingsModelOrg(aBTestingSettingsModel);               
                 }
             }).catch(e => {
                 if(e.response?.status === 400) {
