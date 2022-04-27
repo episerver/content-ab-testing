@@ -3,6 +3,14 @@
 const commerceSettingsButton = document.getElementsByClassName("mt-commerce-settings-submit")[0];
 commerceSettingsButton?.addEventListener("click", saveCommerceSettings);
 
+const commerceSettingsCancel = document.getElementsByClassName("mt-commerce-settings-cancel")[0];
+commerceSettingsCancel?.addEventListener("click", cancelCommerceSettings);
+
+var PreferredMarketOrg = document.getElementById("PreferredMarket").value;
+
+function cancelCommerceSettings(this: HTMLElement, ev: Event) {
+    document.getElementById("PreferredMarket").value = PreferredMarketOrg;
+}
 function saveCommerceSettings(this: HTMLElement, ev: Event){
     let form = this.closest("form") as HTMLFormElement;
     const url = form.getAttribute("action") ?? "";
@@ -22,6 +30,7 @@ function saveCommerceSettings(this: HTMLElement, ev: Event){
             setTimeout(() => {
                 status?.style.setProperty("display", "none");
             }, 2000);
+            PreferredMarketOrg=data["PreferredMarket"];
         })
         .catch((error) => {
             toggleButtonLoadingIndicator(this, false);
