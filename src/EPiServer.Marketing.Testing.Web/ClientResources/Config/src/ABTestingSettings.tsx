@@ -134,10 +134,11 @@ const ABTestingSettings = () => {
                     </Checkbox>
                 </CardContentArea>
             </Card>
-            <TextButton onClick={cancel} style={{ marginRight: "10px" }}>{aBTestingSettingsModel.cancelButton}</TextButton>
+            <TextButton onClick={cancel} style={{ marginRight: "10px", textTransform:"none" }}>{aBTestingSettingsModel.cancelButton}</TextButton>
             <TextButton
                 contained
                 onClick={save}
+                style={{ textTransform:"none" }}
             >
                 {aBTestingSettingsModel.saveButton}
             </TextButton>
