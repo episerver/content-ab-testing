@@ -74,7 +74,7 @@ namespace EPiServer.Reference.Commerce.Site.Features.Shared.Services
                 Subject = subject,
                 Body = new TextPart("html") { Text = body }
             };
-            message.From.Add(MailboxAddress.Parse(_configuration.GetValue<string>("EPiServer:SmtpOptions:FromEmailAddress")));
+            message.From.Add(MailboxAddress.Parse(_configuration.GetValue<string>("EPiServer:SmtpOptions:FromEmailAddress") ?? "no-reply@episerver.com"));
             message.To.Add(MailboxAddress.Parse(recipientMailAddress));
 
             Send(message);
@@ -82,8 +82,8 @@ namespace EPiServer.Reference.Commerce.Site.Features.Shared.Services
 
         public void Send(MimeMessage message)
         {
-            int port = _smtpOptions.Value.Network.Port.HasValue ? _smtpOptions.Value.Network.Port.Value : DefaultSmtpPort;
-            bool useSsl = _smtpOptions.Value.Network.UseSsl.HasValue? _smtpOptions.Value.Network.UseSsl.Value : false;
+            int port = _smtpOptions.Value.Network?.Port ?? DefaultSmtpPort;
+            bool useSsl = _smtpOptions.Value.Network?.UseSsl ?? false;
 
             using var client = new SmtpClient();
             client.Connect(_smtpOptions.Value.Network.Host, port, useSsl);

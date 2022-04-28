@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EPiServer.Marketing.Testing.Dal.EntityModel
 {
@@ -9,6 +10,7 @@ namespace EPiServer.Marketing.Testing.Dal.EntityModel
             Conversions = 0;
             Weight = 1;
         }
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Id { get; set; }
 
         public Guid KpiId { get; set; }

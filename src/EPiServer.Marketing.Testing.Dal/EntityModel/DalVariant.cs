@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EPiServer.Marketing.Testing.Dal.EntityModel
 {
@@ -9,6 +10,7 @@ namespace EPiServer.Marketing.Testing.Dal.EntityModel
         {
         }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Id { get; set; }
 
         /// <summary>

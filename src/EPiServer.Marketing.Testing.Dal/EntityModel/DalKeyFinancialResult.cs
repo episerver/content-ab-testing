@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EPiServer.Marketing.Testing.Dal.EntityModel
 {
     public class DalKeyFinancialResult : EntityBase, IDalKeyResult
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Id { get; set; }
 
         public Guid KpiId { get; set; }
