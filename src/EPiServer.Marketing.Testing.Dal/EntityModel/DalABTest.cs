@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using EPiServer.Marketing.Testing.Dal.EntityModel.Enums;
 
 namespace EPiServer.Marketing.Testing.Dal.EntityModel
@@ -9,6 +10,7 @@ namespace EPiServer.Marketing.Testing.Dal.EntityModel
     /// </summary>
     public class DalABTest : EntityBase, IABTest
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         /// <summary>
         /// ID.
         /// </summary>

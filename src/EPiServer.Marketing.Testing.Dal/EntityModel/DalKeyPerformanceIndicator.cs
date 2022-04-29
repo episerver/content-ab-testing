@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EPiServer.Marketing.Testing.Dal.EntityModel
 {
     public class DalKeyPerformanceIndicator : EntityBase
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Id { get; set; }
 
         /// <summary>
