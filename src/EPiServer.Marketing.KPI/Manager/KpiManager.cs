@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using EPiServer.Data.Dynamic;
 using EPiServer.Logging;
 using System.Globalization;
+using EPiServer.Globalization;
 
 namespace EPiServer.Marketing.KPI.Manager
 {
@@ -111,7 +112,8 @@ namespace EPiServer.Marketing.KPI.Manager
         public CommerceData GetCommerceSettings()
         {
             var store = GetDataStore(typeof(CommerceData));
-            var settings = store.LoadAll<CommerceData>().OrderByDescending(x => x.Id.StoreId).FirstOrDefault() ?? new CommerceData { CommerceCulture = "DEFAULT", preferredFormat = CultureInfo.CurrentCulture.NumberFormat };
+            //Alpine server dont have culture install so we use site language as default
+            var settings = store.LoadAll<CommerceData>().OrderByDescending(x => x.Id.StoreId).FirstOrDefault() ?? new CommerceData { CommerceCulture = "DEFAULT", preferredFormat = CultureInfo.CurrentCulture?.NumberFormat ?? ContentLanguage.PreferredCulture?.NumberFormat };
             return settings;
         }
 
