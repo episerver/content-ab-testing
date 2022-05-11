@@ -112,8 +112,9 @@ namespace EPiServer.Marketing.KPI.Manager
         public CommerceData GetCommerceSettings()
         {
             var store = GetDataStore(typeof(CommerceData));
-            //Alpine server dont have culture install so we use site language as default
-            var settings = store.LoadAll<CommerceData>().OrderByDescending(x => x.Id.StoreId).FirstOrDefault() ?? new CommerceData { CommerceCulture = "DEFAULT", preferredFormat = CultureInfo.CurrentCulture?.NumberFormat ?? ContentLanguage.PreferredCulture?.NumberFormat };
+            //Add culture for preferred language in case cannot get correct SystemLanguage 
+            var settings = store.LoadAll<CommerceData>().OrderByDescending(x => x.Id.StoreId).FirstOrDefault() ?? new CommerceData { CommerceCulture = "DEFAULT", preferredFormat =
+                !String.IsNullOrEmpty(CultureInfo.CurrentCulture.Name) ? CultureInfo.CreateSpecificCulture(CultureInfo.CurrentCulture.Name).NumberFormat : CultureInfo.CreateSpecificCulture(CultureInfo.CurrentUICulture.Name).NumberFormat };
             return settings;
         }
 
