@@ -18,7 +18,7 @@
     </metadata>
 	<files>
 		<file src="src\EPiServer.Marketing.Messaging\license.txt" target="" />
-		<file src="src\EPiServer.Marketing.Messaging\bin\$configuration$\net5.0\EPiServer.Marketing.Messaging.dll" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Messaging\bin\$configuration$\net5.0\EPiServer.Marketing.Messaging.pdb" target="lib\net5.0\" />
+		<file src="src\EPiServer.Marketing.Messaging\bin\$configuration$\net6.0\EPiServer.Marketing.Messaging.dll" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Messaging\bin\$configuration$\net6.0\EPiServer.Marketing.Messaging.pdb" target="lib\net6.0\" />
 	</files>
 </package>

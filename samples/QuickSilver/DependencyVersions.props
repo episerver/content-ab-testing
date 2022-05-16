@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
     <DependencyVersions_props>true</DependencyVersions_props>
-    <CmsCoreVersionCommon>12.1.0</CmsCoreVersionCommon>
-    <CmsUiVersionCommon>12.1.0</CmsUiVersionCommon>
-    <EPiServerAzureVersion>11.0.0</EPiServerAzureVersion>
+    <CmsCoreVersionCommon>12.4.0</CmsCoreVersionCommon>
+    <CmsUiVersionCommon>12.4.0</CmsUiVersionCommon>
+    <EPiServerAzureVersion>11.0.1</EPiServerAzureVersion>
     <EPiServerTrackingCoreVersion>2.0.1</EPiServerTrackingCoreVersion>
     <EPiServerPersonalizationCommonVersion>4.0.2</EPiServerPersonalizationCommonVersion>
     <EPiServerTelemetryVersion>2.0.1</EPiServerTelemetryVersion>

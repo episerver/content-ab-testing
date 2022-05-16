@@ -141,7 +141,7 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
 
                     bool outval;
 
-                    retCookie.TestStart = DateTime.Parse(cookieData["start"], CultureInfo.InvariantCulture);
+                    retCookie.TestStart = DateTime.Parse(cookieData["start"]);
                     retCookie.Viewed = bool.TryParse(cookieData["viewed"], out outval) ? outval : false;
                     retCookie.Converted = bool.TryParse(cookieData["converted"], out outval) ? outval : false;
 

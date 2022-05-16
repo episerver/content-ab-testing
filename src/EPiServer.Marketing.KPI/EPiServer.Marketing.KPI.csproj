@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="version.props" />
+  <Import Project="..\..\build\version.props" />
   <Import Project="..\..\build\nuspec.props" />
   <Import Project="..\..\build\DependencyVersions.props" />
   <PropertyGroup>
     <Product>EPiServer.Marketing.KPI</Product>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>    
     <NuspecFile>EPiServer.Marketing.KPI.nuspec</NuspecFile>
     <IsPackable>true</IsPackable>
@@ -16,10 +16,10 @@
     <PackageReference Include="EPiServer.CMS.AspNetCore.HtmlHelpers" Version="$(CmsCoreVersionCommon)" />
     <PackageReference Include="EPiServer.CMS.UI.Core" Version="$(CmsUiVersionCommon)" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
-    <PackageReference Include="System.Runtime.Caching" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+    <PackageReference Include="System.Runtime.Caching" Version="6.0.0" />
   </ItemGroup>
 	
   <ItemGroup>
