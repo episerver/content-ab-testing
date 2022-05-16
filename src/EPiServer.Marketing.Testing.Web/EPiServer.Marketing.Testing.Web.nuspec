@@ -13,9 +13,9 @@
 		<tags>EPiServerModulePackage EPiServerAddon EPiServer Marketing Testing</tags>
 		<repository type="git" url="https://github.com/episerver/content-ab-testing.git"></repository>
 		<dependencies>
-			<group targetFramework="net5.0">
-				<dependency id="EPiServer.Marketing.KPI" version="$mtVersion$" />
-				<dependency id="EPiServer.Marketing.Messaging" version="$mtMessageVersion$" />
+			<group targetFramework="net6.0">
+				<dependency id="EPiServer.Marketing.KPI" version="[$version$,$mtNextMajorVersion$)" />
+				<dependency id="EPiServer.Marketing.Messaging" version="[$version$,$mtNextMajorVersion$)" />
 				<dependency id="EPiServer.CMS.UI" version="[$uiVersion$,$uiNextMajorVersion$)" />
 				<dependency id="EPiServer.CMS.AspNetCore" version="[$cmsVersion$,$cmsNextMajorVersion$)" />
 			</group>
@@ -26,15 +26,15 @@
 	</metadata>
 	<files>
 		<file src="src\EPiServer.Marketing.Testing.Web\license.txt" target="" />
-		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.dll" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.pdb" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.Views.dll" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Web.Views.pdb" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Core\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Core.dll" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Core\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Core.pdb" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Dal\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Dal.dll" target="lib\net5.0\" />
-		<file src="src\EPiServer.Marketing.Testing.Dal\bin\$configuration$\net5.0\EPiServer.Marketing.Testing.Dal.pdb" target="lib\net5.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Web.dll" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Web.pdb" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Web.Views.dll" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Web\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Web.Views.pdb" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Core\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Core.dll" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Core\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Core.pdb" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Dal\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Dal.dll" target="lib\net6.0\" />
+		<file src="src\EPiServer.Marketing.Testing.Dal\bin\$configuration$\net6.0\EPiServer.Marketing.Testing.Dal.pdb" target="lib\net6.0\" />
 		<file src="zipoutput\EPiServer.Marketing.Testing.zip" target="contentFiles\any\any\modules\_protected\EPiServer.Marketing.Testing" />
-		<file src="build\CopyZipFiles.targets" target="build\net5.0\EPiServer.Marketing.Testing.targets" />
+		<file src="build\CopyZipFiles.targets" target="build\net6.0\EPiServer.Marketing.Testing.targets" />
 	</files>
 </package>
