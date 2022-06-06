@@ -17,15 +17,22 @@ using EPiServer.Marketing.Testing.Web.Models;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.Marketing.Testing.Web.Config;
 using Microsoft.AspNetCore.Http;
+using EPiServer.Security;
+using System.Security.Principal;
 
 namespace EPiServer.Marketing.Testing.Test.Web
 {
+    public class MockPrincipalAccessor : IPrincipalAccessor
+    {
+        public IPrincipal Principal { get; set; }
+    }
     public class JobTests
     {
         Mock<IServiceProvider> _locator = new Mock<IServiceProvider>();
         Mock<IMarketingTestingWebRepository> _webRepo = new Mock<IMarketingTestingWebRepository>();
         Mock<ITestingContextHelper> _contextHelper = new Mock<ITestingContextHelper>();
         Mock<IHttpContextAccessor> _httpContextAccessor = new Mock<IHttpContextAccessor>();
+        Mock<IUserImpersonation> _userImpersonation = new Mock<IUserImpersonation>();
         MyLS _ls = new MyLS();
         Mock<IScheduledJobRepository> _jobRepo = new Mock<IScheduledJobRepository>();
         private Guid TestToStart = Guid.NewGuid();
@@ -38,11 +45,16 @@ namespace EPiServer.Marketing.Testing.Test.Web
 
         private TestSchedulingJob GetUnitUnderTest()
         {
+            var _principalAccessor = new MockPrincipalAccessor();
+
             _locator.Setup(sl => sl.GetService(typeof(ITestingContextHelper))).Returns(_contextHelper.Object);
             _locator.Setup(sl => sl.GetService(typeof(IMarketingTestingWebRepository))).Returns(_webRepo.Object);
             _locator.Setup(sl => sl.GetService(typeof(LocalizationService))).Returns(_ls);
             _locator.Setup(sl => sl.GetService(typeof(IScheduledJobRepository))).Returns(_jobRepo.Object);
             _locator.Setup(sl => sl.GetService(typeof(AdminConfigTestSettings))).Returns(_config);
+            _locator.Setup(sl => sl.GetService(typeof(IPrincipalAccessor))).Returns(_principalAccessor);
+            _locator.Setup(sl => sl.GetService(typeof(IUserImpersonation))).Returns(_userImpersonation.Object);
+
 
             var mtcm = new MarketingTestingContextModel() { DraftVersionContentLink = "draft", PublishedVersionContentLink = "published"};
 
