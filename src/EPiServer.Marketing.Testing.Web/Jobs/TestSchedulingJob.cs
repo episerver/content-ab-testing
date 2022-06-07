@@ -16,6 +16,7 @@ using EPiServer.Marketing.Testing.Web.Models;
 using EPiServer.Marketing.Testing.Web.Repositories;
 using EPiServer.Security;
 using EPiServer.Logging;
+using System.Security.Principal;
 
 namespace EPiServer.Marketing.Testing.Web.Jobs
 {
@@ -59,6 +60,8 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
             var testingContextHelper = _locator.GetInstance<ITestingContextHelper>();
             var webRepo = _locator.GetInstance<IMarketingTestingWebRepository>();
             var jobRepo = _locator.GetInstance<IScheduledJobRepository>();
+            var principalAccessor = _locator.GetInstance<IPrincipalAccessor>();
+            var userImpersonation = _locator.GetInstance<IUserImpersonation>();
             var job = jobRepo.Get(this.ScheduledJobId);
             var nextExecutionUTC = job.NextExecutionUTC;
 
@@ -77,7 +80,7 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
                         {
                             LogManager.GetLogger().Information("Stopping test " + test.Description);
 
-                            CalculateResultsAndSaveTest(test, webRepo, testingContextHelper, autoPublishTestResults);
+                            CalculateResultsAndSaveTest(test, webRepo, testingContextHelper, principalAccessor, userImpersonation, autoPublishTestResults);
 
                             stopped++;
                         }
@@ -137,7 +140,7 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
         /// <param name="webRepo"></param>
         /// <param name="testingContextHelper"></param>
         /// <param name="autoPublishTestResults"></param>
-        private void CalculateResultsAndSaveTest(IMarketingTest test, IMarketingTestingWebRepository webRepo, ITestingContextHelper testingContextHelper, bool autoPublishTestResults)
+        private void CalculateResultsAndSaveTest(IMarketingTest test, IMarketingTestingWebRepository webRepo, ITestingContextHelper testingContextHelper, IPrincipalAccessor principalAccessor, IUserImpersonation userImpersonation, bool autoPublishTestResults)
         {
             try
             {
@@ -145,6 +148,8 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
                 var sigResults = Significance.CalculateIsSignificant(test);
                 test.IsSignificant = sigResults.IsSignificant;
                 test.ZScore = sigResults.ZScore;
+
+                webRepo.StopMarketingTest(test.Id);
 
                 if (autoPublishTestResults && sigResults.IsSignificant)
                 {
@@ -166,6 +171,12 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
                             WinningContentLink = winningLink
                         };
 
+                        //The job may not have sufficient priviledges so we impersonate the test creator identity for it
+                        if (String.IsNullOrEmpty(principalAccessor?.Principal?.Identity?.Name))
+                        {
+                            principalAccessor.Principal = userImpersonation.CreatePrincipalAsync(test.Owner).Result;
+                        }
+
                         webRepo.PublishWinningVariant(storeModel);
                     }
                 }
@@ -178,7 +189,6 @@ namespace EPiServer.Marketing.Testing.Web.Jobs
             {
                 LogManager.GetLogger().Error("Internal error publishing variant.", e);
             }
-            webRepo.StopMarketingTest(test.Id);
         }
     }
 }
