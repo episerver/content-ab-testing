@@ -74,6 +74,14 @@ const ABTestingSettings = () => {
         }
     };
 
+    const hasValidDuration = (duration:number) => {
+        return isNumber(duration?.toString()) && (duration > 0 && duration <= 365)
+    }
+    
+    const hasValidPercent = (percent:number) => {
+        return isNumber(percent?.toString()) && (percent > 0 && percent <= 100)
+    }
+
     const cancel = () =>{
         setABTestingSettingsModel(aBTestingSettingsModelOrg);
     }
@@ -100,8 +108,8 @@ const ABTestingSettings = () => {
                         label={aBTestingSettingsModel.testDurationLabel}
                         value={aBTestingSettingsModel.testDuration?.toString()}
                         onChange={handleChange}
-                        type="number"
                         name="testDuration"
+                        invalid={!hasValidDuration(aBTestingSettingsModel.testDuration)}
                     />
                 </CardContentArea>
                 <CardContentArea>
@@ -109,8 +117,8 @@ const ABTestingSettings = () => {
                         label={aBTestingSettingsModel.participationPercentLabel}
                         value={aBTestingSettingsModel.participationPercent?.toString()}
                         onChange={handleChange}
-                        type="number"
                         name="participationPercent"
+                        invalid={!hasValidPercent(aBTestingSettingsModel.participationPercent)}
                     />
                 </CardContentArea>
                 <CardContentArea>

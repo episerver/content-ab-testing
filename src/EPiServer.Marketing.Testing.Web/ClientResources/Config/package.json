@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "webpack --mode production",
-    "build:debug": "webpack --mode development"
+    "build:debug": "webpack --mode development",
+    "build:config:watch": "webpack --config webpack.config.js --mode development --watch"
   },
   "browserslist": {
     "production": [
