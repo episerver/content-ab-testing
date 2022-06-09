@@ -13,11 +13,8 @@
 		<EmbeddedResource Include="lang\**\*" />
 		<PackageReference Include="Adyen" Version="5.7.0" />
 		<PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
-		<PackageReference Include="EPiServer.Cms" Version="12.4.0" />
-		<PackageReference Include="EPiServer.Cms.UI.Core" Version="12.4.0" />
+		<PackageReference Include="EPiServer.Cms" Version="12.6.0" />
 		<PackageReference Include="EPiServer.Commerce" Version="14.3.0" />
-		<PackageReference Include="EPiServer.Hosting" Version="12.4.0" />
-		<PackageReference Include="EPiServer.Framework" Version="12.4.0" />
 		<PackageReference Include="EPiServer.Personalization.Commerce" Version="4.0.5" />
 		<PackageReference Include="EPiServer.Tracking.Commerce" Version="4.0.5" />
 		<PackageReference Include="Lucene.Net" Version="4.8.0-beta00014" />
