@@ -8,7 +8,7 @@ Run build.cmd to build the typescript and the solution.
 
 ## Contributing
 
-As this is an open-source project, we encourage you to contribute to the source code and the documentation. See the <a href=https://github.com/episerver/content-ab-testing/blob/main/CONTRIBUTING.md">Contribution guidelines</a> for this project.
+As this is an open-source project, we encourage you to contribute to the source code and the documentation. See the <a href="https://github.com/episerver/content-ab-testing/blob/main/CONTRIBUTING.md">Contribution guidelines</a> for this project.
 
 
 ## CMS 11 Version
