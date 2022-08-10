@@ -1,6 +1,6 @@
 # Contribution Guide
 Before
-contributing, please read the [code of conduct](https://github.com/episerver/content-ab-testing/blob/main/docs/code-of-conduct.md).  Contributions are greatly appreciated via forks. Episerver retains control of the direction of the project and reserves the right to close issues and PR:s that don’t align with the project roadmap.
+contributing, please read the [code of conduct](https://github.com/episerver/content-ab-testing/blob/main/code-of-conduct.md).  Contributions are greatly appreciated via forks. Episerver retains control of the direction of the project and reserves the right to close issues and PR:s that don’t align with the project roadmap.
 
 
 * First, if you found a bug yourself you need to report it and let it as an issue in Github.
