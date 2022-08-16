@@ -108,7 +108,10 @@ namespace EPiServer.Marketing.Testing.Dal.DataAccess
         private long GetDatabaseVersionHelper(IRepository repo, string contextKey)
         {
             var lastMigration = repo.GetDatabaseVersion(contextKey);
-
+            if (lastMigration == null)
+            {
+                return 0;
+            }
             // we are only interested in the numerical part of the key (i.e. 201609091719244_Initial)
             var version = lastMigration.Split('_')[0];
 

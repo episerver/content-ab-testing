@@ -5,11 +5,9 @@ on:
     branches:
       - 'main'
       - 'develop'
-      - 'netcore'
   pull_request:
     branches:
       - '*'
-      - '!main'
 jobs:
   build_test_pack:
     name: Build, test & pack
