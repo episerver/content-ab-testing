@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using EPiServer.ServiceLocation;
+using Microsoft.Data.SqlClient;
 
 namespace EPiServer.Marketing.Testing.Dal
 {
@@ -137,7 +138,22 @@ namespace EPiServer.Marketing.Testing.Dal
 
         public string GetDatabaseVersion(string contextKey)
         {
-            return HistoryRepository.GetAppliedMigrations().Select(r => r.MigrationId).FirstOrDefault();
+            string result = null;
+            using(var connection = new SqlConnection(DatabaseContext.Database.GetConnectionString()))
+            {
+                connection.Open();
+                var command = new SqlCommand("Select top 1 MigrationId from __MigrationHistory where ContextKey = @contextKey order by MigrationId desc ", connection);
+                command.Parameters.Add(new SqlParameter("@contextKey", contextKey));
+                try
+                {
+                    result = (string)command.ExecuteScalar();
+                }
+                catch(Exception)
+                {
+                    return null;
+                }
+            }
+            return result;
         }
 
         /// <summary>
