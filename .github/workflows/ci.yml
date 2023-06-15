@@ -5,16 +5,22 @@ on:
     branches:
       - 'main'
       - 'develop'
+      - 'release/*'
   pull_request:
     branches:
       - '*'
+env:
+  JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+  JIRA_PASSWORD: ${{ secrets.JIRA_PASSWORD }}
 jobs:
   build_test_pack:
     name: Build, test & pack
     runs-on: windows-latest
     env:
       buildConfiguration: release
-      versionSuffix: ${{ github.ref == 'refs/heads/develop' && '-pre-' ||  '-ci-' }}${{github.RUN_NUMBER }}
+      versionSuffix: ${{ github.ref == 'refs/heads/develop' && '-inte-' || contains(github.ref,'release/') && '-pre-' || '-ci-' }}${{github.RUN_NUMBER }}
+    outputs:
+      versionSuffix: ${{env.versionSuffix}}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -60,4 +66,25 @@ jobs:
           ./build/pack.ps1 -versionSuffix $env:versionSuffix
       - name: Publish packages
         run: dotnet nuget push artifacts/**/*.nupkg --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }}
+  jira-release:
+    if: ${{ contains(github.ref,'release/') }}
+    runs-on: windows-latest
+    name: Get release version & create JIRA release
+    needs: build_test_pack
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Get release version
+        uses: hungoptimizely/jira-automation/releaseversion@v1
+        id: branchVersion
+
+      - name: Create JIRA release
+        uses: hungoptimizely/jira-automation/release@v1
+        with:
+          jira-project: MAR
+          jira-package: EPiServer.Marketing.Testing
+          jira-host: jira.sso.episerver.net
+          version: ${{ steps.branchVersion.outputs.manifestSafeVersionString }}
+          versionSuffix: ${{needs.build_test_pack.outputs.versionSuffix}}
 
