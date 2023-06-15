@@ -1,20 +1,19 @@
 ﻿using EPiServer.Core;
-using EPiServer.Marketing.KPI.Common;
-using EPiServer.Marketing.KPI.Results;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using EPiServer.DataAbstraction;
 using EPiServer.Framework.Localization;
+using EPiServer.Marketing.KPI.Common;
+using EPiServer.Marketing.KPI.Common.Helpers;
 using EPiServer.Marketing.KPI.Exceptions;
 using EPiServer.Marketing.KPI.Manager.DataClass;
 using EPiServer.Marketing.KPI.Test.Fakes;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
-using Xunit;
-using EPiServer.Marketing.KPI.Common.Helpers;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Xunit;
 
 namespace EPiServer.Marketing.KPI.Test.Common
 {
@@ -251,6 +250,23 @@ namespace EPiServer.Marketing.KPI.Test.Common
             var kpi = GetUnitUnderTest();
             _kpiHelper.Setup(call => call.GetUrl(It.IsAny<ContentReference>())).Returns("/ContentPath/");
             _kpiHelper.Setup(call => call.GetRequestPath()).Returns("/ContentPath");
+
+            var retVal = kpi.Evaluate(new object(), arg);
+            Assert.True(retVal.HasConverted);
+        }
+
+        [Fact]
+        public void Kpi_Converts_IfRequestedPathEqualsStartPagePath_IgnoringUrlTrailingSlash_AndGuidsAreEqual()
+        {
+            var content3 = new Mock<IContent>();
+            content3.SetupGet(get => get.ContentLink).Returns(ContentReference.StartPage);
+            content3.SetupGet(get => get.ContentGuid).Returns(LandingPageGuid);
+            var arg = new ContentEventArgs(new ContentReference()) { Content = content3.Object };
+
+            var kpi = GetUnitUnderTest();
+            _contentRepo.Setup(c => c.Get<IContent>(It.Is<Guid>(g => g == LandingPageGuid))).Returns(content3.Object);
+            _kpiHelper.Setup(call => call.GetUrl(It.Is<ContentReference>(c => c == ContentReference.StartPage))).Returns("/en/");
+            _kpiHelper.Setup(call => call.GetRequestPath()).Returns("/en");
 
             var retVal = kpi.Evaluate(new object(), arg);
             Assert.True(retVal.HasConverted);

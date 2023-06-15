@@ -1,21 +1,17 @@
 ﻿using EPiServer.Core;
+using EPiServer.Framework.Localization;
 using EPiServer.Marketing.KPI.Common.Attributes;
+using EPiServer.Marketing.KPI.Common.Helpers;
+using EPiServer.Marketing.KPI.Exceptions;
 using EPiServer.Marketing.KPI.Manager.DataClass;
+using EPiServer.Marketing.KPI.Results;
 using EPiServer.ServiceLocation;
+using EPiServer.Web.Routing;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Microsoft.AspNetCore.Mvc.Routing;
-using EPiServer.Framework.Localization;
-using EPiServer.Marketing.KPI.Exceptions;
-using EPiServer.Web.Mvc.Html;
-using EPiServer.Marketing.KPI.Results;
-using EPiServer.Web.Routing;
-using System.Web;
-using System.Runtime.Caching;
-using EPiServer.Marketing.KPI.Common.Helpers;
 using System.Linq;
-using EPiServer.Web.Mvc;
+using System.Runtime.Caching;
+using System.Runtime.Serialization;
 
 namespace EPiServer.Marketing.KPI.Common
 {
@@ -138,8 +134,9 @@ namespace EPiServer.Marketing.KPI.Common
                     // if the target content is the start page, we also need to check 
                     // the path to make sure its not just a request for some other static
                     // resources such as css or jscript
-                    retval = (_startpagepaths.Contains(_kpiHelper.Service.GetRequestPath(), StringComparer.OrdinalIgnoreCase) 
-                        && ContentGuid.Equals(ea.Content.ContentGuid));
+                    retval = _startpagepaths.Any(path => path.Trim('/')
+                        .Equals(_kpiHelper.Service.GetRequestPath().Trim('/'), StringComparison.OrdinalIgnoreCase))
+                        && ContentGuid.Equals(ea.Content.ContentGuid);
                 }
                 else
                 {   
