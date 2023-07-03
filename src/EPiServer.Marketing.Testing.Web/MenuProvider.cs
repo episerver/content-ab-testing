@@ -15,7 +15,7 @@ namespace EPiServer.Marketing.Testing.Web
         private readonly ModuleTable _moduleTable;
         private readonly LocalizationService _localizationService;
 
-        private const string MarketingToolSettingsPath = MenuPaths.Global + "/addons";
+        private const string MarketingToolSettingsPath = MenuPaths.Global + "/cms";
 
         public MenuProvider(LocalizationService localizationService, ModuleTable moduleTable)
         {
@@ -33,13 +33,6 @@ namespace EPiServer.Marketing.Testing.Web
             }
             return new List<MenuItem>
             {
-                new SectionMenuItem(_localizationService.GetString("", "Addons"),
-                    MarketingToolSettingsPath)
-                {
-                    SortIndex = 10,
-                    Alignment = MenuItemAlignment.Left,
-                    IsAvailable = (context) => true
-                },
                 new UrlMenuItem(_localizationService.GetString("", "Marketing Tools"),
                     MarketingToolSettingsPath + "/marketingtools",
                     Paths.ToResource(GetType(), "Setting"))
