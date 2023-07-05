@@ -14,7 +14,7 @@ namespace EPiServer.Marketing.KPI.Commerce
     {
         private readonly LocalizationService _localizationService;
 
-        private const string MarketingToolSettingsPath = MenuPaths.Global + "/addons";
+        private const string MarketingToolSettingsPath = MenuPaths.Global + "/cms";
 
         /// <summary>
         /// Initializes a new instance of <see cref="MenuProvider"/>
