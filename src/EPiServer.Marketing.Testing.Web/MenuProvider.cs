@@ -41,15 +41,7 @@ namespace EPiServer.Marketing.Testing.Web
                     Alignment = MenuItemAlignment.Left,
                     IsAvailable = (context) => true,
                     AuthorizationPolicy = CmsPolicyNames.CmsAdmin
-                },
-                 new UrlMenuItem(_localizationService.GetString("/abtesting/admin/displayname", "AB Testing Configuration"),
-                    MarketingToolSettingsPath + "/marketingtools/setting",
-                    Paths.ToResource(GetType(), "Setting"))
-                {
-                    SortIndex = SortIndex.Early + 110,
-                    Alignment = MenuItemAlignment.Left,
-                    AuthorizationPolicy = CmsPolicyNames.CmsAdmin
-                }               
+                }          
             };
         }
     }

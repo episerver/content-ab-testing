@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace EPiServer.Marketing.Testing.Web.Controllers
 {
-    [Authorize(Roles = "Administrators,WebAdmins")]
+    [Authorize(Roles = "Administrators, CmsAdmins")]
     public class SettingController : Controller
     {
         private readonly ILogger _logger;
