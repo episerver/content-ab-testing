@@ -62,7 +62,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
         {
             var testClass = GetUnitUnderTest();
             var request = new KpiPutRequest { entity = "", id = "" };
-            var retResult = testClass.Put(request) as RestResult;
+            var retResult = testClass.Post(request) as RestResult;
 
             var responseDataStatus = (bool)retResult.Data.GetType().GetProperty("status").GetValue(retResult.Data, null);
 
@@ -78,7 +78,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
                 entity = "{\"kpiType\": \"EPiServer.Marketing.KPI.Common.ContentComparatorKPI, EPiServer.Marketing.KPI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8fe83dea738b45b7\",\"ConversionPage\": \"16\",\"CurrentContent\": \"6_197\"}", 
                 id = "" 
             };
-            var retResult = testClass.Put(request) as RestResult;
+            var retResult = testClass.Post(request) as RestResult;
 
             var responseDataStatus = (bool)retResult.Data.GetType().GetProperty("status").GetValue(retResult.Data, null);
 
@@ -113,7 +113,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _kpiWebRepoMock.Setup(call => call.ActivateKpiInstance(It.IsAny<Dictionary<string, string>>())).Returns(sticky.Object);
 
             var request = new KpiPutRequest { entity = "", id = "KpiFormData" };
-            var retResult = testClass.Put(request) as RestResult;
+            var retResult = testClass.Post(request) as RestResult;
             
             var responseDataObj= (Dictionary<Guid,string>)retResult.Data.GetType().GetProperty("obj").GetValue(retResult.Data, null);
 
@@ -149,7 +149,7 @@ namespace EPiServer.Marketing.Testing.Test.Web
             _kpiWebRepoMock.Setup(call => call.ActivateKpiInstance(It.IsAny<Dictionary<string, string>>())).Returns(sticky.Object);
 
             var request = new KpiPutRequest { entity = "", id = "KpiFormData" };
-            var retResult = testClass.Put(request) as RestResult;
+            var retResult = testClass.Post(request) as RestResult;
 
             var responseDataErrors = JsonConvert.DeserializeObject<Dictionary<string,string>>(retResult.Data.GetType().GetProperty("errors").GetValue(retResult.Data, null).ToString());
 
