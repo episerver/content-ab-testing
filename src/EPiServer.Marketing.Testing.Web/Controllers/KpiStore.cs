@@ -49,8 +49,8 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         /// <param name="id"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        [HttpPut]
-        public ActionResult Put([FromBody]KpiPutRequest request)
+        [HttpPost]
+        public ActionResult Post([FromBody]KpiPutRequest request)
         {
             List<IKpi> validKpiInstances = new List<IKpi>();
             Dictionary<string, string> kpiErrors = new Dictionary<string, string>();
