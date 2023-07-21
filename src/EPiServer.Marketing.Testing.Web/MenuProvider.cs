@@ -33,7 +33,7 @@ namespace EPiServer.Marketing.Testing.Web
             }
             return new List<MenuItem>
             {
-                new UrlMenuItem(_localizationService.GetString("", "Marketing Tools"),
+                new UrlMenuItem(_localizationService.GetString("/abtesting/admin/displayname", "AB Testing Configuration"),
                     MarketingToolSettingsPath + "/marketingtools",
                     Paths.ToResource(GetType(), "Setting"))
                 {
