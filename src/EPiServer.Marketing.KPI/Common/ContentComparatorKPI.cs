@@ -35,7 +35,7 @@ namespace EPiServer.Marketing.KPI.Common
         public List<string>  _startpagepaths = new List<string>();
         private ObjectCache _cache;
         private readonly Injected<IKpiHelper> _kpiHelper;
-        private readonly Injected<IUrlResolver> _IUrlResolver;
+        private readonly Injected<IUrlResolver> _urlResolver;
         private readonly Injected<IContentRepository> _contentRepository;
         private readonly Injected<IContentVersionRepository> _contentVersionRepository;
         private readonly Injected<IContentEvents> _contentEvents;
@@ -74,7 +74,7 @@ namespace EPiServer.Marketing.KPI.Common
                      var conversionDescription = LocalizationService.Current.GetString("/kpi/content_comparator_kpi/readonly_markup/conversion_selector_description");
 
                     var conversionContent = _contentRepository.Service.Get<IContent>(ContentGuid);
-                    var conversionLink = _IUrlResolver.Service.GetUrl(conversionContent.ContentLink);
+                    var conversionLink = _urlResolver.Service.GetUrl(conversionContent.ContentLink);
                     markup = string.Format(markup, conversionDescription, conversionLink,
                         conversionContent.Name);
                 }
@@ -137,9 +137,15 @@ namespace EPiServer.Marketing.KPI.Common
                     retval = _startpagepaths.Any(path => path.Trim('/')
                         .Equals(_kpiHelper.Service.GetRequestPath().Trim('/'), StringComparison.OrdinalIgnoreCase))
                         && ContentGuid.Equals(ea.Content.ContentGuid);
+
+                    // Special case: Start page contain url that has no language segment in multilingual site
+                    if (_kpiHelper.Service.GetRequestPath().Equals("/") && ContentGuid.Equals(ea.Content.ContentGuid))
+                    {
+                        retval = true;
+                    }
                 }
                 else
-                {   
+                {
                     //We need to make sure the content being evaluated is the actual content being requested
                     //Addresses MAR-1226
                     retval = (_kpiHelper.Service.GetUrl(_content.ContentLink).ToLower().Trim('/') == _kpiHelper.Service.GetRequestPath().ToLower().Trim('/') 
