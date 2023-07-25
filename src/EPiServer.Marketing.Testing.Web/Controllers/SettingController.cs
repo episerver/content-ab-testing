@@ -1,14 +1,14 @@
 ﻿using EPiServer.Framework.Localization;
 using EPiServer.Logging;
 using EPiServer.Marketing.Testing.Web.Config;
+using EPiServer.Marketing.Testing.Web.Models;
 using EPiServer.Marketing.Testing.Web.Models.Settings;
 using EPiServer.Shell.Web.Mvc;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace EPiServer.Marketing.Testing.Web.Controllers
 {
@@ -16,13 +16,23 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
     public class SettingController : Controller
     {
         private readonly ILogger _logger;
-        public SettingController()
+        private readonly AntiforgeryOptions _antiforgeryOptions;
+        public SettingController(IOptions<AntiforgeryOptions> antiforgeryOptions)
         {
             _logger = LogManager.GetLogger();
+            _antiforgeryOptions = antiforgeryOptions.Value;
         }
 
         [HttpGet]
-        public ActionResult Index() => View();
+        public ActionResult Index() 
+        {
+            var viewModel = new DefaultViewModel
+            {
+                AntiforgeryOptions = _antiforgeryOptions
+            };
+
+            return View(viewModel);
+        }
 
         [HttpGet]
         public IActionResult Get()
@@ -55,6 +65,7 @@ namespace EPiServer.Marketing.Testing.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryReleaseToken]
         public IActionResult Save([FromBody] SettingsRequest request)
         {
             if (request.ParticipationPercent < 1 || request.ParticipationPercent > 100)
