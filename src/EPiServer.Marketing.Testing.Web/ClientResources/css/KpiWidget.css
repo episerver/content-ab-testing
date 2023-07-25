@@ -7,6 +7,10 @@
     width: 95%;
 }
 
+.epi-kpiWidget-content .dijitTextBox {
+    width: 100%;
+}
+
 .epi-kpiWidget-lbl {
     padding-top: 4px;
     font-weight: bold;
