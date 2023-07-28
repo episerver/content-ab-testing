@@ -51,5 +51,9 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
             dictionary.TryGetValue(src, out value);
             return value;                
         }
+
+        public bool IsNullOrEmpty() { 
+            return dictionary is null || (dictionary.Count == 0); 
+        }
     }
 }

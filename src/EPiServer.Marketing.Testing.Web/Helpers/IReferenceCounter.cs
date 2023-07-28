@@ -8,5 +8,6 @@ namespace EPiServer.Marketing.Testing.Web.Helpers
         void RemoveReference(object src);
         Boolean hasReference(object src);
         int getReferenceCount(object src);
+        bool IsNullOrEmpty();
     }
 }
