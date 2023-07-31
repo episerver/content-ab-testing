@@ -667,7 +667,7 @@ namespace EPiServer.Marketing.Testing.Web
 
             // Add the proxyeventhandler only once, if its in our reference counter, just increment
             // the reference.
-            if (!_ReferenceCounter.hasReference(kpi.GetType()))
+            if (_ReferenceCounter.IsNullOrEmpty())
             {
                 kpi.EvaluateProxyEvent += ProxyEventHandler;
                 _ReferenceCounter.AddReference(kpi.GetType());
@@ -689,7 +689,7 @@ namespace EPiServer.Marketing.Testing.Web
             _ReferenceCounter.RemoveReference(kpi.GetType());
 
             // Remove the proxyeventhandler only once, when the last reference is removed.
-            if (!_ReferenceCounter.hasReference(kpi.GetType()))
+            if (_ReferenceCounter.IsNullOrEmpty())
             {
                 kpi.EvaluateProxyEvent -= ProxyEventHandler;
             }
