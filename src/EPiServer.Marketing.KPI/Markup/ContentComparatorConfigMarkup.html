@@ -1,7 +1,10 @@
-﻿<script>dojo.require("epi-cms/widget/ContentSelector")</script>
+﻿<script>dojo.require("epi-cms/contentediting/editors/ContentReferenceEditor");</script>
 <p>
     <label>{0}</label>
-    <span name="ConversionPage" data-dojo-type="epi-cms/widget/ContentSelector"
-          data-dojo-props="repositoryKey:'pages',required: true, allowedTypes: ['episerver.core.pagedata'], allowedDndTypes: ['episerver.core.pagedata'], value: null, dndSourcePropertyName: 'contentLink'">
-    </span>  
+    <div name="ConversionPage" data-dojo-type="epi-cms/contentediting/editors/ContentReferenceEditor"
+        data-dojo-props="repositoryKey:'pages',required: true, 
+          allowedTypes: ['episerver.core.pagedata'], allowedDndTypes: ['episerver.core.pagedata'], 
+          value: null, dndSourcePropertyName: 'contentLink', hideAllowedTypesList: true"
+        data-dojo-attach-point="contentSelectorPnP">
+    </div>
 </p>

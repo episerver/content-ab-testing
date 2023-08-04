@@ -229,3 +229,4 @@ ModelManifest.xml
 /nupkgs
 modules
 zipoutput
+/samples/QuickSilver/EPiServer.Reference.Commerce.Site/App_Data/**

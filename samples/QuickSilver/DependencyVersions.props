@@ -1,8 +1,7 @@
 <Project>
+  <Import Project="../../build/DependencyVersions.props" />
   <PropertyGroup>
     <DependencyVersions_props>true</DependencyVersions_props>
-    <CmsCoreVersionCommon>12.4.0</CmsCoreVersionCommon>
-    <CmsUiVersionCommon>12.4.0</CmsUiVersionCommon>
     <EPiServerAzureVersion>11.0.1</EPiServerAzureVersion>
     <EPiServerTrackingCoreVersion>2.0.1</EPiServerTrackingCoreVersion>
     <EPiServerPersonalizationCommonVersion>4.0.2</EPiServerPersonalizationCommonVersion>
