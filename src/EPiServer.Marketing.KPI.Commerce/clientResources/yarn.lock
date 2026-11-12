@@ -1396,10 +1396,10 @@ available-typed-arrays@^1.0.7:
   dependencies:
     possible-typed-array-names "^1.0.0"
 
-axios@^0.31.1:
-  version "0.31.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.31.1.tgz#05b4c8f99e0b6f897708c74d6788d7535c6ac0c3"
-  integrity sha512-Ef8DUZSZQP6igY48mjGaoEjwhely97lserep0IFJifBH4YdKvwH5eMLniy3kig2HQoBNR8EkZpDjowxwTJcmbg==
+axios@^0.35.0:
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.35.0.tgz#c02b9481cf186214c7509985bff7337224219a9f"
+  integrity sha512-nIDzOGsDEAQZot5aP5ZZ6y/GRDv8woMaDJMab/VxlZIRw0OG6GPbkAMca55+AO1JgvRZquh5pp+RjzBDt0N2fQ==
   dependencies:
     follow-redirects "^1.15.4"
     form-data "^4.0.4"
