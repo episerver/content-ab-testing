@@ -12,11 +12,8 @@
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
-    "@episerver/ui-framework": "^0.12.0",
-    "@rmwc/snackbar": "^6.1.4",
-    "axios": "^0.21.1",
-    "node-sass": "^7.0.0",
-    "optimizely-oui": "^48.14.3"
+    "@optimizely/design-tokens": "0.0.7",
+    "axios": "^0.31.1"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
@@ -31,6 +28,7 @@
     "css-loader": "^6.2.0",
     "html-webpack-plugin": "^4.5.0",
     "mini-css-extract-plugin": "^2.1.0",
+    "sass": "~1.77.8",
     "sass-loader": "^12.1.0",
     "style-loader": "^2.0.0",
     "ts-loader": "^8.0.10",
@@ -38,5 +36,9 @@
     "webpack": "^5.48.0",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.2"
+  },
+  "resolutions": {
+    "@types/minimatch": "5.1.2",
+    "node-releases": "2.0.44"
   }
 }

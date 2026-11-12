@@ -45,7 +45,21 @@ module.exports = (env, argv) => {
             }
         },
         {
-          test: /\.s?css$/,
+          test: /\.css$/,
+          // Vendor packages (e.g. @material/*) declare "sideEffects": false, which makes webpack 5 drop their CSS imports.
+          sideEffects: true,
+          use: [
+            {
+              loader: argv.mode === "production" ? MiniCssExtractPlugin.loader : 'style-loader',
+            },
+            {
+              loader: 'css-loader',
+            }
+          ]
+        },
+        {
+          test: /\.scss$/,
+          sideEffects: true,
           use: [
             {
               loader: argv.mode === "production" ? MiniCssExtractPlugin.loader : 'style-loader',
