@@ -552,13 +552,14 @@ namespace EPiServer.Reference.Commerce.Site.Infrastructure.SiteImport
                 using (var conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    var query = $@"UPDATE c 
+                    const string query = @"UPDATE c
                                    SET c.AcceptMarketingEmail = 1,
-                                       c.ConsentUpdated = '{DateTime.UtcNow:s}' 
-                                   FROM  dbo.cls_Contact c 
+                                       c.ConsentUpdated = @consentUpdated
+                                   FROM  dbo.cls_Contact c
                                    WHERE c.ConsentUpdated IS NULL";
                     using (var cmd = new SqlCommand(query, conn))
                     {
+                        cmd.Parameters.Add("@consentUpdated", System.Data.SqlDbType.DateTime).Value = DateTime.UtcNow;
                         cmd.ExecuteNonQuery();
                     }
                     conn.Close();
